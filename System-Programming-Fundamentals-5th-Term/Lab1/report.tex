@@ -1,0 +1,31 @@
+\documentclass[en, listings]{labreport}
+\subject{System Software Fundamentals}
+\titleparts{Lab Work \#1 (9)}{Introduction to Shell Scripting}
+\students{Timothy Labushev}
+
+\begin{document}
+
+\maketitlepage
+
+\section*{Assignment}
+
+This report discusses the implementation of an interactive shell script that
+performs a fixed set of actions: \textit{print the current working directory},
+\textit{list files in the current working directory}, \textit{create a new directory},
+\textit{grant and revoke write access to a directory}.
+
+For commands that require a directory name to be provided, the user may use
+TAB completion and \texttt{vi} or \texttt{emacs} keybindings. This is achieved by invoking
+the \texttt{read} utility with an \verb|-e| switch, which uses GNU Readline to obtain a line
+from standard input. It is important to note that it is not mandated by POSIX and may be
+absent on uncommon and outdated systems.
+
+Error handling is performed by checking the exit code of executed commands.
+In case of a non-zero code, a user-friendly error message printed. The error message
+as produced by the failed command is appened to a log file, which can be inspected later.
+
+\section*{Code Listing}
+
+\lstinputlisting[firstline=3, basicstyle=\scriptsize]{lab.sh}
+
+\end{document}
