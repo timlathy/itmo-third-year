@@ -15,7 +15,7 @@ function make_dir {
   read -e path
   echo Creating $path
   mkdir -p "$path" 2>>$log_file \
-    || echo Unable to create the specified directory \
+    || echo_stderr Unable to create the specified directory \
         -- are you sure you have sufficient permissions?
 }
 
@@ -24,7 +24,7 @@ function make_world_writeable {
   read -e path
   echo Altering permissions for $path
   chmod +w $path 2>>$log_file \
-    || echo Unable to alter permissions for the specified directory \
+    || echo_stderr Unable to alter permissions for the specified directory \
         -- are you sure the directory exists and you have sufficient permissions?
 }
 
@@ -33,12 +33,16 @@ function make_read_only {
   read -e path
   echo Altering permissions for $path
   chmod -w $path 2>>$log_file \
-    || echo Unable to alter permissions for the specified directory \
+    || echo_stderr Unable to alter permissions for the specified directory \
         -- are you sure the directory exists and you have sufficient permissions?
 }
 
 function run {
   echo; $1; echo
+}
+
+function echo_stderr {
+  echo "$@" 1>&2
 }
 
 while true; do
@@ -56,7 +60,7 @@ while true; do
     4) run make_world_writeable;;
     5) run make_read_only;;
     6) break;;
-    *) echo Unknown action [$action];;
+    *) echo_stderr Unknown action [$action];;
     esac
   else
     break # handle EOF
