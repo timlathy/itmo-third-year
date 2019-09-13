@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+log_file="$HOME/lab1_err"
+
 function print_cwd {
   echo $PWD
 }
@@ -9,9 +11,11 @@ function list_cwd {
 }
 
 function make_dir {
-  echo Enter the path to the new directory (TAB to autocomplete):
+  echo Enter the path to the new directory \(TAB to autocomplete\):
   read -e path
-  mkdir -p "$path"
+  echo Creating $path
+  mkdir -p "$path" 2>>$log_file \
+    || echo Unable to create the specified directory -- are you sure you have sufficient permissions?
 }
 
 function run {
