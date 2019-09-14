@@ -1,0 +1,12 @@
+[package]
+name = "entropy"
+version = "0.1.0"
+authors = ["timlathy <tim.labushev@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "entropy"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.8.0", features = ["extension-module"] }
