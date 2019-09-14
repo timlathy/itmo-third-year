@@ -2,6 +2,21 @@
 
 log_file="$HOME/lab1_err"
 
+if [ "$INRAW" = "1" ]; then
+  echo Raw input on.
+else
+  echo Raw input off. TAB may be used for autocompletion. Set INRAW to 1 to override this behavior.
+fi
+
+function read_path {
+  if [ "$INRAW" = "1" ]; then
+    IFS= read path
+  else
+    read -e path
+  fi
+  echo "$path"
+}
+
 function print_cwd {
   echo $PWD
 }
@@ -11,30 +26,31 @@ function list_cwd {
 }
 
 function make_dir {
-  echo Enter the path to the new directory \(TAB to autocomplete\):
-  read -e path
-  echo Creating $path
-  mkdir -p "$path" 2>>$log_file \
-    || echo_stderr Unable to create the specified directory \
-        -- are you sure you have sufficient permissions?
+  echo Enter the path to the new directory:
+  local path=$(read_path)
+  echo Creating "$path"
+  mkdir "$path" 2>>$log_file \
+    || echo_stderr Unable to create the specified directory -- \
+        are you sure you have sufficient permissions \
+        and all parent directories exist while the directory itself does not?
 }
 
-function make_world_writeable {
-  echo Enter the path to the directory you wish to make world-writeable:
-  read -e path
-  echo Altering permissions for $path
+function make_world_writable {
+  echo Enter the path to the directory you wish to make world-writable:
+  local path=$(read_path)
+  echo Altering permissions for "$path"
   chmod +w $path 2>>$log_file \
-    || echo_stderr Unable to alter permissions for the specified directory \
-        -- are you sure the directory exists and you have sufficient permissions?
+    || echo_stderr Unable to alter permissions for the specified directory -- \
+        are you sure the directory exists and you have sufficient permissions?
 }
 
 function make_read_only {
   echo Enter the path to the directory you wish to make read only:
-  read -e path
-  echo Altering permissions for $path
+  local path=$(read_path)
+  echo Altering permissions for "$path"
   chmod -w $path 2>>$log_file \
-    || echo_stderr Unable to alter permissions for the specified directory \
-        -- are you sure the directory exists and you have sufficient permissions?
+    || echo_stderr Unable to alter permissions for the specified directory -- \
+        are you sure the directory exists and you have sufficient permissions?
 }
 
 function run {
@@ -57,7 +73,7 @@ while true; do
     1) run print_cwd;;
     2) run list_cwd;;
     3) run make_dir;;
-    4) run make_world_writeable;;
+    4) run make_world_writable;;
     5) run make_read_only;;
     6) break;;
     *) echo_stderr Unknown action [$action];;
