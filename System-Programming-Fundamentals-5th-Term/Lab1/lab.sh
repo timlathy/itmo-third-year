@@ -71,6 +71,10 @@ function echo_stderr {
 }
 
 while true; do
+  if [ ! -w $log_file ]; then
+    echo_stderr Log file "$log_file" is not writable. Please restore write access and relaunch the script.
+    exit 1
+  fi
   echo [1] Print current working directory
   echo [2] List files in current working directory
   echo [3] Create a new directory
