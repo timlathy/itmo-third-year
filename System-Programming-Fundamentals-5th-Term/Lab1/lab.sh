@@ -12,7 +12,7 @@ function read_path {
   if [ "$INRAW" = "1" ]; then
     IFS= read path
   else
-    read -e path
+    IFS= read -e path
   fi
   echo "$path"
 }
@@ -39,16 +39,25 @@ function make_world_writable {
   echo Enter the path to the directory you wish to make world-writable:
   local path=$(read_path)
   echo Altering permissions for "$path"
-  chmod +w $path 2>>$log_file \
-    || echo_stderr Unable to alter permissions for the specified directory -- \
-        are you sure the directory exists and you have sufficient permissions?
+
+  local current_perm=$(stat --dereference --format="%a" "$path" 2>>$log_file)
+  if [ -z "$current_perm" ]; then
+    echo_stderr The specified directory does not exist.
+  elif ((($current_perm & 222) == 8)); then
+    echo_stderr chmod: directory \'"$path"\' is already world-writable 2>>$log_file
+    echo_stderr The specified directory is already world-writable. Nothing is done.
+  else
+    chmod ugo+w $path 2>>$log_file \
+      || echo_stderr Unable to alter permissions for the specified directory -- \
+          are you sure the directory exists and you have sufficient permissions?
+  fi
 }
 
 function make_read_only {
   echo Enter the path to the directory you wish to make read only:
   local path=$(read_path)
   echo Altering permissions for "$path"
-  chmod -w $path 2>>$log_file \
+  chmod ugo-w $path 2>>$log_file \
     || echo_stderr Unable to alter permissions for the specified directory -- \
         are you sure the directory exists and you have sufficient permissions?
 }
