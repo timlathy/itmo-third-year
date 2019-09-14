@@ -28,4 +28,27 @@ as produced by the failed command is appened to a log file, which can be inspect
 
 \lstinputlisting[firstline=3, basicstyle=\scriptsize]{lab.sh}
 
+\section*{Lessons Learned}
+
+While completing the assignment, I have familiarized myself with
+the basics of control flow in shell scripts: chaining commands
+with logical OR to handle error conditions (non-zero exit code),
+matching on value variants (\texttt{case}), executing repeating code
+in a loop and terminating it based on a condition.
+
+In addition to that, I discovered that scripts running on systems
+with GNU utilities may provide the user with advanced input capabilities,
+such as filename autocompletion and configurable editing shortcuts,
+with practically zero cost to the script author.
+
+At the same time, I have encountered certain limitations of shell scripting.
+The assignment features independent commands, with the user picking which one to
+execute by entering its index. Initially, I wanted to separate the command picking
+logic from the actual commands, making it easier to add or remove commands in the future.
+It turned out that while the language has function references and associative arrays,
+the syntax is arcane and the support is not universal among different shells.
+This leads me to a conclusion that, while shell scripts are quite versatile and
+fast to write for an experienced programmer, they are not the best choice
+for a system that needs to be actively maintained and adapted to changing requirements.
+
 \end{document}
