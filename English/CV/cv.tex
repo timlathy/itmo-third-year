@@ -1,0 +1,83 @@
+\documentclass[11pt,a4paper,ragged2e]{altacv}
+\geometry{left=2cm,right=10cm,marginparwidth=6.8cm,marginparsep=1.2cm,top=2cm,bottom=2cm}
+
+\setmainfont{Carlito}
+
+\definecolor{Black}{HTML}{000000}
+\definecolor{Gray}{HTML}{2E2E2E}
+\definecolor{LightGray}{HTML}{444444}
+\colorlet{heading}{Black}
+\colorlet{accent}{Black}
+\colorlet{emphasis}{LightGray}
+\colorlet{body}{Gray}
+
+% Increase line spacing
+\renewcommand{\baselinestretch}{1.1} 
+
+% Change the bullets for itemize
+\renewcommand{\itemmarker}{{\small\textbullet}}
+
+% https://tex.stackexchange.com/a/177179/170494
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+\begin{document}
+\name{Timothy Labushev}
+\tagline{Software Engineering Intern}
+\personalinfo{
+  \email{tim.labushev@gmail.com}
+  \location{Saint Petersburg, Russia}
+  \github{github.com/timlathy}
+}
+
+%% Make the header extend all the way to the right
+\begin{fullwidth}
+\makecvheader
+\end{fullwidth}
+
+%% Make fonts of itemize environments slightly smaller
+\AtBeginEnvironment{itemize}{\small}
+
+\cvsection[cv-sidebar]{Work Experience}
+
+\cvevent{Junior Software Developer}{Luxoft}{March 2019 -- Present}{Saint Petersburg, Russia}
+\begin{itemize}
+\item Development of IDE extensions for cross-machine debugging and data visualization
+to improve accelerator kernel development workflow.
+\item Working on a team leading a project from a prototype to a product used by multiple people.
+\item Experience with automated testing, desktop GUI programming, TCP-based network communication.
+\end{itemize}
+\vspace*{1mm}
+\small{\textbf{Technologies:}}\\[2mm]
+\cvtag{c\#}
+\cvtag{.net framework}
+\cvtag{.net core}
+\cvtag{wpf}
+\\\smallskip
+\cvtag{visual studio extensibility}
+
+\medskip
+
+\cvsection{Education}
+\cvevent{Bachelor's in Computer Engineering}{ITMO University}{2017 -- Present}{Saint Petersburg, Russia}
+\small{\textbf{Projects:}}\\[2mm]
+\begin{itemize}
+\item Scalable, multi-user web application in Scala (Akka) and Vue.js
+\item Interactive novel developed as an SPA in React.js
+\item Graphics processing in C++ and Rust (WebAssembly, WebGL), with hand-written
+assembly optimizations (x86, SSE) where applicable
+\item Data manipulation with Jupyter Notebook (Python), including writing
+native extensions in C and Rust for CPU intensive code
+\end{itemize}
+\vspace*{1mm}
+\small{\textbf{Experience:}}\\[2mm]
+\begin{itemize}
+\item Collaborating in a team, using version control and issue tracking
+\item Working with new languages and frameworks, efficiently searching for necessary information
+\item Using appropriate data structures and algorithms for data processing
+\item Automating common tasks with Unix shell scripts
+\end{itemize}
+
+\end{document}
