@@ -2,7 +2,7 @@ use itertools::Itertools;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use pyo3::wrap_pyfunction;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 #[pymodule]
 fn entropy(_py: Python, m: &PyModule) -> PyResult<()> {
@@ -12,8 +12,8 @@ fn entropy(_py: Python, m: &PyModule) -> PyResult<()> {
 }
 
 #[pyfunction]
-fn letter_frequencies(path: &str) -> PyResult<HashMap<String, i32>> {
-    let mut frequency = HashMap::new();
+fn letter_frequencies(path: &str) -> PyResult<BTreeMap<String, i32>> {
+    let mut frequency = BTreeMap::new();
     let text = std::fs::read_to_string(path)?;
     for c in iterate_text_chars(&text) {
         *frequency.entry(c.to_string()).or_insert(0) += 1;
@@ -22,8 +22,8 @@ fn letter_frequencies(path: &str) -> PyResult<HashMap<String, i32>> {
 }
 
 #[pyfunction]
-fn letter_pair_frequencies(path: &str) -> PyResult<HashMap<String, i32>> {
-    let mut frequency = HashMap::new();
+fn letter_pair_frequencies(path: &str) -> PyResult<BTreeMap<String, i32>> {
+    let mut frequency = BTreeMap::new();
     let text = std::fs::read_to_string(path)?;
     for (c1, c2) in iterate_text_chars(&text).tuple_windows() {
         if c1 != ' ' && c1 != '.' && c2 != ' ' && c2 != '.' {
