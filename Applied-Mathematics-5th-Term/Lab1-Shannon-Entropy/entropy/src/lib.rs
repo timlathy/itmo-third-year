@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use pyo3::wrap_pyfunction;
@@ -6,24 +7,39 @@ use std::collections::HashMap;
 #[pymodule]
 fn entropy(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(letter_frequencies))?;
+    m.add_wrapped(wrap_pyfunction!(letter_pair_frequencies))?;
     m.add_wrapped(wrap_pyfunction!(frequencies_to_probabilities))
 }
 
 #[pyfunction]
 fn letter_frequencies(path: &str) -> PyResult<HashMap<String, i32>> {
+    let mut frequency = HashMap::new();
     let text = std::fs::read_to_string(path)?;
-    let chars = text.chars().filter_map(|c| match c {
+    for c in iterate_text_chars(&text) {
+        *frequency.entry(c.to_string()).or_insert(0) += 1;
+    }
+    Ok(frequency)
+}
+
+#[pyfunction]
+fn letter_pair_frequencies(path: &str) -> PyResult<HashMap<String, i32>> {
+    let mut frequency = HashMap::new();
+    let text = std::fs::read_to_string(path)?;
+    for (c1, c2) in iterate_text_chars(&text).tuple_windows() {
+        if c1 != ' ' && c1 != '.' && c2 != ' ' && c2 != '.' {
+            *frequency.entry(format!("{}{}", c1, c2)).or_insert(0) += 1;
+        }
+    }
+    Ok(frequency)
+}
+
+fn iterate_text_chars<'t>(text: &'t str) -> impl Iterator<Item = char> + 't {
+    text.chars().filter_map(|c| match c {
         _ if c.is_ascii_alphabetic() => Some(c.to_ascii_lowercase()),
         _ if c.is_ascii_punctuation() => Some('.'),
         ' ' => Some(' '),
         _ => None,
-    });
-
-    let mut frequency = HashMap::new();
-    for c in chars {
-        *frequency.entry(c.to_string()).or_insert(0) += 1;
-    }
-    Ok(frequency)
+    })
 }
 
 #[pyfunction]
