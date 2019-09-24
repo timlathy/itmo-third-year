@@ -27,6 +27,21 @@
 
 \section*{Порядок создания загрузочного модуля}
 
+\begin{enumerate}
+\item Трансляция исходного кода в объектные модули
+\item Связывание объектных модулей в загрузочный файл
+\end{enumerate}
+
+\begin{scriptsize}
+\begin{verbatim}
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PROGRAM
+OBJECT MODULE PLACED IN .\Objects\program.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE program.c OPTIMIZE(1,SPEED) BROWSE DEBUG O
+                    -BJECTEXTEND CODE PRINT(.\Listings\program.lst) PAGEWIDTH(90) TABS(2) OBJECT(.\Objects\prog
+                    -ram.obj)
+\end{verbatim}
+\end{scriptsize}
+
 \section*{Файл листинга}
 
 \lstinputlisting[basicstyle=\scriptsize]{listing.asm}
@@ -52,5 +67,9 @@
 \end{tabular}
 
 \section*{Выводы}
+
+В ходе выполнения лабораторной работы были изучены написание и отладка
+программных модулей для микроконтроллеров MCS-51, а также создание загрузочного
+модуля.
 
 \end{document}
