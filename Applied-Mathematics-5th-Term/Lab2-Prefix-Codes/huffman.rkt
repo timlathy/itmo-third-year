@@ -1,32 +1,24 @@
 #lang racket
 
-(define make-node (case-lambda
-  [(letter prob left right) (list (cons letter prob) left right)]
-  [(letter prob) (list (cons letter prob) null null)]))
+(define-struct node (sym prob left right) #:transparent)
+(define init-node (lambda (sym prob)
+  (node sym prob null null)))
+(define group-node (lambda (left right)
+  (define psum (+ (node-prob left) (node-prob right)))
+  (node null psum left right)))
 
 (define alphabet (list
-  (make-node "a1" 0.36)
-  (make-node "a2" 0.18)
-  (make-node "a3" 0.18)
-  (make-node "a4" 0.12)
-  (make-node "a5" 0.09)
-  (make-node "a6" 0.07)))
-
-(define node-probability (lambda (node)
-  (cdr (first node))))
-
-(define desc-probability-tree (lambda (tree)
-  (sort tree >= #:key node-probability)))
-
-(define node-from-leaves (lambda (left right)
-  (define prob-sum (+ (node-probability left) (node-probability right)))
-  (make-node null prob-sum left right)))
+  (init-node "a1" 0.36)
+  (init-node "a2" 0.18)
+  (init-node "a3" 0.18)
+  (init-node "a4" 0.12)
+  (init-node "a5" 0.09)
+  (init-node "a6" 0.07)))
 
 (define huffman-tree (lambda (tree)
   (if (= 2 (length tree))
     tree
-    (let* ([sorted-tree (desc-probability-tree tree)]
-           [updated-tree (let-values
-             ([(head tail) (split-at-right sorted-tree 2)])
-             (cons (node-from-leaves (first tail) (second tail)) head))])
+    (let* ([sorted-tree (sort tree >= #:key node-prob)]
+           [updated-tree (match/values (split-at-right sorted-tree 2)
+             [(head (list n1 n2)) (cons (group-node n1 n2) head)])])
           (huffman-tree updated-tree)))))
