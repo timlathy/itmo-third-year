@@ -1,9 +1,9 @@
 #lang racket
 
 (define-struct node (sym prob left right) #:transparent)
-(define init-node (lambda (sym prob)
+(define init-node (λ (sym prob)
   (node sym prob null null)))
-(define group-node (lambda (left right)
+(define group-node (λ (left right)
   (define psum (+ (node-prob left) (node-prob right)))
   (node null psum left right)))
 
@@ -15,7 +15,7 @@
   (init-node "a5" 0.09)
   (init-node "a6" 0.07)))
 
-(define huffman-tree (lambda (tree)
+(define huffman-tree (λ (tree)
   (if (= 2 (length tree))
     (group-node (first tree) (second tree))
     (let* ([sorted-tree (sort tree >= #:key node-prob)]
@@ -30,7 +30,7 @@
      (fold-tree-to-codelist r (~a code "1")
        (fold-tree-to-codelist l (~a code "0") lst))]))
 
-(define codelist (lambda (alphabet)
+(define codelist (λ (alphabet)
   (let* ([tree (huffman-tree alphabet)]
          [codelist (fold-tree-to-codelist tree "" '())])
   (sort codelist >= #:key second))))
