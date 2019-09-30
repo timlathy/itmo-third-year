@@ -17,8 +17,20 @@
 
 (define huffman-tree (lambda (tree)
   (if (= 2 (length tree))
-    tree
+    (group-node (first tree) (second tree))
     (let* ([sorted-tree (sort tree >= #:key node-prob)]
            [updated-tree (match/values (split-at-right sorted-tree 2)
              [(head (list n1 n2)) (cons (group-node n1 n2) head)])])
           (huffman-tree updated-tree)))))
+
+(define fold-tree-to-codelist (match-lambda*
+  [(list (struct* node ([sym s] [prob p] [left null] [right null])) code lst)
+    (cons (list s p code (string-length code)) lst)]
+  [(list (struct* node ([left l] [right r])) code lst)
+     (fold-tree-to-codelist r (~a code "1")
+       (fold-tree-to-codelist l (~a code "0") lst))]))
+
+(define codelist (lambda (alphabet)
+  (let* ([tree (huffman-tree alphabet)]
+         [codelist (fold-tree-to-codelist tree "" '())])
+  (sort codelist >= #:key second))))
