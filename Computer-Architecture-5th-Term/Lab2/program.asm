@@ -50,7 +50,7 @@ handle_fixp:
 	mov r0, b ; r0 <- bin & 0x0f00
 	; bcd |= (((bin & 0xff) * 10) & 0xf00) >> 8; /* a.b0 -> b.00, write b to the second place (0.ab) */
 	mov b, #10
-	mul ab
+	mul ab ; higher order bytes in b, low-order in a
 	anl b, #00fh
 	mov a, r0
 	swap a ; (bin & 0x0f00) >> 4
@@ -59,12 +59,13 @@ handle_fixp:
 	jmp terminate
 
 bcd_to_bin_int:
+	mov r0, a
 	anl a, #0f0h 
 	swap a ; a >> 4
 	mov b, #10   
 	mul ab ; a <- (a * b)[0..7]
 	mov b, a ; b <- higher digit
-	mov a, P1   	
+	mov a, r0   	
 	anl a, #00fh ; a <- lower digit
 	add a, b ; a + b = bcd converted to binary
 	ret
