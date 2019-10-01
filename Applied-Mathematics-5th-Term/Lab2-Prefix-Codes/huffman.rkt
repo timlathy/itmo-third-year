@@ -1,5 +1,7 @@
 #lang racket
 
+(provide huffman)
+
 (define-struct node (sym prob left right) #:transparent)
 (define init-node (λ (sym prob)
   (node sym prob null null)))
@@ -7,13 +9,11 @@
   (define psum (+ (node-prob left) (node-prob right)))
   (node null psum left right)))
 
-(define alphabet (list
-  (init-node "a1" 0.36)
-  (init-node "a2" 0.18)
-  (init-node "a3" 0.18)
-  (init-node "a4" 0.12)
-  (init-node "a5" 0.09)
-  (init-node "a6" 0.07)))
+(define huffman (λ (frequency-map)
+  (let* ([alphabet (hash-map frequency-map init-node)]
+         [tree (huffman-tree alphabet)]
+         [codelist (fold-tree-to-codelist tree "" '())])
+  (sort codelist <= #:key fourth))))
 
 (define huffman-tree (λ (tree)
   (if (= 2 (length tree))
@@ -29,8 +29,3 @@
   [(list (struct* node ([left l] [right r])) code lst)
      (fold-tree-to-codelist r (~a code "1")
        (fold-tree-to-codelist l (~a code "0") lst))]))
-
-(define codelist (λ (alphabet)
-  (let* ([tree (huffman-tree alphabet)]
-         [codelist (fold-tree-to-codelist tree "" '())])
-  (sort codelist >= #:key second))))
