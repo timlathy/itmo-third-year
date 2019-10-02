@@ -11,9 +11,23 @@
   (define char (read-char input-port))
   (cond
     [(eof-object? char) char]
-    [(or (char-numeric? char) (char-alphabetic? char) (char-punctuation? char)) char]
+    [((disjoin char-numeric? char-alphabetic? char-punctuation?) char) char]
     [" " #\space]
     [else (read-text-char input-port)])))
 
-; (huffman (letter-frequencies "filename"))
-; (shannon-fano (letter-frequencies "filename"))
+(define cli-coding (make-parameter huffman))
+
+(define cli-get-input-file
+  (command-line #:program "lab2"
+   #:once-any
+   [("--huffman") "Encode the alphabet usign Huffman coding"
+    (cli-coding huffman)]
+   [("--shannon-fano") "Encode the alphabet usign Shannon-Fano coding"
+    (cli-coding shannon-fano)]
+   #:args (filename)
+   filename))
+
+(define filename cli-get-input-file)
+(define result ((cli-coding) (letter-frequencies filename)))
+(define csv (map (compose1 (curryr string-join ",") (curry map ~a)) result))
+(display (string-join csv "\n"))
