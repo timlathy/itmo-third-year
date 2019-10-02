@@ -3,15 +3,18 @@
 (require "huffman.rkt" "shannon-fano.rkt"
   (only-in math samples->hash))
 
-(define letter-frequencies (λ (filename)
+(define letter-probabilities (λ (filename)
   (define file-port (open-input-file filename #:mode 'text))
-  (samples->hash (port->list read-text-char file-port))))
+  (define freqs (samples->hash (port->list read-text-char file-port)))
+  (define letter-count (exact->inexact (foldl + 0 (hash-values freqs))))
+  (hash-map freqs (λ (sym freq) (list sym (/ freq letter-count))))))
 
 (define read-text-char (λ (input-port)
   (define char (read-char input-port))
   (cond
-    [(eof-object? char) char]
-    [((disjoin char-numeric? char-alphabetic? char-punctuation?) char) char]
+    [((disjoin eof-object? char-numeric?) char) char]
+    [(char-alphabetic? char) (char-downcase char)]
+    [(char-punctuation? char) #\.]
     [" " #\space]
     [else (read-text-char input-port)])))
 
@@ -28,6 +31,10 @@
    filename))
 
 (define filename cli-get-input-file)
-(define result ((cli-coding) (letter-frequencies filename)))
-(define csv (map (compose1 (curryr string-join ",") (curry map ~a)) result))
+(define result ((cli-coding) (letter-probabilities filename)))
+(define formatted-result (map (match-lambda
+  [(list s p c codelen) (list (~a s) (~r p #:precision 5) c (~a codelen))])
+  result))
+(define result-table (cons '("sym" "prob" "code" "codelen") formatted-result))
+(define csv (map (curryr string-join ",") result-table))
 (display (string-join csv "\n"))

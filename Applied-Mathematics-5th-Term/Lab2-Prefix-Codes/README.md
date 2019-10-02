@@ -10,9 +10,13 @@ Debugging with REPL (`racket`):
 ,enter shannon-fano.rkt
 ```
 
-Running the application:
+Preparing the report:
+```sh
+racket entry.rkt --huffman $filename > huffman.csv
+racket entry.rkt --shannon-fano $filename > shannon-fano.csv
+```
+
+Creating a standalone executable (why not ¯\_(ツ)_/¯):
 ```sh
 raco exe entry.rkt
-./entry --huffman <filename>
-./entry --shannon-fano <filename>
 ```

@@ -3,15 +3,15 @@
 (provide huffman)
 
 (define-struct node (sym prob left right) #:transparent)
-(define init-node (λ (sym prob)
-  (node sym prob null null)))
+(define init-node (λ (prob-entry)
+  (node (first prob-entry) (second prob-entry) null null)))
 (define group-node (λ (left right)
   (define psum (+ (node-prob left) (node-prob right)))
   (node null psum left right)))
 
-(define huffman (λ (frequency-map)
-  (let* ([alphabet (hash-map frequency-map init-node)]
-         [tree (huffman-tree alphabet)]
+(define huffman (λ (probabilities)
+  (let* ([prob-nodes (map init-node probabilities)]
+         [tree (huffman-tree prob-nodes)]
          [codelist (fold-tree-to-codelist tree "" '())])
   (sort codelist <= #:key fourth))))
 

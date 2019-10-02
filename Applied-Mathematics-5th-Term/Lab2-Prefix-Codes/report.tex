@@ -1,0 +1,58 @@
+\documentclass[listings]{labreport}
+\usepackage{csvsimple}
+\usepackage{verbatim}
+\subject{Прикладная математика}
+\titleparts{Лабораторная работа №2}{Построение оптимальных кодов}
+\students{Лабушев Тимофей}
+
+\makeatletter
+\patchcmd{\verbatim@input}{\@verbatim}{\footnotesize\@verbatim}{}{}
+\makeatother
+
+\begin{document}
+
+\maketitlepage
+
+\section*{Цель работы}
+
+Изучение основных принципов эффективного кодирования и приобретение
+практических навыков построения оптимальных кодов на примере
+кодов Шеннона-Фано и Хаффмана, оценка их эффективности.
+
+\section*{Задание}
+
+\begin{enumerate}
+\item Реализовать процедуры построения кода Шеннона-Фано и оптимального кода Хаффмана 
+\item Построить коды для текстового файла, распечатать кодовые таблицы, содержащие
+\textit{символ}, \textit{вероятность}, \textit{кодовое слово},
+\textit{длину кодового слова}.
+\item Сравнить среднюю длину кодовых слов, полученных двумя алгоритмами.
+\end{enumerate}
+
+\section*{Исходный код}
+
+\subsection*{Построение кода Хаффмана}
+\verbatiminput{huffman.rkt}
+
+\subsection*{Построение кода Шеннона-Фано}
+\verbatiminput{shannon-fano.rkt}
+
+\section*{Результаты работы программы}
+
+\csvstyle{codelist}{tabular=|c|c|c|c|,
+  table head=\hline Символ & Вероятность & Кодовое слово & Длина кодового слова\\\hline,
+  late after line=\\\hline}
+
+\subsection*{Код Хаффмана}
+
+\noindent
+\csvreader[codelist]{huffman.csv}{}{\csvcoli & \csvcolii & \csvcoliii & \csvcoliv}
+
+\subsection*{Код Шеннона-Фано}
+
+\noindent
+\csvreader[codelist]{shannon-fano.csv}{}{\csvcoli & \csvcolii & \csvcoliii & \csvcoliv}
+
+\section*{Выводы}
+
+\end{document}

@@ -2,10 +2,11 @@
 
 (provide shannon-fano)
 
-(define shannon-fano (λ (frequency-map)
-  (let* ([alphabet (hash-map frequency-map list)]
-         [codelist (shannon-fano-rec alphabet "" '())])
-  (sort codelist >= #:key second))))
+(define shannon-fano (λ (probabilities)
+  (let* ([codelist (shannon-fano-rec probabilities "" '())]
+         [codelist-with-len (map
+           (λ (c) (append c (list (string-length (third c))))) codelist)])
+  (sort codelist-with-len >= #:key second))))
 (define shannon-fano-rec (λ (alphabet code-prefix codes) (match alphabet
   [(list (list sym prob))
     (cons (list sym prob code-prefix) codes)]
