@@ -53,6 +53,19 @@
 \noindent
 \csvreader[codelist]{shannon-fano.csv}{}{\csvcoli & \csvcolii & \csvcoliii & \csvcoliv}
 
+\section*{Сравнение кодов}
+
+Найдем среднюю длину кодового слова, взвешенную по вероятности появления в тексте:\\
+
+Код Хаффмана:
+\verbatiminput{huffman.stat}
+
+Код Шеннона-Фано:
+\verbatiminput{shannon-fano.stat}
+
 \section*{Выводы}
+
+В ходе выполнения лабораторной работы было установлено, что код Хаффмана
+является более оптимальным с учетом вероятности появления символов в исходном тексте.
 
 \end{document}

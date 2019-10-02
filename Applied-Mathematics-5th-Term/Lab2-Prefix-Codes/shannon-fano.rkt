@@ -11,7 +11,7 @@
   [(list (list sym prob))
     (cons (list sym prob code-prefix) codes)]
   [(list syms ...)
-    (match-let ([(list left right) (partition-eqsum alphabet)])
+    (match-let ([(list left right) (partition-eqsum syms)])
       (shannon-fano-rec right (~a code-prefix "1")
         (shannon-fano-rec left (~a code-prefix "0") codes)))])))
 

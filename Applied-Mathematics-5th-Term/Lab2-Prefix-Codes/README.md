@@ -12,8 +12,12 @@ Debugging with REPL (`racket`):
 
 Preparing the report:
 ```sh
-racket entry.rkt --huffman $filename > huffman.csv
-racket entry.rkt --shannon-fano $filename > shannon-fano.csv
+racket entry.rkt --huffman $filename > huffman_.csv
+racket entry.rkt --shannon-fano $filename > shannon-fano_.csv
+
+head -1 huffman_.csv > huffman.stat
+tail -n+2 huffman_.csv > huffman.csv
+# same for shannon-fano.csv
 ```
 
 Creating a standalone executable (why not ¯\_(ツ)_/¯):

@@ -32,9 +32,11 @@
 
 (define filename cli-get-input-file)
 (define result ((cli-coding) (letter-probabilities filename)))
+(define avg-codeword-len (foldl + 0 (map
+  (match-lambda [(list s p c cl) (* p cl)]) result)))
 (define formatted-result (map (match-lambda
   [(list s p c codelen) (list (~a s) (~r p #:precision 5) c (~a codelen))])
   result))
 (define result-table (cons '("sym" "prob" "code" "codelen") formatted-result))
-(define csv (map (curryr string-join ",") result-table))
+(define csv (cons (~a avg-codeword-len) (map (curryr string-join ",") result-table)))
 (display (string-join csv "\n"))

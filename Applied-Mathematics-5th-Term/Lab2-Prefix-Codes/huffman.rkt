@@ -1,7 +1,5 @@
 #lang racket
 
-(provide huffman)
-
 (define-struct node (sym prob left right) #:transparent)
 (define init-node (λ (prob-entry)
   (node (first prob-entry) (second prob-entry) null null)))
