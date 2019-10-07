@@ -17,8 +17,11 @@ class GraphSolver:
         self.nodes.add(b)
 
     def make_equations(self, edge_equations):
-        ps = [sp.Symbol(f'p{i}') for i in range(len(self.nodes))]
-        self.symbols['p'] = ps
+        self.nodes = list(self.nodes)
+        self.nodes.sort()
+
+        self.symbols['p'] = {sp.Symbol(f'p{i}'): node for i, node in enumerate(self.nodes)}
+        ps = list(self.symbols['p'].keys())
 
         def cell(i_row, n_row, i_col, n_col):
             if n_row in self.adjacency and n_col in self.adjacency[n_row]:
@@ -35,6 +38,6 @@ class GraphSolver:
         return [sp.Eq(sum(col), 0) for col in cols] + [sp.Eq(sum(ps), 1)]
 
     def solve(self, equations, l, mu):
-        solution = sp.solve(equations, self.symbols['p'])
-        return {p: v.subs([(self.symbols['l'], l), (self.symbols['mu'], mu)]) for p, v in solution.items()}
+        solution = sp.solve(equations, list(self.symbols['p'].keys()))
+        return {self.symbols['p'][p]: v.subs([(self.symbols['l'], l), (self.symbols['mu'], mu)]) for p, v in solution.items()}
 
