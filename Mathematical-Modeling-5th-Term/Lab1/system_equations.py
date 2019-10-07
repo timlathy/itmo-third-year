@@ -39,40 +39,46 @@ class SystemEquations:
     def loss_probability(self):
         return sum(n.p for n in self.nodes if n.is_fully_occupied)
 
-    def equation_table_csv(self, l, b, q_1, q_2):
+    def equation_table_csv(self, l, b, qs):
         def r(num):
             return str(round(num, 3))
 
-        output = [
-            ['Нагрузка', '', '', ''],
-            ['', 'П1', '$$y_1 = \lambda q_1 B$$', r(l * q_1 * b)],
-            ['', 'П2', '$$y_1 = \lambda q_2 B$$', r(l * q_2 * b)],
-            ['', '$$\sum$$', '$$y = \lambda B$$', r(l * b)],
-            ['Загрузка', '', '', ''],
-            ['', 'П1', '$$\\rho_1 = \sum_{device_1 = T} p_i$$', r(self.rho(0))],
-            ['', 'П2', '$$\\rho_2 = \sum_{device_2 = T} p_i$$', r(self.rho(1))],
-            ['', '$$\sum$$', '$$\\rho = \sum_{i = 2}^n p_i$$', r(self.rho())],
-            ['Длина очереди', '', '', ''],
-            ['', 'П1', '$$l_1 = \sum_{i = 1}^n p_i O_1_i$$', r(self.queue_len(0))],
-            ['', 'П2', '$$l_2 = \sum_{i = 2}^n p_i O_2_i$$', r(self.queue_len(1))],
-            ['', '$$\sum$$', '$$l = \sum_{i = 1}^n p_i (O_1_i+O_2_i)$$', r(self.queue_len())],
-            ['Число заявок', '', '', ''],
-            ['', 'П1', '$$m_1 = \sum_{device_1 = T} p_i $$', r(self.task_count(0))],
-            ['', 'П2', '$$m_2 = \sum_{device_2 = T} p_i $$', r(self.task_count(1))],
-            ['', '$$\sum$$', '$$m = \sum p_i (device_1 + device_2 + O_2)$$', r(self.task_count())],
-            ['Время ожидания', '', '', ''],
-            ['', 'П1', '$$w_1 = m_1/\lambda$$', r(self.task_count(0) / l)],
-            ['', 'П2', '$$w_2 = m_2/\lambda$$', r(self.task_count(1) / l)],
-            ['', '$$\sum$$', '$$w = m/\lambda$$', r(self.task_count() / l)],
-            ['Время пребывания', '', '', ''],
-            ['', 'П1', '$$u_1 = w_1 + B$$', r(self.task_count(0) / l + b)],
-            ['', 'П2', '$$u_2 = w_2 + B$$', r(self.task_count(1) / l + b)],
-            ['', '$$\sum$$', '$$u = w + B$$', r(self.task_count() / l + b)],
-            ['Вероятность потери', '', '', ''],
-            ['', '$$\sum$$', '$$\pi = \sum_{device_2 = T \& O_2 = 3 || device_1 = T} p_i$$', r(self.loss_probability())],
-            ['Производительность', '', '', ''],
-            ['', '$$\sum$$', '$$\lambda\' = (1 - \pi) \lambda$$', r((1 - self.loss_probability()) * l)],
-        ]
+        efficiency = (1 - self.loss_probability()) * l
+
+        output = []
+        output.append(['Нагрузка', '', '', ''])
+        for i, q in enumerate(qs):
+          output.append(['', f'П{i+1}', f'$$y_{i+1} = \lambda q_{i+1} B$$', r(l * q * b)])
+        output.append(['', '$$\sum$$', '$$y = \lambda B$$', r(l * b)])
+        output.append(['Загрузка', '', '', ''])
+        for i, q in enumerate(qs):
+          output.append(['', f'П{i+1}', f'$$\\rho_{i+1} = \sum_{{device_{i+1} = T}} p_i$$', r(self.rho(i))])
+        output.append(['', '$$\sum$$', '$$\\rho = \sum_{i = 2}^n p_i$$', r(self.rho())])
+
+        output.append(['Длина очереди', '', '', ''])
+        for i, q in enumerate(qs):
+          output.append(['', f'П{i+1}', f'$$l_{i+1} = \sum_{{i = 1}}^n p_i O_{i+1}_i$$', r(self.queue_len(i))])
+        output.append(['', '$$\sum$$', '$$l = \sum_{i = 1}^n p_i (\sum O_j_i)$$', r(self.queue_len())])
+
+        output.append(['Число заявок', '', '', ''])
+        for i, q in enumerate(qs):
+          output.append(['', f'П{i+1}', f'$$m_{i+1} = \sum_{{device_{i+1} = T}} p_i $$', r(self.task_count(i))])
+        output.append(['', '$$\sum$$', '$$m = \sum p_i (\sum device_i + O_i)$$', r(self.task_count())])
+        output.append(['Время ожидания', '', '', ''])
+        for i, q in enumerate(qs):
+          output.append(['', f'П{i+1}', f'$$w_{i+1} = l_{i+1}/\lambda\'$$', r(self.queue_len(i) / efficiency)])
+        output.append(['', '$$\sum$$', '$$w = l/\lambda\'$$', r(self.queue_len() / efficiency)])
+
+        output.append(['Время пребывания', '', '', ''])
+        for i, q in enumerate(qs):
+            output.append(['', f'П{i+1}', f'$$u_{i+1} = m_{i+1}/\lambda\'$$', r(self.task_count(i) / efficiency)])
+        output.append(['', '$$\sum$$', '$$u = l/\lambda\'$$', r(self.task_count() / efficiency)])
+
+        output.append(['Вероятность потери', '', '', ''])
+        output.append(['', '$$\sum$$', '$$\pi = \sum_{device_1 = T \& O_1 = 1 \& device_2 = T & device_3 = T} p_i$$', r(self.loss_probability())])
+        output.append(['Производительность', '', '', ''])
+        output.append(['', '$$\sum$$', '$$\lambda\' = (1 - \pi) \lambda$$', r((1 - self.loss_probability()) * l)])
+
         return '\n'.join(','.join(line) for line in output)
 
 
