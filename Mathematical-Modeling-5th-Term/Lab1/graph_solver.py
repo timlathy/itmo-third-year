@@ -47,3 +47,7 @@ class GraphSolver:
     def adjacency_table_csv(self):
         return '\n'.join(','.join(map(str, row)) for row in self.adjacency_eqs)
 
+    def probability_table_csv(self, solution):
+        return '\n'.join(','.join([str(i + 1), node, str(round(solution[node], 4))])
+                         for i, node in enumerate(self.symbols['p'].values()))
+
