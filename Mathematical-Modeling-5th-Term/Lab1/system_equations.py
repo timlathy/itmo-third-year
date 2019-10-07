@@ -1,13 +1,22 @@
+def separate_queues_eqs(ps, busy_sym, device_queues):
+    queues = {
+        device: (queue_idx, q_len) for queue_idx, (device, q_len)
+        in enumerate((i, q_len) for i, q_len in enumerate(device_queues) if q_len != 0)
+    }
+    return SystemEquations([
+        SeparateQueueNode(p, node, queues, busy_sym, device_num=len(device_queues))
+        for node, p in ps.items()
+    ])
+
+def shared_queue_eqs(ps, busy_sym, queue_len):
+    return SystemEquations([
+        SharedQueueNode(p, node, queue_len, busy_sym)
+        for node, p in ps.items()
+    ])
+
 class SystemEquations:
-    def __init__(self, ps, busy_sym, device_queues):
-        queues = {
-            device: (queue_idx, q_len) for queue_idx, (device, q_len)
-            in enumerate((i, q_len) for i, q_len in enumerate(device_queues) if q_len != 0)
-        }
-        self.nodes = [
-            StateNode(p, node, queues, busy_sym, device_num=len(device_queues))
-            for node, p in ps.items()
-        ] 
+    def __init__(self, nodes):
+        self.nodes = nodes
 
     def rho(self, i_device=None):
         if i_device is None:
@@ -52,13 +61,13 @@ class SystemEquations:
             ['', 'П2', '$$m_2 = \sum_{device_2 = T} p_i $$', r(self.task_count(1))],
             ['', '$$\sum$$', '$$m = \sum p_i (device_1 + device_2 + O_2)$$', r(self.task_count())],
             ['Время ожидания', '', '', ''],
-            ['', 'П1', '$$w_1 = m_1/\lambda$$', r(self.task_count(0) * l)],
-            ['', 'П2', '$$w_2 = m_2/\lambda$$', r(self.task_count(1) * l)],
-            ['', '$$\sum$$', '$$w = m/\lambda$$', r(self.task_count() * l)],
+            ['', 'П1', '$$w_1 = m_1/\lambda$$', r(self.task_count(0) / l)],
+            ['', 'П2', '$$w_2 = m_2/\lambda$$', r(self.task_count(1) / l)],
+            ['', '$$\sum$$', '$$w = m/\lambda$$', r(self.task_count() / l)],
             ['Время пребывания', '', '', ''],
-            ['', 'П1', '$$u_1 = w_1 + B$$', r(self.task_count(0) * l + b)],
-            ['', 'П2', '$$u_2 = w_2 + B$$', r(self.task_count(1) * l + b)],
-            ['', '$$\sum$$', '$$u = w + B$$', r(self.task_count() * l + b)],
+            ['', 'П1', '$$u_1 = w_1 + B$$', r(self.task_count(0) / l + b)],
+            ['', 'П2', '$$u_2 = w_2 + B$$', r(self.task_count(1) / l + b)],
+            ['', '$$\sum$$', '$$u = w + B$$', r(self.task_count() / l + b)],
             ['Вероятность потери', '', '', ''],
             ['', '$$\sum$$', '$$\pi = \sum_{device_2 = T \& O_2 = 3 || device_1 = T} p_i$$', r(self.loss_probability())],
             ['Производительность', '', '', ''],
@@ -67,7 +76,7 @@ class SystemEquations:
         return '\n'.join(','.join(line) for line in output)
 
 
-class StateNode:
+class SeparateQueueNode:
     def __init__(self, p, node, queues, busy_sym, device_num):
         self.p = p
         self.node = node
@@ -99,4 +108,30 @@ class StateNode:
     def __repr__(self):
         return f'p={self.p}, node={self.node}, occupancy={self.device_occupancy}, ' +\
                f'enqueued={self.device_enqueued}, fully_occupied={self.is_fully_occupied}'
+
+class SharedQueueNode:
+    def __init__(self, p, node, queue_len, busy_sym):
+        device_num = len(node) - 1 # - queue
+
+        self.p = p
+        self.node = node
+        self.device_occupancy = [node[i] == busy_sym for i in range(device_num)]
+
+        self.is_fully_occupied = all(self.device_occupancy) and self.enqueued_count() == queue_len
+    
+    def is_busy(self, i_device):
+        return self.device_occupancy[i_device]
+    
+    def enqueued_count(self, i_device=None):
+        return int(self.node[-1])
+
+    def busy_device_count(self):
+        return len(list(occupied for occupied in self.device_occupancy if occupied))
+
+    def any_device_busy(self):
+        return any(self.device_occupancy)
+
+    def __repr__(self):
+        return f'p={self.p}, node={self.node}, occupancy={self.device_occupancy}, ' +\
+               f'fully_occupied={self.is_fully_occupied}'
 
