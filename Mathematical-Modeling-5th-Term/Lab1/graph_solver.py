@@ -8,6 +8,7 @@ class GraphSolver:
         'l': sp.Symbol('λ'),
         'mu': sp.Symbol('μ')
     }
+    adjacency_eqs = []
 
     def edge(self, a, b, **kwargs):
         if a not in self.adjacency:
@@ -34,10 +35,15 @@ class GraphSolver:
             cells[i_row] = -1 * sum(cells)
             return cells
 
-        cols = np.transpose([row(i_row, n_row) for i_row, n_row in enumerate(self.nodes)])
+        self.adjacency_eqs = [row(i_row, n_row) for i_row, n_row in enumerate(self.nodes)]
+
+        cols = np.transpose(self.adjacency_eqs)
         return [sp.Eq(sum(col), 0) for col in cols] + [sp.Eq(sum(ps), 1)]
 
     def solve(self, equations, l, mu):
         solution = sp.solve(equations, list(self.symbols['p'].keys()))
         return {self.symbols['p'][p]: v.subs([(self.symbols['l'], l), (self.symbols['mu'], mu)]) for p, v in solution.items()}
+
+    def adjacency_table_csv(self):
+        return '\n'.join(','.join(map(str, row)) for row in self.adjacency_eqs)
 
