@@ -1,36 +1,43 @@
 class SystemEquations:
-    def __init__(self, ps, free_sym, busy_sym, device_queues):
-        self.ps = ps
-        self.free_sym = free_sym
-        self.busy_sym = busy_sym
-        self.queues = {device: queue_idx for queue_idx, device
-                       in enumerate(i for i, q_len in enumerate(device_queues) if q_len != 0)}
-        self.device_num = len(device_queues)
+    # ps: a dict of {'0000': 0.xxxx}, where
+    #     '0000' is a state node, 0.xxx is the probability of this state.
+    def __init__(self, ps, busy_sym, device_queues):
+        queues = {
+            device: queue_idx for queue_idx, device
+            in enumerate(i for i, q_len in enumerate(device_queues) if q_len != 0)
+        }
+        self.nodes = [
+            StateNode(p, node, queues, busy_sym, device_num=len(device_queues))
+            for node, p in ps.items()
+        ] 
 
     def ro_device(self, i_device):
-        return sum(p for node, p in self.ps.items() if node[i_device] == self.busy_sym)
+        return sum(n.p for n in self.nodes if n.is_busy(i_device))
     
     def ro_system(self):
-        return sum(p for node, p in self.ps.items() if not self.all_devices_free(node))
+        return sum(n.p for n in self.nodes if n.any_device_busy())
 
     def queue_len(self, i_device):
-        return sum(p * self.enqueued_count(node, i_device)
-           for node, p in self.ps.items() if node[i_device] == self.busy_sym)
+        return sum(n.p * n.enqueued_count(i_device) for n in self.nodes if n.is_busy(i_device))
     
     def task_count(self, i_device):
-        return sum(p * (1 + self.enqueued_count(node, i_device))
-                   for node, p in self.ps.items() if node[i_device] == self.busy_sym)
+        return sum(n.p * (1 + n.enqueued_count(i_device)) for n in self.nodes if n.is_busy(i_device))
+
+class StateNode:
+    def __init__(self, p, node, queues, busy_sym, device_num):
+        self.p = p
+        self.device_occupancy = [node[i] == busy_sym for i in range(device_num)]
+        self.device_enqueued = [
+            int(node[device_num + queues[i_device]]) if i_device in queues else 0
+            for i_device in range(device_num)
+        ]
     
-    # === Node utils
+    def is_busy(self, i_device):
+        return self.device_occupancy[i_device]
     
-    def all_devices_free(self, node):
-        for i in range(self.device_num):
-            if node[i] == self.busy_sym:
-                return False
-        return True
+    def enqueued_count(self, i_device):
+        return self.device_enqueued[i_device]
     
-    def enqueued_count(self, node, i_device):
-        if i_device in self.queues:
-            return int(node[self.device_num + self.queues[i_device]])
-        return 0
+    def any_device_busy(self):
+        return any(self.device_occupancy)
 
