@@ -66,13 +66,13 @@ class SystemEquations:
         output.append(['', '$$\sum$$', '$$m = \sum p_i (\sum device_i + O_i)$$', r(self.task_count())])
         output.append(['Время ожидания', '', '', ''])
         for i, q in enumerate(qs):
-          output.append(['', f'П{i+1}', f'$$w_{i+1} = l_{i+1}/\lambda\'$$', r(self.queue_len(i) / efficiency)])
-        output.append(['', '$$\sum$$', '$$w = l/\lambda\'$$', r(self.queue_len() / efficiency)])
+          output.append(['', f'П{i+1}', f'$$w_{i+1} = l_{i+1}/\lambda\'$$', r(self.task_count(i) / efficiency)])
+        output.append(['', '$$\sum$$', '$$w = l/\lambda\'$$', r(self.task_count() / efficiency)])
 
         output.append(['Время пребывания', '', '', ''])
         for i, q in enumerate(qs):
-            output.append(['', f'П{i+1}', f'$$u_{i+1} = m_{i+1}/\lambda\'$$', r(self.task_count(i) / efficiency)])
-        output.append(['', '$$\sum$$', '$$u = l/\lambda\'$$', r(self.task_count() / efficiency)])
+            output.append(['', f'П{i+1}', f'$$u_{i+1} = m_{i+1}/\lambda\'$$', r((self.task_count(i) / efficiency) + b)])
+        output.append(['', '$$\sum$$', '$$u = l/\lambda\'$$', r((self.task_count() / efficiency) + b)])
 
         output.append(['Вероятность потери', '', '', ''])
         output.append(['', '$$\sum$$', '$$\pi = \sum_{device_1 = T \& O_1 = 1 \& device_2 = T & device_3 = T} p_i$$', r(self.loss_probability())])
