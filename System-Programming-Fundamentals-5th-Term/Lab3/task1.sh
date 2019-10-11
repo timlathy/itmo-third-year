@@ -1,7 +1,19 @@
 #!/bin/bash
 
+if [ -z "$1" ]; then
+  echo Usage: $(basename "$0") dir
+  exit
+fi
+
 # Sample stat output: drwxrwxrwx 1000 1000
-read -r perms owner_uid owner_gid <<< $(stat -c "%A %u %g" "$1")
+dir_info=$(stat -c '%A %u %g' "$1" 2>/dev/null)
+if [ $? -ne 0 ]; then
+  >&2 echo Unable to open $1
+  >&2 echo Please ensure the directory exists and you have sufficient permissions
+  exit 1
+fi
+
+read -r perms owner_uid owner_gid <<< "$dir_info"
 
 if [ ${perms:0:1} != 'd' ]; then
   >&2 echo "$1 is not a directory"
