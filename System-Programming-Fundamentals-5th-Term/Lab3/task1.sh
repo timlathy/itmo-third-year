@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-  echo Usage: $(basename "$0") dir
+if [ $# -ne 1 ]; then
+  echo Usage: $(basename "$0") dir_path
   exit
 fi
 
