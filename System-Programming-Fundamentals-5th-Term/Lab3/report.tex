@@ -1,0 +1,33 @@
+\documentclass[en]{labreport}
+\subject{System Software Fundamentals}
+\titleparts{Lab Work \#3 (5, 11)}{File Permissions}
+\students{Timothy Labushev}
+\setmonofont{Fira Mono}
+
+\usepackage{minted}
+
+\begin{document}
+
+\maketitlepage
+
+\section*{Assignment}
+
+Create separate shell scripts that output the following information:
+\begin{enumerate}
+\item a list of users who have write access to the given directory;
+\item a list of files in the current directory that can be executed by the given user.
+\end{enumerate}
+
+\section*{Code Listing}
+
+\subsection*{Task 1}
+
+\inputminted[linenos, fontsize=\scriptsize]{bash}{task1.sh}
+
+\newpage
+
+\subsection*{Task 2}
+
+\inputminted[linenos, fontsize=\scriptsize]{bash}{task2.sh}
+
+\end{document}
