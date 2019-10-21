@@ -8,8 +8,8 @@ class GraphSolver:
 
     def __init__(self, num_priorities):
         self.symbols = {
-            'l': [sp.Symbol(f'λ{i}') for i in range(num_priorities)],
-            'mu': [sp.Symbol(f'μ{i}') for i in range(num_priorities)]
+            'l': [sp.Symbol('λ' + str(i)) for i in range(num_priorities)],
+            'mu': [sp.Symbol('μ' + str(i)) for i in range(num_priorities)]
         }
 
     def edge(self, a, b, **kwargs):
@@ -48,10 +48,11 @@ class GraphSolver:
         assert len(mus) == len(self.symbols['mu']), \
             "len(mus) must be equal to num_priorities passed to GraphSolver(...)"
 
-        solution = sp.solve(equations, list(self.symbols['p'].keys()))
-        substitutions = [*zip(self,symbols['l'], lambdas), *zip(self.symbols['mu'], mus)]
+        substitutions = [*zip(self.symbols['l'], lambdas), *zip(self.symbols['mu'], mus)]
+        substituted = [e.subs(substitutions) for e in equations]
 
-        return {self.symbols['p'][p]: v.subs(substitutions) for p, v in solution.items()}
+        solution = sp.solve(substituted, list(self.symbols['p'].keys()))
+        return {self.symbols['p'][p]: v for p, v in solution.items()}
 
     def adjacency_table_csv(self):
         return '\n'.join(','.join(map(str, row)) for row in self.adjacency_eqs)
