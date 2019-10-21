@@ -2,6 +2,8 @@
 
 (require data/bit-vector math/base)
 
+; === Encoding
+
 ; A Single Error Correction code (Hamming distance = 3) can either correct a
 ; single-bit error or detect two-bit errors, but not both at the same time:
 ; since errors appear the same, if we perform error correction
@@ -25,6 +27,19 @@
 
   encoded)
 
+; A Single Error Correction, Double Error Detection code (Hamming distance = 4)
+; can both correct a single-bit error and detect two-bit errors.
+; It adds a single additional check bit, computed as the parity of all other bits.
+(define/contract (encode-secded message)
+  (-> bit-vector? bit-vector?)
+
+  (define secbits (bit-vector->list (encode-sec message)))
+  (define total-parity (for/fold ([parity #f]) ([b (in-list secbits)])
+    (xor parity b)))
+  (list->bit-vector (append secbits (list total-parity))))
+
+; === Decoding
+
 (define/contract (decode-sec encoded)
   (-> bit-vector? (values (or/c 'correct integer?) bit-vector?))
 
@@ -47,6 +62,26 @@
     [else
       (bit-vector-set! encoded syndrome-dec (not (bit-vector-ref encoded syndrome-dec)))
       (values syndrome-dec (extract-encoded-message-sec encoded))]))
+
+(define (decode-secded encoded)
+  (define total-parity-i (sub1 (bit-vector-length encoded)))
+  (define total-parity-actual (bit-vector-ref encoded total-parity-i))
+  (define total-parity-expected
+    (for/fold ([parity #f]) ([(b i) (in-indexed (in-bit-vector encoded))]
+                             #:break (= i total-parity-i))
+    (xor parity b)))
+  (define-values (status decoded)
+    (decode-sec (bit-vector-copy encoded 0 (sub1 (bit-vector-length encoded)))))
+  (cond
+    [(and (eq? status 'correct) (eq? total-parity-actual total-parity-expected))
+      (values 'correct decoded)]
+    [(eq? status 'correct) ; error in the parity bit
+      (values total-parity-i decoded)]
+    [(and (integer? status) (not (eq? total-parity-actual total-parity-expected)))
+      (values status decoded)] ; single bit error
+    [else 'double-error]))
+
+; === Utils
 
 (define (extract-encoded-message-sec encoded)
   (for/bit-vector ([i (in-range (bit-vector-length encoded))]
