@@ -43,10 +43,15 @@
 
   (cond
     [(= -1 syndrome-dec)
-      (values 'correct encoded)]
+      (values 'correct (extract-encoded-message-sec encoded))]
     [else
       (bit-vector-set! encoded syndrome-dec (not (bit-vector-ref encoded syndrome-dec)))
-      (values syndrome-dec encoded)]))
+      (values syndrome-dec (extract-encoded-message-sec encoded))]))
+
+(define (extract-encoded-message-sec encoded)
+  (for/bit-vector ([i (in-range (bit-vector-length encoded))]
+                   #:when (not (power-of-two? (add1 i))))
+    (bit-vector-ref encoded i)))
 
 (define (data-parity-bit data bit-i)
   (for/fold ([parity #f])
