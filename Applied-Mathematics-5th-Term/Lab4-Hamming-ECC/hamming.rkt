@@ -48,14 +48,8 @@
       (bit-vector-set! encoded syndrome-dec (not (bit-vector-ref encoded syndrome-dec)))
       (values syndrome-dec encoded)]))
 
-(define (data-parity-bit data bit-i [data-i (add1 bit-i)] [parity-window-i 1] [parity #f])
-  (cond
-    [(>= data-i (bit-vector-length data))
-      parity]
-    [(= parity-window-i (* 2 (add1 bit-i)))
-      (data-parity-bit data bit-i data-i 0 parity)]
-    [(> parity-window-i bit-i)
-      (data-parity-bit data bit-i (add1 data-i) (add1 parity-window-i) parity)]
-    [else
-      (define p (xor parity (bit-vector-ref data data-i)))
-      (data-parity-bit data bit-i (add1 data-i) (add1 parity-window-i) p)]))
+(define (data-parity-bit data bit-i)
+  (for/fold ([parity #f])
+            ([data-i (in-range (add1 bit-i) (bit-vector-length data))]
+             #:when (= (add1 bit-i) (bitwise-and (add1 bit-i) (add1 data-i))))
+    (xor parity (bit-vector-ref data data-i))))
