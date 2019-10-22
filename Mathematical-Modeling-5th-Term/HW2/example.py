@@ -1,4 +1,5 @@
 from graph_solver import GraphSolver
+from system_equations import priority_queue_eqs
 
 g = GraphSolver(num_priorities=3)
 
@@ -103,7 +104,12 @@ edge_equations = {
   '2/3μ3': lambda p: p * g.symbols['mu'][2] * 2 / 3
 }
 
-eqs = g.make_equations(edge_equations)
-ps = g.solve(eqs, lambdas=[0.5, 0.1, 1.0], mus=[1 / 1.0, 1 / 2.0, 1 / 0.5])
+lambdas = [0.5, 0.1, 1.0]
+bs = [1.0, 2.0, 0.5]
 
-print(ps)
+eqs = g.make_equations(edge_equations)
+ps = g.solve(eqs, lambdas, mus=[1 / b for b in bs])
+e = priority_queue_eqs(ps, queues=[1, 1, 1], priorities=[3, 2, 1])
+
+print('\nХарактеристики системы:\n')
+print(e.equation_table_csv(lambdas, bs))
