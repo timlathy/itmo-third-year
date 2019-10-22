@@ -36,7 +36,9 @@ class PriorityQueueNode:
     # ! Assignment-specific
     def can_lose_task(self, priority):
         lowest_priority = priority == self.lowest_priority_i
-        can_override_lower_priority = not lowest_priority and self.device_occupancy[self.lowest_priority_i]
+        can_override_lower_priority = not lowest_priority \
+            and self.device_occupancy[self.lowest_priority_i] \
+            and self.enqueued_count(self.lowest_priority_i) == 0
         return self.node[1 + priority] != '0' and not can_override_lower_priority
 
     def __repr__(self):
@@ -74,6 +76,10 @@ class SystemEquations:
         loss_probs = [self.loss_probability(i) for i in priorities]
         loss_prob_p_sum = sum(pi for pi, _ in loss_probs)
         loss_prob_eq = ' + '.join(eq for _, eq in loss_probs)
+        efficiencies = [l * (1 - pi) for l, (pi, _) in zip(lambdas, loss_probs)]
+
+        mean_wait_times = [l / eff for (l, _), eff in zip(queue_lens, efficiencies)] 
+        mean_wait_time_sum = self.queue_len()[0] / sum(efficiencies)
 
         output = [
             ['Нагрузка', '', '', ''],
@@ -85,16 +91,27 @@ class SystemEquations:
             ['', '$$\sum$$', f'$$\\rho = {self.occupancy()[1]}$$', r(self.occupancy()[0])],
 
             ['Длина очереди', '', '', ''],
-            *[['', f'К{i+1}', f'$$\\l_{i+1} = {eq}$$', r(l)] for i, (l, eq) in enumerate(queue_lens)],
-            ['', '$$\sum$$', f'$$\\l = {self.queue_len()[1]}$$', r(self.queue_len()[0])],
+            *[['', f'К{i+1}', f'$$l_{i+1} = {eq}$$', r(l)] for i, (l, eq) in enumerate(queue_lens)],
+            ['', '$$\sum$$', f'$$l = {self.queue_len()[1]}$$', r(self.queue_len()[0])],
 
             ['Число заявок', '', '', ''],
-            *[['', f'К{i+1}', f'$$\\m_{i+1} = l_{i+1} + \\rho_{i+1}$$', r(t)] for i, t in enumerate(task_counts)],
-            ['', '$$\sum$$', f'$$\\m_ = l + \\rho$$', r(self.occupancy()[0] + self.queue_len()[0])],
+            *[['', f'К{i+1}', f'$$m_{i+1} = l_{i+1} + \\rho_{i+1}$$', r(t)] for i, t in enumerate(task_counts)],
+            ['', '$$\sum$$', f'$$m_ = l + \\rho$$', r(self.occupancy()[0] + self.queue_len()[0])],
 
             ['Вероятность потери', '', '', ''],
             *[['', f'К{i+1}', f'$$\\pi_{i+1} = {eq}$$', r(pi)] for i, (pi, eq) in enumerate(loss_probs)],
             ['', '$$\sum$$', f'$$\\pi = {loss_prob_eq}$$', r(loss_prob_p_sum)],
+
+            ['Производительность', '', '', ''],
+            *[['', f'К{i+1}', f'$$\\lambda\'_{i+1} = \\lambda(1 - \\pi_{i+1})$$', r(eff)] for i, eff in enumerate(efficiencies)],
+            ['', '$$\sum$$', f'$$\\lambda\' = \\sum \\lambda\'_i$$', r(sum(efficiencies))],
+
+            ['Среднее время ожидания', '', '', ''],
+            *[['', f'К{i+1}', f'$$w_{i+1} = l_{i+1} / \\lambda\'_{i+1}$$', r(w)] for i, w in enumerate(mean_wait_times)],
+            ['', '$$\sum$$', f'$$w = l / \\lambda\'$$', r(mean_wait_time_sum)],
+
+            ['Среднее время пребывания', '', '', ''],
+            *[['', f'К{i+1}', f'$$u_{i+1} = w_{i+1} + b_{i+1}$$', r(w + b)] for i, (w, b) in enumerate(zip(mean_wait_times, bs))],
         ]
 
         return '\n'.join(','.join(line) for line in output)
