@@ -2,6 +2,8 @@
 
 (require data/bit-vector math/base)
 
+(provide encode-sec encode-secded decode-sec decode-secded)
+
 ; === Encoding
 
 ; A Single Error Correction code (Hamming distance = 3) can either correct a
@@ -11,14 +13,22 @@
 (define/contract (encode-sec message)
   (-> bit-vector? bit-vector?)
 
-  (define message-len (bit-vector-length message))
-  (define check-bits (exact-ceiling (log (add1 message-len) 2)))
+  (define message-bits (add1 (bit-vector-length message)))
+  (define message-len
+    (if (power-of-two? (add1 message-bits))
+      message-bits
+      (+ message-bits (- (expt 2 (exact-ceiling (log message-bits 2))) 1 message-bits))))
+  (define check-bits (exact-ceiling (log message-len 2)))
   (define encoded-len (+ check-bits message-len))
 
   (define encoded (make-bit-vector encoded-len))
-  (for/fold ([data-i 0]) ([i (in-range encoded-len)] #:when (not (power-of-two? (add1 i))))
-    (bit-vector-set! encoded i (bit-vector-ref message data-i #f))
-    (add1 data-i))
+  (for/fold ([data-i 0] [check-bit-i 0]) ([i (in-range encoded-len)])
+    (cond
+      [(and (power-of-two? (add1 i)) (check-bit-i . < . check-bits))
+        (values data-i (add1 check-bit-i))]
+      [else
+        (bit-vector-set! encoded i (bit-vector-ref message data-i #f))
+        (values (add1 data-i) check-bit-i)]))
 
   (for ([i (in-range check-bits)])
     (define check-bit-i (sub1 (expt 2 i)))
@@ -43,9 +53,14 @@
 (define/contract (decode-sec encoded)
   (-> bit-vector? (values (or/c 'correct integer?) bit-vector?))
 
+  (define (compute-message-len check-bits message-len)
+    (if ((- (expt 2 check-bits) check-bits) . >= . message-len)
+      (add1 message-len)
+      (compute-message-len (add1 check-bits) (sub1 message-len))))
+
   (define encoded-len (bit-vector-length encoded))
-  (define check-bits (exact-ceiling (log encoded-len 2)))
-  (define message-len (- encoded-len check-bits))
+  (define message-len (compute-message-len 0 encoded-len))
+  (define check-bits (- encoded-len message-len))
 
   (define syndromes (for/list ([i (in-range check-bits)])
     (define check-bit-i (sub1 (expt 2 i)))
@@ -58,10 +73,10 @@
 
   (cond
     [(= -1 syndrome-dec)
-      (values 'correct (extract-encoded-message-sec encoded))]
+      (values 'correct (extract-encoded-message-sec encoded check-bits message-len))]
     [else
       (bit-vector-set! encoded syndrome-dec (not (bit-vector-ref encoded syndrome-dec)))
-      (values syndrome-dec (extract-encoded-message-sec encoded))]))
+      (values syndrome-dec (extract-encoded-message-sec encoded check-bits message-len))]))
 
 (define (decode-secded encoded)
   (define total-parity-i (sub1 (bit-vector-length encoded)))
@@ -83,10 +98,16 @@
 
 ; === Utils
 
-(define (extract-encoded-message-sec encoded)
-  (for/bit-vector ([i (in-range (bit-vector-length encoded))]
-                   #:when (not (power-of-two? (add1 i))))
-    (bit-vector-ref encoded i)))
+(define (extract-encoded-message-sec encoded check-bits message-len)
+  (define message (make-bit-vector message-len))
+  (for/fold ([data-i 0] [check-bit-i 0]) ([i (in-range (bit-vector-length encoded))])
+  (cond
+    [(and (power-of-two? (add1 i)) (check-bit-i . < . check-bits))
+      (values data-i (add1 check-bit-i))]
+    [else
+      (bit-vector-set! message data-i (bit-vector-ref encoded i))
+      (values (add1 data-i) check-bit-i)]))
+  message)
 
 (define (data-parity-bit data bit-i)
   (for/fold ([parity #f])
