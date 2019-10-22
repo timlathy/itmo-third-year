@@ -30,8 +30,7 @@
   (car (for/fold ([bounds : Segment-Bounds (cons 0 1)]) ([char input])
     (match-define (cons lower upper) bounds)
     (match-define (cons lbound ubound) (hash-ref segments char))
-    ; Assert nonnegativity for the type checker (noop in practice since upper > lower)
-    (define bounds-diff (abs (- upper lower)))
+    (define bounds-diff (assert (- upper lower) positive?))
     (cons (+ lower (* lbound bounds-diff)) (+ lower (* ubound bounds-diff))))))
 
 (: decode (-> Code-Point Index Char-Segment-Hash String))
