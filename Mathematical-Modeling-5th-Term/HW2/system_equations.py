@@ -7,19 +7,22 @@
 #   you may see "3-2-1" in your assignment, which means that class #3
 #   has higher priority than #2. This translates to priorities=[3, 2, 1].
 
+# Note that PriorityQueueNode#can_lose_task is assignment-specific.
+
 def priority_queue_eqs(ps, queues, priorities):
     assert len(queues) == len(priorities), \
         "Assignments with number of queues /= number of priorities are not supported"
-    return SystemEquations([
+    return SystemEquations(sorted([
         PriorityQueueNode(p_indexed, node, queues, priorities)
         for node, p_indexed in ps.items()
-    ])
+    ], key=lambda n: int(n.p_eq[3:-1])))
 
 class PriorityQueueNode:
     def __init__(self, p_indexed, node, queues, priorities):
         self.p_eq = f'p_{{{p_indexed[0] + 1}}}'
         self.p = p_indexed[1]
         self.node = node
+        self.lowest_priority_i = priorities[-1] - 1
         self.device_occupancy = [node[0] == str(i + 1) for i in range(len(priorities))]
 
     def is_busy(self, priority=None):
@@ -29,6 +32,12 @@ class PriorityQueueNode:
         if priority is not None:
             return 1 if self.node[1 + priority] == str(priority + 1) else 0
         return sum(self.enqueued_count(priority) for priority in range(len(self.device_occupancy)))
+
+    # ! Assignment-specific
+    def can_lose_task(self, priority):
+        lowest_priority = priority == self.lowest_priority_i
+        can_override_lower_priority = not lowest_priority and self.device_occupancy[self.lowest_priority_i]
+        return self.node[1 + priority] != '0' and not can_override_lower_priority
 
     def __repr__(self):
         return f'p_eq={self.p_eq}, p={self.p}, node={self.node}, occupancy={self.device_occupancy}'
@@ -47,6 +56,11 @@ class SystemEquations:
         eq = ' + '.join(n.p_eq for n in self.nodes if n.is_busy(priority) and n.enqueued_count(priority) > 0)
         return p_sum, eq
 
+    def loss_probability(self, priority):
+        p_sum = sum(n.p for n in self.nodes if n.can_lose_task(priority))
+        eq = ' + '.join(n.p_eq for n in self.nodes if n.can_lose_task(priority))
+        return p_sum, eq
+
     def equation_table_csv(self, lambdas, bs):
         def r(num):
             return str(round(num, 3))
@@ -57,6 +71,9 @@ class SystemEquations:
         occupancies = [self.occupancy(i) for i in priorities]
         queue_lens = [self.queue_len(i) for i in priorities]
         task_counts = [occupancies[i][0] * queue_lens[i][0] for i in priorities]
+        loss_probs = [self.loss_probability(i) for i in priorities]
+        loss_prob_p_sum = sum(pi for pi, _ in loss_probs)
+        loss_prob_eq = ' + '.join(eq for _, eq in loss_probs)
 
         output = [
             ['Нагрузка', '', '', ''],
@@ -73,7 +90,11 @@ class SystemEquations:
 
             ['Число заявок', '', '', ''],
             *[['', f'К{i+1}', f'$$\\m_{i+1} = l_{i+1} + \\rho_{i+1}$$', r(t)] for i, t in enumerate(task_counts)],
-            ['', '$$\sum$$', f'$$\\m_{i+1} = l + \\rho$$', r(self.occupancy()[0] + self.queue_len()[0])],
+            ['', '$$\sum$$', f'$$\\m_ = l + \\rho$$', r(self.occupancy()[0] + self.queue_len()[0])],
+
+            ['Вероятность потери', '', '', ''],
+            *[['', f'К{i+1}', f'$$\\pi_{i+1} = {eq}$$', r(pi)] for i, (pi, eq) in enumerate(loss_probs)],
+            ['', '$$\sum$$', f'$$\\pi = {loss_prob_eq}$$', r(loss_prob_p_sum)],
         ]
 
         return '\n'.join(','.join(line) for line in output)
