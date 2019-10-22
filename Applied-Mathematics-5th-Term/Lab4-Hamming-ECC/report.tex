@@ -1,0 +1,48 @@
+\documentclass[listings]{labreport}
+\usepackage{csvsimple}
+\usepackage{verbatim}
+\subject{Прикладная математика}
+\titleparts{Лабораторная работа №4}{Построение кода Хэмминга}
+\students{Лабушев Тимофей}
+
+\makeatletter
+\patchcmd{\verbatim@input}{\@verbatim}{\footnotesize\@verbatim}{}{}
+\makeatother
+
+\begin{document}
+
+\maketitlepage
+
+\section*{Цель работы}
+
+Получить практические навыки кодирования и декодирования
+помехоустойчивыми кодами Хэмминга.
+
+\section*{Задание}
+
+\begin{enumerate}
+\item Реализовать процедуру построения кода Хэмминга с заданным
+  числом информационных символов с кодовыми расстояниями 3 и 4.
+\item Реализовать процедуру декодирования кода Хэмминга и
+  исправления ошибок для различных кодовых расстояний. Провести
+  программный контроль выполнения на примере случайных кодовых
+  комбинаций.
+\end{enumerate}
+
+\section*{Исходный код}
+
+\subsection*{Кодирование}
+
+\verbatiminput{hamming.rkt}
+
+\subsection*{Тестирование}
+
+\verbatiminput{hamming-test.rkt}
+
+\section*{Выводы}
+
+В ходе выполнения лабораторной работы были изучены приципы построения
+помехоустойчивых кодов Хэмминга для исправления одной ошибки (SEC) и
+исправления одной с обнаружением двух (SECDED).
+
+\end{document}
