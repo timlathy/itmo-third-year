@@ -42,7 +42,8 @@
     (match-define-values (char lbound ubound) (decode-lookup-char bound segment-list))
     (cons (~a decoded char) (abs (/ (- bound lbound) (- ubound lbound))))))))
 
-(: decode-lookup-char (-> Code-Point (Listof (Pair Char Segment-Bounds)) (Values Char Code-Point Code-Point)))
+(: decode-lookup-char
+   (-> Code-Point (Listof (Pair Char Segment-Bounds)) (Values Char Code-Point Code-Point)))
 (define (decode-lookup-char bound segment-list)
   (match-define (cons (cons char (cons lbound ubound)) tail) segment-list)
   (if (and (<= lbound bound) (< bound ubound))

@@ -1,0 +1,63 @@
+\documentclass[listings]{labreport}
+\usepackage{csvsimple}
+\usepackage{verbatim}
+\subject{Прикладная математика}
+\titleparts{Лабораторная работа №3}{Арифметическое кодирование}
+\students{Лабушев Тимофей}
+
+\makeatletter
+\patchcmd{\verbatim@input}{\@verbatim}{\footnotesize\@verbatim}{}{}
+\makeatother
+
+\begin{document}
+
+\maketitlepage
+
+\section*{Цель работы}
+
+Получить практические навыки кодирования и декодирования текстового файла
+арифметическим кодом.
+
+\section*{Задание}
+
+\begin{enumerate}
+\item Реализовать процедуру построения арифметического кода
+\item Предусмотреть ввод последовательности символов для кодирования
+\item Вычислить коэффициент сжатия данных как процентное отношение
+  длины закодированного файла к длине исходного файла
+\item Декодировать полученную последовательность,
+  сравнить полученный файл с исходным текстом
+\end{enumerate}
+
+\section*{Исходный код}
+
+\subsection*{Кодирование}
+
+\verbatiminput{coder.rkt}
+
+\subsection*{Ввод}
+
+\verbatiminput{entry.rkt}
+
+\section*{Пример работы программы}
+
+\begin{scriptsize}
+\begin{verbatim}
+Enter the text to encode:
+Fly me to the moon, let me play among the stars, and let me see what spring is like on Jupyter and Mars
+Enter desired precision (in bits, 53 for double precision)
+450
+Encoded: 0.9821783982146021614208059043513765417781895896223288305328811410486010602429103146656947712082555708095342416578377510963963423517698176
+Decoded: Fly me to the moon, let me play among the stars, and let me see what spring is like on Jupyter and Mars
+Encoding precision: 103
+Compression ratio: 54.61165048543689%
+\end{verbatim}
+\end{scriptsize}
+
+\section*{Выводы}
+
+В ходе выполнения лабораторной работы было установлено, что для кодирования
+сообщений достаточной длины арифметическим кодированием необходима высокая точность
+представления чисел с плавающей запятой.
+
+\end{document}
