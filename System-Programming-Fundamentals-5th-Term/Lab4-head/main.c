@@ -41,7 +41,20 @@ int main(int argc, char** argv) {
     }
   }
 
-  print_lines_buffered(STDIN_FILENO, num_lines);
+  if (optind == argc)
+    print_lines_buffered(STDIN_FILENO, num_lines);
+  else
+    do {
+      int fd = open(argv[optind], O_RDONLY);
+      if (fd == -1) {
+        fprintf(stderr, "%s: Cannot open %s for reading", argv[0], argv[optind]);
+      }
+      else {
+        print_lines_buffered(fd, num_lines);
+        close(fd);
+      }
+    }
+    while (++optind < argc);
 
   return 0;
 }
