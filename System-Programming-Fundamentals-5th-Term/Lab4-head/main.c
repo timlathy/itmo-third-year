@@ -1,4 +1,7 @@
+#define _POSIX_C_SOURCE 2
+#include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #define BUF_SIZE 8192
 
@@ -22,7 +25,26 @@ void print_lines_buffered(FILE* src, unsigned int lines_requested) {
   }
 }
 
+int try_parse_uint(const char* str, unsigned int* val) {
+  char* endptr;
+  *val = strtoul(str, &endptr, 10);
+  return endptr != str && *endptr == '\0';
+}
+
 int main(int argc, char** argv) {
-  print_lines_buffered(stdin, 10);
+  unsigned int num_lines = 10;
+
+  int c;
+  while ((c = getopt(argc, argv, "n:")) != EOF) {
+    switch (c) {
+      case 'n':
+        if (!try_parse_uint(optarg, &num_lines)) {
+            fprintf(stderr, "%s: invalid number of lines: '%s'\n", argv[0], optarg);
+            exit(EXIT_FAILURE);
+        }
+    }
+  }
+
+  print_lines_buffered(stdin, num_lines);
   return 0;
 }
