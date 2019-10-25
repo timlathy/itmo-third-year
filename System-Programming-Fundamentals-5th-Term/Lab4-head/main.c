@@ -1,6 +1,5 @@
 #define _POSIX_C_SOURCE 2
 #include <unistd.h>
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -86,6 +85,10 @@ int main(int argc, char** argv) {
           fdprintf(STDERR_FILENO, "%s: invalid number of lines: '%s'\n", argv[0], optarg);
           return 1;
         }
+        break;
+      case '?':
+        fdprintf(STDERR_FILENO, "Usage: %s [-n num-lines] [file...]\n", argv[0]);
+        return 1;
     }
   }
 
