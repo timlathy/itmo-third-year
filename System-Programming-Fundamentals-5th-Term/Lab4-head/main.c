@@ -1,9 +1,11 @@
 #define _POSIX_C_SOURCE 2
 #include <unistd.h>
 
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <stdbool.h>
 
 #define BUF_SIZE 4096
 
@@ -17,14 +19,53 @@ void print_lines_buffered(int fd, unsigned int num_lines) {
     for (pos = 0; pos < bytes_read; ++pos)
       if (inbuf[pos] == '\n' && ++printed == num_lines) break;
 
-    write(STDOUT_FILENO, inbuf, pos + 1);
+    write(STDOUT_FILENO, inbuf, pos);
   }
+
+  write(STDOUT_FILENO, "\n", sizeof("\n"));
 }
 
-int try_parse_uint(const char* str, unsigned int* val) {
+bool try_parse_uint(const char* str, unsigned int* val) {
   char* endptr;
   *val = strtoul(str, &endptr, 10);
   return endptr != str && *endptr == '\0';
+}
+
+void handle_filename_args(int argc, char** argv, int num_lines) {
+  // According to POSIX,
+  // If multiple file operands are specified, head shall precede the output for each with the header:
+  // "\n==> %s <==\n", <pathname>
+  // except that the first header written shall not include the initial <newline>.
+  #define HEADER_START "==> "
+  #define HEADER_END " <==\n"
+  #define HEADER_STDIN HEADER_START "standard input" HEADER_END
+
+  bool first_header = true;
+  do {
+    if (first_header)
+      first_header = false;
+    else
+      write(STDOUT_FILENO, "\n", sizeof("\n"));
+
+    if (*argv[optind] == '-') {
+      write(STDOUT_FILENO, HEADER_STDIN, sizeof(HEADER_STDIN));
+      print_lines_buffered(STDIN_FILENO, num_lines);
+    }
+    else {
+      int fd = open(argv[optind], O_RDONLY);
+      if (fd == -1) {
+        fprintf(stderr, "%s: Cannot open %s for reading", argv[0], argv[optind]);
+      }
+      else {
+        write(STDOUT_FILENO, HEADER_START, sizeof(HEADER_START));
+        write(STDOUT_FILENO, argv[optind], strlen(argv[optind]));
+        write(STDOUT_FILENO, HEADER_END, sizeof(HEADER_END));
+        print_lines_buffered(fd, num_lines);
+        close(fd);
+      }
+    }
+  }
+  while (++optind < argc);
 }
 
 int main(int argc, char** argv) {
@@ -44,17 +85,7 @@ int main(int argc, char** argv) {
   if (optind == argc)
     print_lines_buffered(STDIN_FILENO, num_lines);
   else
-    do {
-      int fd = open(argv[optind], O_RDONLY);
-      if (fd == -1) {
-        fprintf(stderr, "%s: Cannot open %s for reading", argv[0], argv[optind]);
-      }
-      else {
-        print_lines_buffered(fd, num_lines);
-        close(fd);
-      }
-    }
-    while (++optind < argc);
+    handle_filename_args(argc, argv, num_lines);
 
   return 0;
 }
