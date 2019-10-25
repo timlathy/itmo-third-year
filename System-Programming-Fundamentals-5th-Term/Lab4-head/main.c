@@ -27,10 +27,10 @@ void print_lines_buffered(int fd, unsigned int num_lines) {
 bool try_parse_uint(const char* str, unsigned int* val) {
   char* endptr;
   *val = strtoul(str, &endptr, 10);
-  return endptr != str && *endptr == '\0';
+  return *str != '-' && endptr != str && *endptr == '\0';
 }
 
-// A fprintf-like wrapper over write().
+// An fprintf()-like wrapper over write().
 // Rationale: the assignment requires we only use raw syscalls to perform IO.
 void fdprintf(int fd, const char* fmt, ...) {
   #define MSG_BUF_SIZE 512

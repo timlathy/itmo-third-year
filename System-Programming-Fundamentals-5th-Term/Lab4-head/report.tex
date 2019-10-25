@@ -1,0 +1,89 @@
+\documentclass[en, listings]{labreport}
+\subject{System Software Fundamentals}
+\titleparts{Lab Work \#4 (3)}{System Calls}
+\students{Timothy Labushev}
+
+\lstdefinestyle{lablisting}{
+  basicstyle=\scriptsize\ttfamily,
+  numbers=left,
+  stepnumber=1,
+  otherkeywords={EOF, O\_RDONLY, STDIN\_FILENO, STDOUT\_FILENO, STDERR\_FILENO},
+  numbersep=10pt,
+  showspaces=false,
+  showstringspaces=false
+}
+
+\usepackage{verbatim}
+
+\begin{document}
+
+\maketitlepage
+
+\section*{Assignment}
+
+Using raw system calls, write a C program that mimics the behavior of the \textit{head} utility.
+
+\subsection*{Requirements}
+
+\begin{enumerate}
+\item The program should perform input and output via \verb|read(2)| and \verb|write(2)|.
+\item The program should accept multiple input files and use standard input when \texttt{-} is given as a filename.
+\item The program should handle errors and print informative messages to \verb|stderr|.
+\end{enumerate}
+
+\subsection*{Relevant Sections from POSIX.1-2008}
+
+\subsubsection*{Synopsis}
+
+\noindent
+\texttt{head [-n \textit{number}] [\textit{file}...]}
+
+\subsubsection*{Description}
+
+\noindent
+The \textit{head} utility shall copy its input files to the standard output,
+ending the output for each file at a designated point.
+
+\noindent
+Copying shall end at the point in each input file indicated by the
+\textbf{-n} \textit{number} option. The option-argument number shall be counted in units of lines.
+
+\subsubsection*{Options}
+
+\noindent
+The following option shall be supported:
+
+\textbf{-n} \textit{number}
+
+The first \textit{number} lines of each input file shall be copied to standard output.
+The application shall ensure that the number option-argument is a positive decimal integer.
+
+\noindent
+When a file contains less than number lines, it shall be copied to standard output
+in its entirety. This shall not be an error.
+
+\noindent
+If no options are specified, \textit{head} shall act as if \textbf{-n 10} had been specified.
+
+\subsubsection*{Stdout}
+
+\noindent
+The standard output shall contain designated portions of the input files.
+
+\noindent
+If multiple \textit{file} operands are specified, \textit{head} shall precede
+the output for each with the header:
+
+\begin{verbatim}
+"\n==> %s <==\n", <pathname>
+\end{verbatim}
+
+\noindent
+except that the first header written shall not include the initial <newline>.
+
+\section*{Code Listing}
+
+\setmonofont{Fira Mono}
+\lstinputlisting[language=c, style=lablisting]{main.c}
+
+\end{document}
