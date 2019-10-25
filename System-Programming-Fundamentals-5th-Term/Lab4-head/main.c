@@ -1,27 +1,23 @@
 #define _POSIX_C_SOURCE 2
-#include <stdlib.h>
-#include <stdio.h>
 #include <unistd.h>
 
-#define BUF_SIZE 8192
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
 
-void print_lines_buffered(FILE* src, unsigned int lines_requested) {
-  unsigned int lines_printed = 0;
+#define BUF_SIZE 4096
+
+void print_lines_buffered(int fd, unsigned int num_lines) {
+  unsigned int printed = 0;
+
   char inbuf[BUF_SIZE];
+  int bytes_read;
+  while (printed < num_lines && (bytes_read = read(fd, inbuf, BUF_SIZE)) > 0) {
+    unsigned int pos;
+    for (pos = 0; pos < bytes_read; ++pos)
+      if (inbuf[pos] == '\n' && ++printed == num_lines) break;
 
-  while (fgets(inbuf, BUF_SIZE, src) == inbuf) {
-    for (unsigned int i = 0; i < BUF_SIZE; ++i) {
-      if (inbuf[i] == '\n') {
-        fwrite(inbuf, i + 1, 1, stdout);
-        if (++lines_printed == lines_requested)
-          return;
-      }
-      else if (inbuf[i] == '\0') {
-        if (i > 0 && inbuf[i - 1] != '\n')
-          fwrite(inbuf, i + 1, 1, stdout);
-        break;
-      }
-    }
+    write(STDOUT_FILENO, inbuf, pos + 1);
   }
 }
 
@@ -40,11 +36,12 @@ int main(int argc, char** argv) {
       case 'n':
         if (!try_parse_uint(optarg, &num_lines)) {
             fprintf(stderr, "%s: invalid number of lines: '%s'\n", argv[0], optarg);
-            exit(EXIT_FAILURE);
+            return 1;
         }
     }
   }
 
-  print_lines_buffered(stdin, num_lines);
+  print_lines_buffered(STDIN_FILENO, num_lines);
+
   return 0;
 }
