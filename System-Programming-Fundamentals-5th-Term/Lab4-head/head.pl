@@ -11,7 +11,10 @@ use Getopt::Long;
 my $num_lines = 10;
 
 GetOptions("n=i" => \$num_lines) or die("Usage: $0 [-n num-lines] [file...]\n");
-$num_lines > 0 or die("$0: invalid number of lines: '$num_lines'\n");
+$num_lines >= 0 or die("$0: invalid number of lines: '$num_lines'\n");
+if ($num_lines == 0) {
+  exit;
+}
 
 my $printed = 0;
 my $first_file = 1;

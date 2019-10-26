@@ -7,7 +7,7 @@
 #define MAX_ARG_SIZE 1024 * 1024
 
 void read_arg_string(char* arg_buf) {
-  unsigned int args_pos = strlen(arg_buf);
+  int args_pos = strlen(arg_buf);
 
   char inbuf[BUF_SIZE];
   int bytes_read;

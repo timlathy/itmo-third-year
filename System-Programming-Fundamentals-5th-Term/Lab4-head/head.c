@@ -9,18 +9,29 @@
 
 #define BUF_SIZE 4096
 
-void print_lines_buffered(int fd, unsigned int num_lines) {
+typedef enum { LINES, CHARS } print_mode_t;
+
+void print_lines_buffered(int fd, unsigned int num_print, print_mode_t mode) {
   unsigned int printed = 0;
 
   char inbuf[BUF_SIZE];
-  int bytes_read;
-  while (printed < num_lines && (bytes_read = read(fd, inbuf, BUF_SIZE)) > 0) {
-    int pos;
-    for (pos = 0; pos < bytes_read; ++pos)
-      if (inbuf[pos] == '\n' && ++printed == num_lines) break;
+  int bytes_read, pos;
 
-    write(STDOUT_FILENO, inbuf, pos);
-  }
+  if (mode == LINES)
+    while (printed < num_print && (bytes_read = read(fd, inbuf, BUF_SIZE)) > 0) {
+      for (pos = 0; pos < bytes_read; ++pos)
+        if (inbuf[pos] == '\n' && ++printed == num_print) break;
+      write(STDOUT_FILENO, inbuf, pos);
+    }
+  else if (mode == CHARS)
+    while (printed < num_print) {
+      pos = (num_print - printed) < BUF_SIZE ? (num_print - printed) : BUF_SIZE;
+      if ((bytes_read = read(fd, inbuf, pos)) > 0) {
+        write(STDOUT_FILENO, inbuf, bytes_read);
+        printed += bytes_read;
+      }
+      else break;
+    }
 
   write(STDOUT_FILENO, "\n", sizeof("\n"));
 }
@@ -44,7 +55,7 @@ void fdprintf(int fd, const char* fmt, ...) {
   write(fd, buf, msg_len < MSG_BUF_SIZE ? msg_len : MSG_BUF_SIZE);
 }
 
-void handle_filename_args(int argc, char** argv, int num_lines) {
+void handle_filename_args(int argc, char** argv, int num_print, print_mode_t mode) {
   // According to POSIX,
   // If multiple file operands are specified, head shall precede the output for each with the header:
   // "\n==> %s <==\n", <pathname>
@@ -59,7 +70,7 @@ void handle_filename_args(int argc, char** argv, int num_lines) {
 
     if (*argv[optind] == '-') {
       write(STDOUT_FILENO, HEADER_STDIN + header_offset, sizeof(HEADER_STDIN) - header_offset);
-      print_lines_buffered(STDIN_FILENO, num_lines);
+      print_lines_buffered(STDIN_FILENO, num_print, mode);
     }
     else {
       errno = 0;
@@ -78,7 +89,7 @@ void handle_filename_args(int argc, char** argv, int num_lines) {
       }
       else {
         fdprintf(STDOUT_FILENO, HEADER_FILE_FMT + header_offset, argv[optind]);
-        print_lines_buffered(fd, num_lines);
+        print_lines_buffered(fd, num_print, mode);
         close(fd);
       }
     }
@@ -87,16 +98,25 @@ void handle_filename_args(int argc, char** argv, int num_lines) {
 }
 
 int main(int argc, char** argv) {
-  unsigned int num_lines = 10;
+  print_mode_t mode = LINES;
+  unsigned int num_print = 10;
 
   int c;
-  while ((c = getopt(argc, argv, "n:")) != EOF) {
+  while ((c = getopt(argc, argv, "n:c:")) != EOF) {
     switch (c) {
       case 'n':
-        if (!try_parse_uint(optarg, &num_lines)) {
+        if (!try_parse_uint(optarg, &num_print)) {
           fdprintf(STDERR_FILENO, "%s: invalid number of lines: '%s'\n", argv[0], optarg);
           return 1;
         }
+        mode = LINES;
+        break;
+      case 'c':
+        if (!try_parse_uint(optarg, &num_print)) {
+          fdprintf(STDERR_FILENO, "%s: invalid number of characters: '%s'\n", argv[0], optarg);
+          return 1;
+        }
+        mode = CHARS;
         break;
       case '?':
         fdprintf(STDERR_FILENO, "Usage: %s [-n num-lines] [file...]\n", argv[0]);
@@ -105,9 +125,9 @@ int main(int argc, char** argv) {
   }
 
   if (optind == argc)
-    print_lines_buffered(STDIN_FILENO, num_lines);
+    print_lines_buffered(STDIN_FILENO, num_print, mode);
   else
-    handle_filename_args(argc, argv, num_lines);
+    handle_filename_args(argc, argv, num_print, mode);
 
   return 0;
 }
