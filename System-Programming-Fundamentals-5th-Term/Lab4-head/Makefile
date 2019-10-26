@@ -1,10 +1,13 @@
 CC=gcc
 CFLAGS=-std=c11 -g -Wall -Werror -march=native
 
-all: lab4
+all: head xargs
 
-lab4: *.c
-	$(CC) $(CFLAGS) -o lab4 *.c
+head: head.c
+	$(CC) $(CFLAGS) -o head head.c
+
+xargs: xargs.c
+	$(CC) $(CFLAGS) -o xargs xargs.c
 
 clean:
-	@rm lab7
+	@rm head xargs
