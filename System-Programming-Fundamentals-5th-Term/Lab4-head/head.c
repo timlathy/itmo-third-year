@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
         mode = CHARS;
         break;
       case '?':
-        fdprintf(STDERR_FILENO, "Usage: %s [-n num-lines] [file...]\n", argv[0]);
+        fdprintf(STDERR_FILENO, "Usage: %s [-n num-lines] [-c num-bytes] [file...]\n", argv[0]);
         return 1;
     }
   }

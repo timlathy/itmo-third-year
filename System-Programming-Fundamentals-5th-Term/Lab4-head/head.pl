@@ -8,13 +8,16 @@ use strict;
 use warnings qw(FATAL all);
 use Getopt::Long;
 
-my $num_lines = 10;
+use constant USAGE => "Usage: $0 [-n num-lines] [-c num-bytes] [file...]\n";
 
-GetOptions("n=i" => \$num_lines) or die("Usage: $0 [-n num-lines] [file...]\n");
-$num_lines >= 0 or die("$0: invalid number of lines: '$num_lines'\n");
-if ($num_lines == 0) {
-  exit;
-}
+my $num_lines;
+my $num_chars;
+
+GetOptions("n=i" => \$num_lines, "c=i" => \$num_chars) or die(USAGE);
+die("$0: invalid number of lines: '$num_lines'\n") if ($num_lines and $num_lines < 0);
+die("$0: invalid number of characters: '$num_chars'\n") if ($num_chars and $num_chars < 0);
+exit if $num_lines and $num_lines == 0 or $num_chars and $num_chars == 0;
+$num_lines = 10 if not $num_lines and not $num_chars;
 
 my $printed = 0;
 my $first_file = 1;
@@ -32,7 +35,8 @@ while (@ARGV or $first_file or $printed > 0) {
       undef $first_file;
     }
   }
-  if ($printed++ < $num_lines) {
+
+  if ($num_lines and $printed++ < $num_lines) {
     eval {
       my $line = <>;
       print $line;
@@ -42,7 +46,21 @@ while (@ARGV or $first_file or $printed > 0) {
       $printed = 0;
     }
   }
-  if ($printed == $num_lines or eof) {
+  elsif ($num_chars and $printed < $num_chars) {
+    eval {
+      my $line = <>;
+      my $remaining_chars = $num_chars - $printed;
+      my $should_print = $remaining_chars < length $line ? $remaining_chars : length $line;
+      print substr $line, 0, $should_print;
+      $printed += $should_print;
+    }
+    or do {
+      print $@; # error
+      $printed = 0;
+    }
+  }
+
+  if ($num_lines and $printed == $num_lines or $num_chars and $printed == $num_chars or eof) {
     $printed = 0;
     close ARGV;
   }
