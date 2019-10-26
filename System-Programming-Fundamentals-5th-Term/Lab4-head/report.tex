@@ -49,6 +49,8 @@ Rewrite the same program in Perl.
 Write a C program that mimics the behavior of the \textit{xargs}
 utility without optional arguments.
 
+\newpage
+
 \subsection*{Relevant Sections from POSIX.1-2008}
 
 \subsubsection*{Synopsis}
@@ -101,9 +103,14 @@ except that the first header written shall not include the initial <newline>.
 
 \section*{Code Listing}
 
+\setmonofont{Fira Mono}
+
+\subsection*{Makefile}
+
+\lstinputlisting[style=lablisting]{Makefile}
+
 \subsection*{head (C)}
 
-\setmonofont{Fira Mono}
 \lstinputlisting[language=c, style=lablisting]{head.c}
 
 \subsection*{head (Perl)}

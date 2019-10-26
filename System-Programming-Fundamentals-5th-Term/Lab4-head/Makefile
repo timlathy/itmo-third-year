@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-std=c11 -g -Wall -Werror -march=native
+CFLAGS=-std=c11 -g -Wall -Wextra -pedantic -Werror
 
 all: head xargs
 

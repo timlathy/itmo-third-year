@@ -13,9 +13,7 @@ void read_arg_string(char* arg_buf) {
   int bytes_read;
   while (args_pos < MAX_ARG_SIZE - 1 &&
           (bytes_read = read(STDIN_FILENO, inbuf, BUF_SIZE)) > 0)
-    for (unsigned int pos = 0;
-        pos < bytes_read && args_pos < MAX_ARG_SIZE - 1;
-        ++pos)
+    for (int pos = 0; pos < bytes_read && args_pos < MAX_ARG_SIZE - 1; ++pos)
       arg_buf[args_pos++] = inbuf[pos] == '\n' ? ' ' : inbuf[pos];
 }
 

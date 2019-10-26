@@ -15,7 +15,7 @@ void print_lines_buffered(int fd, unsigned int num_lines) {
   char inbuf[BUF_SIZE];
   int bytes_read;
   while (printed < num_lines && (bytes_read = read(fd, inbuf, BUF_SIZE)) > 0) {
-    unsigned int pos;
+    int pos;
     for (pos = 0; pos < bytes_read; ++pos)
       if (inbuf[pos] == '\n' && ++printed == num_lines) break;
 
