@@ -21,15 +21,33 @@
 
 \section*{Assignment}
 
+\subsection*{Part I}
+
 Using raw system calls, write a C program that mimics the behavior of the \textit{head} utility.
 
-\subsection*{Requirements}
+\subsubsection*{Requirements}
 
 \begin{enumerate}
 \item The program should perform input and output via \verb|read(2)| and \verb|write(2)|.
 \item The program should accept multiple input files and use standard input when \texttt{-} is given as a filename.
 \item The program should handle errors and print informative messages to \verb|stderr|.
 \end{enumerate}
+
+\subsection*{Part II}
+
+Rewrite the same program in Perl.
+
+\subsubsection*{Requirements}
+
+\begin{enumerate}
+\item Use \verb|use strict; use warnings qw(FATAL all);| pragmas.
+\item Enable \textit{taint mode} with \verb|#!/usr/bin/perl -T|.
+\end{enumerate}
+
+\subsection*{Part III}
+
+Write a C program that mimics the behavior of the \textit{xargs}
+utility without optional arguments.
 
 \subsection*{Relevant Sections from POSIX.1-2008}
 
@@ -83,7 +101,17 @@ except that the first header written shall not include the initial <newline>.
 
 \section*{Code Listing}
 
+\subsection*{head (C)}
+
 \setmonofont{Fira Mono}
-\lstinputlisting[language=c, style=lablisting]{main.c}
+\lstinputlisting[language=c, style=lablisting]{head.c}
+
+\subsection*{head (Perl)}
+
+\lstinputlisting[language=perl, style=lablisting]{head.pl}
+
+\subsection*{xargs (C)}
+
+\lstinputlisting[language=c, style=lablisting]{xargs.c}
 
 \end{document}

@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <errno.h>
 
 #define BUF_SIZE 4096
 
@@ -25,9 +26,10 @@ void print_lines_buffered(int fd, unsigned int num_lines) {
 }
 
 bool try_parse_uint(const char* str, unsigned int* val) {
+  errno = 0;
   char* endptr;
   *val = strtoul(str, &endptr, 10);
-  return *str != '-' && endptr != str && *endptr == '\0';
+  return *str != '-' && errno == 0 && endptr != str && *endptr == '\0';
 }
 
 // An fprintf()-like wrapper over write().
@@ -60,9 +62,19 @@ void handle_filename_args(int argc, char** argv, int num_lines) {
       print_lines_buffered(STDIN_FILENO, num_lines);
     }
     else {
+      errno = 0;
       int fd = open(argv[optind], O_RDONLY);
       if (fd == -1) {
-        fdprintf(STDERR_FILENO, "%s: Cannot open %s for reading", argv[0], argv[optind]);
+        const char* error_fmt = "%s: Cannot open %s for reading\n";
+        switch (errno) {
+          case EACCES:
+            error_fmt = "%s: Cannot open %s for reading (access denied)\n";
+            break;
+          case ENOENT:
+            error_fmt = "%s: Cannot open %s for reading (file not found)\n";
+            break;
+        }
+        fdprintf(STDERR_FILENO, error_fmt, argv[0], argv[optind]);
       }
       else {
         fdprintf(STDOUT_FILENO, HEADER_FILE_FMT + header_offset, argv[optind]);
