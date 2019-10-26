@@ -16,25 +16,28 @@ $num_lines > 0 or die("$0: invalid number of lines: '$num_lines'\n");
 my $printed = 0;
 my $first_file = 1;
 
-while (1) {
+while (@ARGV or $first_file or $printed > 0) {
   if ($printed == 0) {
-    if (not @ARGV and $first_file) {
-      # No arguments = don't print the header, read from stdin
-      undef $first_file;
-    }
-    elsif (@ARGV) {
+    if (@ARGV) {
       my $leading_newline = $first_file ? "" : "\n";
       my $filename = $ARGV[0] eq "-" ? "standard input" : $ARGV[0];
       print "$leading_newline==> $filename <==\n";
       undef $first_file;
     }
     else {
-      last;
+      # No arguments = don't print the header, read from stdin
+      undef $first_file;
     }
   }
   if ($printed++ < $num_lines) {
-    my $line = <>;
-    print $line;
+    eval {
+      my $line = <>;
+      print $line;
+    }
+    or do {
+      print $@; # error
+      $printed = 0;
+    }
   }
   if ($printed == $num_lines or eof) {
     $printed = 0;
