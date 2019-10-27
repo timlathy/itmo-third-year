@@ -50,8 +50,11 @@ class SystemEquations:
         return p_sum, eq
 
     def queue_len(self, priority=None):
-        p_sum = sum(n.p * n.enqueued_count(priority) for n in self.nodes if n.is_busy(priority))
-        eq = ' + '.join(n.p_eq for n in self.nodes if n.is_busy(priority) and n.enqueued_count(priority) > 0)
+        p_sum = sum(n.p * n.enqueued_count(priority) for n in self.nodes)
+        def node_eq(n):
+            q = n.enqueued_count(priority)
+            return (str(q) if q > 1 else '') + '\\cdot ' + n.p_eq
+        eq = ' + '.join(node_eq(n) for n in self.nodes if n.enqueued_count(priority) > 0)
         return p_sum, eq
 
     def loss_probability(self, priority):
@@ -73,13 +76,13 @@ class SystemEquations:
         ys = [l * b for l, b in zip(lambdas, bs)]
         occupancies = [self.occupancy(i) for i in priorities]
         queue_lens = [self.queue_len(i) for i in priorities]
-        task_counts = [occupancies[i][0] * queue_lens[i][0] for i in priorities]
+        task_counts = [occupancies[i][0] + queue_lens[i][0] for i in priorities]
         loss_probs = [self.loss_probability(i) for i in priorities]
         loss_prob_p_sum, loss_prob_sum_eq = self.loss_probability(priorities)
-        efficiencies = [l * (1 - pi) for l, (pi, _) in zip(lambdas, loss_probs)]
+        throughputs = [l * (1 - pi) for l, (pi, _) in zip(lambdas, loss_probs)]
 
-        mean_wait_times = [l / eff for (l, _), eff in zip(queue_lens, efficiencies)]
-        mean_wait_time_sum = self.queue_len()[0] / sum(efficiencies)
+        mean_wait_times = [l / eff for (l, _), eff in zip(queue_lens, throughputs)]
+        mean_wait_time_sum = self.queue_len()[0] / sum(throughputs)
 
         output = [
             ['Нагрузка', '', '', ''],
@@ -102,9 +105,9 @@ class SystemEquations:
             *[['', f'К{i+1}', f'$$\\pi_{i+1} = {eq}$$', r(pi)] for i, (pi, eq) in enumerate(loss_probs)],
             ['', '$$\sum$$', f'$$\\pi = {loss_prob_sum_eq}$$', r(loss_prob_p_sum)],
 
-            ['Производительность', '', '', ''],
-            *[['', f'К{i+1}', f'$$\\lambda\'_{i+1} = \\lambda(1 - \\pi_{i+1})$$', r(eff)] for i, eff in enumerate(efficiencies)],
-            ['', '$$\sum$$', f'$$\\lambda\' = \\sum \\lambda\'_i$$', r(sum(efficiencies))],
+            ['Пропускная способность', '', '', ''],
+            *[['', f'К{i+1}', f'$$\\lambda\'_{i+1} = \\lambda(1 - \\pi_{i+1})$$', r(eff)] for i, eff in enumerate(throughputs)],
+            ['', '$$\sum$$', f'$$\\lambda\' = \\sum \\lambda\'_i$$', r(sum(throughputs))],
 
             ['Среднее время ожидания', '', '', ''],
             *[['', f'К{i+1}', f'$$w_{i+1} = l_{i+1} / \\lambda\'_{i+1}$$', r(w)] for i, w in enumerate(mean_wait_times)],
