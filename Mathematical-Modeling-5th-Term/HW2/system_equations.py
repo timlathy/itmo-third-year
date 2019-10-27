@@ -2,16 +2,11 @@
 # occupancy (0 = free, 1-3 = occupied by the specified priority class),
 # the rest are for queues (0 = empty, 1-3 = occupied by a priority class).
 
-# queues: a list of queue sizes for priority classes #0, #1, #2.
-# priorities: a list specifying priority class ordering. For instance,
-#   you may see "3-2-1" in your assignment, which means that class #3
-#   has higher priority than #2. This translates to priorities=[3, 2, 1].
-
-# Note that PriorityQueueNode#can_lose_task is assignment-specific.
+# queues: a list of queue sizes for priority classes.
+# priorities: a matrix (list of row lists) showing relationship between priority classes.
 
 def priority_queue_eqs(ps, queues, priorities):
-    assert len(queues) == len(priorities), \
-        "Assignments with number of queues /= number of priorities are not supported"
+    assert len(queues) == len(priorities), "Each priority class has to have a queue"
     return SystemEquations(sorted([
         PriorityQueueNode(p_indexed, node, queues, priorities)
         for node, p_indexed in ps.items()
@@ -22,7 +17,7 @@ class PriorityQueueNode:
         self.p_eq = f'p_{{{p_indexed[0] + 1}}}'
         self.p = p_indexed[1]
         self.node = node
-        self.lowest_priority_i = priorities[-1] - 1
+        self.priorities = priorities
         self.device_occupancy = [node[0] == str(i + 1) for i in range(len(priorities))]
 
     def is_busy(self, priority=None):
@@ -33,13 +28,14 @@ class PriorityQueueNode:
             return 1 if self.node[1 + priority] == str(priority + 1) else 0
         return sum(self.enqueued_count(priority) for priority in range(len(self.device_occupancy)))
 
-    # ! Assignment-specific
     def can_lose_task(self, priority):
-        lowest_priority = priority == self.lowest_priority_i
-        can_override_lower_priority = not lowest_priority \
-            and self.device_occupancy[self.lowest_priority_i] \
-            and self.enqueued_count(self.lowest_priority_i) == 0
-        return self.node[1 + priority] != '0' and not can_override_lower_priority
+        if any(rel == 2 for rel in self.priorities[priority]): # has absolute priority over some other class?
+            for priority2, rel in enumerate(self.priorities[priority]):
+                if rel == 2:
+                    cannot_override_task = self.is_busy() and not self.is_busy(priority2)
+                    return self.enqueued_count(priority) > 0 and cannot_override_task
+        else:
+            return self.is_busy() and self.enqueued_count(priority) > 0
 
     def __repr__(self):
         return f'p_eq={self.p_eq}, p={self.p}, node={self.node}, occupancy={self.device_occupancy}'
@@ -59,8 +55,13 @@ class SystemEquations:
         return p_sum, eq
 
     def loss_probability(self, priority):
-        p_sum = sum(n.p for n in self.nodes if n.can_lose_task(priority))
-        eq = ' + '.join(n.p_eq for n in self.nodes if n.can_lose_task(priority))
+        priorities = priority if hasattr(priority, '__iter__') else [priority]
+        nodes = sorted(
+            set(n for p in priorities for n in self.nodes if n.can_lose_task(p)),
+            key=lambda n: int(n.p_eq[3:-1])
+        )
+        p_sum = sum(n.p for n in nodes)
+        eq = ' + '.join(n.p_eq for n in nodes)
         return p_sum, eq
 
     def equation_table_csv(self, lambdas, bs):
@@ -74,11 +75,10 @@ class SystemEquations:
         queue_lens = [self.queue_len(i) for i in priorities]
         task_counts = [occupancies[i][0] * queue_lens[i][0] for i in priorities]
         loss_probs = [self.loss_probability(i) for i in priorities]
-        loss_prob_p_sum = sum(pi for pi, _ in loss_probs)
-        loss_prob_eq = ' + '.join(eq for _, eq in loss_probs)
+        loss_prob_p_sum, loss_prob_sum_eq = self.loss_probability(priorities)
         efficiencies = [l * (1 - pi) for l, (pi, _) in zip(lambdas, loss_probs)]
 
-        mean_wait_times = [l / eff for (l, _), eff in zip(queue_lens, efficiencies)] 
+        mean_wait_times = [l / eff for (l, _), eff in zip(queue_lens, efficiencies)]
         mean_wait_time_sum = self.queue_len()[0] / sum(efficiencies)
 
         output = [
@@ -100,7 +100,7 @@ class SystemEquations:
 
             ['Вероятность потери', '', '', ''],
             *[['', f'К{i+1}', f'$$\\pi_{i+1} = {eq}$$', r(pi)] for i, (pi, eq) in enumerate(loss_probs)],
-            ['', '$$\sum$$', f'$$\\pi = {loss_prob_eq}$$', r(loss_prob_p_sum)],
+            ['', '$$\sum$$', f'$$\\pi = {loss_prob_sum_eq}$$', r(loss_prob_p_sum)],
 
             ['Производительность', '', '', ''],
             *[['', f'К{i+1}', f'$$\\lambda\'_{i+1} = \\lambda(1 - \\pi_{i+1})$$', r(eff)] for i, eff in enumerate(efficiencies)],

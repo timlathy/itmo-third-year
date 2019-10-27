@@ -106,10 +106,15 @@ edge_equations = {
 
 lambdas = [0.5, 0.1, 1.0]
 bs = [1.0, 2.0, 0.5]
+priorities = [
+  [0, 0, 0],
+  [2, 0, 0], # class #2 has absolute priority over class #1
+  [2, 0, 0]  # class #3 has absolute priority over class #1
+]
 
 eqs = g.make_equations(edge_equations)
 ps = g.solve(eqs, lambdas, mus=[1 / b for b in bs])
-e = priority_queue_eqs(ps, queues=[1, 1, 1], priorities=[3, 2, 1])
+e = priority_queue_eqs(ps, queues=[1, 1, 1], priorities=priorities)
 
 print('\nХарактеристики системы:\n')
 print(e.equation_table_csv(lambdas, bs))
