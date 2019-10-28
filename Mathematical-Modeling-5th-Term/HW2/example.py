@@ -116,5 +116,22 @@ eqs = g.make_equations(edge_equations)
 ps = g.solve(eqs, lambdas, mus=[1 / b for b in bs])
 e = priority_queue_eqs(ps, queues=[1, 1, 1], priorities=priorities)
 
+equation_table = e.equation_table(lambdas, bs)
+param_variation_table = e.param_variation_table(lambdas, bs,
+  lambdas_alt=[
+    [l * 0.5 for l in lambdas],
+    [l * 2 for l in lambdas]
+  ],
+  bs_alt=[
+    [b * 0.5 for b in bs],
+    [b * 2 for b in bs]
+  ])
+
+#print(f'Матрица интенсивностей переходов:\n{",".join(g.nodes)}\n')
+#print(g.adjacency_table_csv())
+#print('\nСтационарные вероятности состояний:\n')
+#print(g.probability_table_csv(ps))
 print('\nХарактеристики системы:\n')
-print(e.equation_table_csv(lambdas, bs))
+print(table_to_csv(equation_table))
+print('\nВарьирование параметров:\n')
+print(table_to_csv(param_variation_table))

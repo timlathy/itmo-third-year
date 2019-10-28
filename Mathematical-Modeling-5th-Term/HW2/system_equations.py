@@ -12,6 +12,9 @@ def priority_queue_eqs(ps, queues, priorities):
         for node, p_indexed in ps.items()
     ], key=lambda n: int(n.p_eq[3:-1])))
 
+def table_to_csv(table):
+    return '\n'.join(','.join(line) for line in table)
+
 class PriorityQueueNode:
     def __init__(self, p_indexed, node, queues, priorities):
         self.p_eq = f'p_{{{p_indexed[0] + 1}}}'
@@ -81,7 +84,7 @@ class SystemEquations:
         eq = ' + '.join(f'{n.p_eq}\\cdot (({lambda_terms(priorities)}) / \\sum\\lambda)' for n, priorities in nodes)
         return p_sum, eq
 
-    def equation_table_csv(self, lambdas, bs):
+    def equation_table(self, lambdas, bs):
         def r(num):
             return str(round(num, 3))
 
@@ -98,7 +101,7 @@ class SystemEquations:
         mean_wait_times = [l / eff for (l, _), eff in zip(queue_lens, throughputs)]
         mean_wait_time_sum = self.queue_len()[0] / sum(throughputs)
 
-        output = [
+        return [
             ['Нагрузка', '', '', ''],
             *[['', f'К{i+1}', f'$$y_{i+1} = \lambda_{i+1} b_{i+1}$$', r(y)] for i, y in enumerate(ys)],
             ['', '$$\sum$$', f'$$y = \sum y_i$$', r(sum(ys))],
@@ -131,4 +134,17 @@ class SystemEquations:
             *[['', f'К{i+1}', f'$$u_{i+1} = w_{i+1} + b_{i+1}$$', r(w + b)] for i, (w, b) in enumerate(zip(mean_wait_times, bs))],
         ]
 
-        return '\n'.join(','.join(line) for line in output)
+    def param_variation_table(self, lambdas, bs, lambdas_alt, bs_alt):
+        alt_params = [(alt, bs) for alt in lambdas_alt] + [(lambdas, alt) for alt in bs_alt]
+
+        table = []
+        for line in self.equation_table(lambdas, bs):
+            if line[0] != '': # header
+                table.append([*line[:3], *[''] * len(alt_params)])
+            else: # equation
+                table.append([*line[:2], line[3], *[''] * len(alt_params)])
+        for alt_i, (alt_l, alt_b) in enumerate(alt_params):
+            for i, line in enumerate(self.equation_table(alt_l, alt_b)):
+                table[i][3 + alt_i] = line[3]
+
+        return table
