@@ -28,14 +28,25 @@ class PriorityQueueNode:
             return 1 if self.node[1 + priority] == str(priority + 1) else 0
         return sum(self.enqueued_count(priority) for priority in range(len(self.device_occupancy)))
 
-    def can_lose_task(self, priority):
-        if any(rel == 2 for rel in self.priorities[priority]): # has absolute priority over some other class?
-            for priority2, rel in enumerate(self.priorities[priority]):
-                if rel == 2:
-                    cannot_override_task = self.is_busy() and not self.is_busy(priority2)
-                    return self.enqueued_count(priority) > 0 and cannot_override_task
-        else:
-            return self.is_busy() and self.enqueued_count(priority) > 0
+    def loses_task_to(self, priority):
+        overriden_by_priorities = set()
+        for priority2, rels in enumerate(self.priorities):
+            if priority2 == priority: continue
+            if rels[priority] == 2: # has absolute priority over our class?
+                if self.is_busy(priority) and \
+                    self.enqueued_count(priority) > 0 and self.enqueued_count(priority2) > 0:
+                    overriden_by_priorities.add(priority2)
+        if self.enqueued_count(priority) > 0:
+            can_override_other_class = any(rel == 2 for rel in self.priorities[priority])
+            if can_override_other_class:
+                for priority2, rel in enumerate(self.priorities[priority]):
+                    if rel == 2:
+                        cannot_override_task = self.is_busy() and not self.is_busy(priority2)
+                        if self.enqueued_count(priority) > 0 and cannot_override_task:
+                            overriden_by_priorities.add(priority)
+            else:
+                overriden_by_priorities.add(priority)
+        return overriden_by_priorities
 
     def __repr__(self):
         return f'p_eq={self.p_eq}, p={self.p}, node={self.node}, occupancy={self.device_occupancy}'
@@ -57,14 +68,17 @@ class SystemEquations:
         eq = ' + '.join(node_eq(n) for n in self.nodes if n.enqueued_count(priority) > 0)
         return p_sum, eq
 
-    def loss_probability(self, priority):
+    def loss_probability(self, priority, lambdas):
         priorities = priority if hasattr(priority, '__iter__') else [priority]
-        nodes = sorted(
-            set(n for p in priorities for n in self.nodes if n.can_lose_task(p)),
-            key=lambda n: int(n.p_eq[3:-1])
-        )
-        p_sum = sum(n.p for n in nodes)
-        eq = ' + '.join(n.p_eq for n in nodes)
+        nodes = []
+        for n in self.nodes:
+            loses_task_to = set(p2 for p in priorities for p2 in n.loses_task_to(p))
+            if len(loses_task_to) > 0:
+                nodes.append((n, loses_task_to))
+        nodes.sort(key=lambda n: int(n[0].p_eq[3:-1]))
+        p_sum = sum(n.p * sum(lambdas[prio] for prio in priorities) / sum(lambdas) for n, priorities in nodes)
+        lambda_terms = lambda priorities: ' + '.join(f'\\lambda_{prio + 1}' for prio in priorities)
+        eq = ' + '.join(f'{n.p_eq}\\cdot (({lambda_terms(priorities)}) / \\sum\\lambda)' for n, priorities in nodes)
         return p_sum, eq
 
     def equation_table_csv(self, lambdas, bs):
@@ -77,8 +91,8 @@ class SystemEquations:
         occupancies = [self.occupancy(i) for i in priorities]
         queue_lens = [self.queue_len(i) for i in priorities]
         task_counts = [occupancies[i][0] + queue_lens[i][0] for i in priorities]
-        loss_probs = [self.loss_probability(i) for i in priorities]
-        loss_prob_p_sum, loss_prob_sum_eq = self.loss_probability(priorities)
+        loss_probs = [self.loss_probability(i, lambdas) for i in priorities]
+        loss_prob_p_sum, loss_prob_sum_eq = self.loss_probability(priorities, lambdas)
         throughputs = [l * (1 - pi) for l, (pi, _) in zip(lambdas, loss_probs)]
 
         mean_wait_times = [l / eff for (l, _), eff in zip(queue_lens, throughputs)]
