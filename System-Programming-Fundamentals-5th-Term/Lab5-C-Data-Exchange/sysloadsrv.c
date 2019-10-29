@@ -1,27 +1,13 @@
-#define _POSIX_C_SOURCE 2
 #define _DEFAULT_SOURCE // getloadavg
-#include <sys/types.h>
+#include "sysload.h"
+
 #include <unistd.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
+
 // Shared memory
 #include <sys/ipc.h>
 #include <sys/shm.h>
-
-#define DIE_ON_ERRNO(errmsg) if (errno != 0) {\
-  fprintf(stderr, "%s: %s\n", errmsg, strerror(errno));\
-  return 1;\
-}
-
-typedef struct {
-  pid_t srv_pid;
-  uid_t srv_uid;
-  gid_t srv_gid;
-  double loadavg[3];
-} server_state_t;
 
 int run_sysv_shmem_server(pid_t pid, uid_t uid, gid_t gid) {
   errno = 0;
