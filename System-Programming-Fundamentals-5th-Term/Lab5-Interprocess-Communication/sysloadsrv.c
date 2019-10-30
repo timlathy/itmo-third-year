@@ -8,8 +8,13 @@
 // Shared memory
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <sys/msg.h>
 
 typedef enum { M_UNDEF, M_SHMEM, M_MSGQ } ipc_mode_t;
+
+#define MSGTYPE_IN 1
+#define MSGTYPE_OUT 2
+typedef struct { long mtype; char mtext[sizeof(server_state_t)]; } msgbuf_t;
 
 int run_sysv_shmem_server(pid_t pid, uid_t uid, gid_t gid) {
   errno = 0;
@@ -36,6 +41,32 @@ int run_sysv_shmem_server(pid_t pid, uid_t uid, gid_t gid) {
 }
 
 int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid) {
+  errno = 0;
+
+  int mqid = msgget(IPC_PRIVATE, IPC_CREAT | 0644);
+  DIE_ON_ERRNO("Unable to create a message queue");
+
+  server_state_t state;
+  state.srv_pid = pid;
+  state.srv_uid = uid;
+  state.srv_gid = gid;
+
+  printf("Message queue id: %d\n", mqid);
+
+  while (1) {
+    msgbuf_t msg;
+    msgrcv(mqid, &msg, 0, MSGTYPE_IN, 0);
+    DIE_ON_ERRNO("Unable to receive an incoming message");
+
+    getloadavg(state.loadavg, 3);
+
+    msg.mtype = MSGTYPE_OUT;
+    memcpy(msg.mtext, &state, sizeof(server_state_t));
+
+    msgsnd(mqid, &msg, sizeof(server_state_t), 0);
+    DIE_ON_ERRNO("Unable to send a reply message");
+  }
+
   return 0;
 }
 
