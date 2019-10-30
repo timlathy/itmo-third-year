@@ -15,6 +15,9 @@ typedef struct {
 
 typedef enum { M_UNDEF, M_SHMEM, M_MSGQ } ipc_mode_t;
 
+// Unique identifier used as a key_t for System V IPC calls
+#define IPC_KEY 0xC011151
+
 #define MSGTYPE_QUERY 1
 #define MSGTYPE_REPLY 2
 typedef struct {

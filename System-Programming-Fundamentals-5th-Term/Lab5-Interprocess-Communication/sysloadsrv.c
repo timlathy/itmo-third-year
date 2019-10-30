@@ -37,7 +37,7 @@ int run_sysv_shmem_server(pid_t pid, uid_t uid, gid_t gid) {
 int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid) {
   errno = 0;
 
-  int mqid = msgget(IPC_PRIVATE, IPC_CREAT | 0644);
+  int mqid = msgget(IPC_KEY, IPC_CREAT | 0644);
   DIE_ON_ERRNO("Unable to create a message queue");
 
   server_state_t state;
@@ -45,7 +45,7 @@ int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid) {
   state.srv_uid = uid;
   state.srv_gid = gid;
 
-  printf("Message queue id: %d\n", mqid);
+  puts("Message queue created");
 
   while (1) {
     msgbuf_t msg;
