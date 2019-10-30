@@ -13,6 +13,15 @@ typedef struct {
   double loadavg[3];
 } server_state_t;
 
+typedef enum { M_UNDEF, M_SHMEM, M_MSGQ } ipc_mode_t;
+
+#define MSGTYPE_QUERY 1
+#define MSGTYPE_REPLY 2
+typedef struct {
+  long mtype;
+  char mtext[sizeof(server_state_t)];
+} msgbuf_t;
+
 #define DIE_ON_ERRNO(errmsg) if (errno != 0) {\
   fprintf(stderr, "%s: %s\n", errmsg, strerror(errno));\
   return 1;\

@@ -5,16 +5,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-// Shared memory
+// IPC
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/msg.h>
-
-typedef enum { M_UNDEF, M_SHMEM, M_MSGQ } ipc_mode_t;
-
-#define MSGTYPE_IN 1
-#define MSGTYPE_OUT 2
-typedef struct { long mtype; char mtext[sizeof(server_state_t)]; } msgbuf_t;
 
 int run_sysv_shmem_server(pid_t pid, uid_t uid, gid_t gid) {
   errno = 0;
@@ -55,12 +49,12 @@ int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid) {
 
   while (1) {
     msgbuf_t msg;
-    msgrcv(mqid, &msg, 0, MSGTYPE_IN, 0);
-    DIE_ON_ERRNO("Unable to receive an incoming message");
+    msgrcv(mqid, &msg, 0, MSGTYPE_QUERY, 0);
+    DIE_ON_ERRNO("Unable to receive an incoming query message");
 
     getloadavg(state.loadavg, 3);
 
-    msg.mtype = MSGTYPE_OUT;
+    msg.mtype = MSGTYPE_REPLY;
     memcpy(msg.mtext, &state, sizeof(server_state_t));
 
     msgsnd(mqid, &msg, sizeof(server_state_t), 0);
