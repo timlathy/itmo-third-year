@@ -5,6 +5,7 @@ class GraphSolver:
     nodes = set()
     adjacency = {}
     adjacency_eqs = []
+    equations = None
 
     def __init__(self, num_priorities):
         self.symbols = {
@@ -19,7 +20,7 @@ class GraphSolver:
         self.nodes.add(a)
         self.nodes.add(b)
 
-    def make_equations(self, edge_equations):
+    def build_equations(self, edge_equations):
         self.nodes = list(self.nodes)
         self.nodes.sort()
 
@@ -38,18 +39,20 @@ class GraphSolver:
             return cells
 
         self.adjacency_eqs = [row(i_row, n_row) for i_row, n_row in enumerate(self.nodes)]
-
         cols = np.transpose(self.adjacency_eqs)
-        return [sp.Eq(sum(col), 0) for col in cols] + [sp.Eq(sum(self.p_list), 1)]
 
-    def solve(self, equations, lambdas, mus):
+        self.equations = [sp.Eq(sum(col), 0) for col in cols] + [sp.Eq(sum(self.p_list), 1)]
+
+    def solve(self, lambdas, mus):
+        assert self.equations is not None, \
+            "call #build_equations first"
         assert len(lambdas) == len(self.symbols['l']), \
             "len(lambdas) must be equal to num_priorities passed to GraphSolver(...)"
         assert len(mus) == len(self.symbols['mu']), \
             "len(mus) must be equal to num_priorities passed to GraphSolver(...)"
 
         substitutions = [*zip(self.symbols['l'], lambdas), *zip(self.symbols['mu'], mus)]
-        substituted = [e.subs(substitutions) for e in equations]
+        substituted = [e.subs(substitutions) for e in self.equations]
 
         solution = sp.solve(substituted, list(self.symbols['p'].keys()))
         return {self.symbols['p'][p]: (self.p_list.index(p), v) for p, v in solution.items()}

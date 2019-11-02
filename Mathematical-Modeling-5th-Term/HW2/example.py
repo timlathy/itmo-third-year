@@ -89,7 +89,7 @@ g.edge('3223', '3220', label='1/3μ3')
 g.edge('3323', '3023', label='2/3μ3')
 g.edge('3323', '2303', label='1/3μ3')
 
-edge_equations = {
+g.build_equations(edge_equations={
   'λ1': lambda p: p * g.symbols['l'][0],
   'λ2': lambda p: p * g.symbols['l'][1],
   'λ3': lambda p: p * g.symbols['l'][2],
@@ -102,7 +102,7 @@ edge_equations = {
   '0.5μ3': lambda p: p * g.symbols['mu'][2] * 0.5,
   '1/3μ3': lambda p: p * g.symbols['mu'][2] / 3,
   '2/3μ3': lambda p: p * g.symbols['mu'][2] * 2 / 3
-}
+})
 
 lambdas = [0.5, 0.1, 1.0]
 bs = [1.0, 2.0, 0.5]
