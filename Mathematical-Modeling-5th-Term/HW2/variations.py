@@ -4,22 +4,21 @@ os.environ['MPLBACKEND'] = 'Agg'
 import matplotlib.pyplot as plt
 import labellines as pltlines
 
-def variation_table(g, ps_to_syseqs, default_lambdas, default_bs, lambdas_vars, bs_vars):
+def variation_table(g, model, default_lambdas, default_bs, lambdas_vars, bs_vars):
     var_params = [(l, default_bs) for l in lambdas_vars] + [(default_lambdas, b) for b in bs_vars]
 
     table = []
     for var_i, (var_l, var_b) in enumerate(var_params):
         print(f'variation #{var_i}: l = {var_l}, b = {var_b}')
-        ps = g.solve(var_l, mus=[1 / b for b in var_b])
-        e = ps_to_syseqs(ps)
-        var_table = e.equation_table(var_l, var_b)
+        states = g.solve(var_l, mus=[1 / b for b in var_b])
+        measures_table = model.get_measures(states).measures_table(var_l, var_b)
         if len(table) == 0:
-            for line in var_table:
+            for line in measures_table:
                 if line[0] != '': # header
                     table.append([*line[:3], *[''] * len(var_params)])
                 else: # equation
                     table.append([*line[:2], line[3], *[''] * len(var_params)])
-        for i, line in enumerate(var_table):
+        for i, line in enumerate(measures_table):
             table[i][3 + var_i] = line[3]
 
     return table

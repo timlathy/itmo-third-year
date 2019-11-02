@@ -2,18 +2,30 @@
 # occupancy (0 = free, 1-3 = occupied by the specified priority class),
 # the rest are for queues (0 = empty, 1-3 = occupied by a priority class).
 
-# queues: a list of queue sizes for priority classes.
-# priorities: a matrix (list of row lists) showing relationship between priority classes.
+class Model:
+    # queues: a list of queue sizes for priority classes.
+    # priorities: a matrix (list of row lists) showing relationship between priority classes.
+    def __init__(self, queues, priorities):
+        """Constructs a model with the specified queues and priority classes.
 
-def priority_queue_eqs(ps, queues, priorities):
-    assert len(queues) == len(priorities), "Each priority class has to have a queue"
-    return SystemEquations(sorted([
-        PriorityQueueNode(p_indexed, node, queues, priorities)
-        for node, p_indexed in ps.items()
-    ], key=lambda n: int(n.p_eq[3:-1])))
+        Parameters
+        ----------
+        queues : list of ints
+            queue sizes for priority classes, e.g. [1, 1, 1]
+        priorities : list of row lists
+            a matrix of relationships between priority classes.
+            Example: an absolute 2-3-1 priority is [[0, 0, 0], [2, 0, 2], [2, 0, 0]]
+        """
+        assert len(queues) == len(priorities), "Each priority class has to have a queue"
+        self.queues = queues
+        self.priorities = priorities
 
-def table_to_csv(table):
-    return '\n'.join(','.join(line) for line in table)
+    def get_measures(self, state_probabilties):
+      """Returns measures for the model with the given state probabilities (computed using `StateGraph`)."""
+      return ModelMeasures(sorted([
+          PriorityQueueNode(p_indexed, node, self.queues, self.priorities)
+          for node, p_indexed in state_probabilties.items()
+      ], key=lambda n: int(n.p_eq[3:-1])))
 
 class PriorityQueueNode:
     def __init__(self, p_indexed, node, queues, priorities):
@@ -54,7 +66,7 @@ class PriorityQueueNode:
     def __repr__(self):
         return f'p_eq={self.p_eq}, p={self.p}, node={self.node}, occupancy={self.device_occupancy}'
 
-class SystemEquations:
+class ModelMeasures:
     def __init__(self, nodes):
         self.nodes = nodes
 
@@ -73,6 +85,9 @@ class SystemEquations:
 
     def loss_probability(self, priority, lambdas):
         priorities = priority if hasattr(priority, '__iter__') else [priority]
+        lup = { '0000': 'p0', '1000': 'p1', '2000': 'p2', '3000': 'p3', '1100': 'p4', '2100': 'p5',
+            '2003': 'p6', '2020': 'p7', '3100': 'p8', '3003': 'p9', '2120': 'p10', '2103': 'p11',
+            '2023': 'p12', '3103': 'p13', '2123': 'p14' }
         nodes = []
         for n in self.nodes:
             loses_task_to = set(p2 for p in priorities for p2 in n.loses_task_to(p))
@@ -81,10 +96,10 @@ class SystemEquations:
         nodes.sort(key=lambda n: int(n[0].p_eq[3:-1]))
         p_sum = sum(n.p * sum(lambdas[prio] for prio in priorities) / sum(lambdas) for n, priorities in nodes)
         lambda_terms = lambda priorities: ' + '.join(f'\\lambda_{prio + 1}' for prio in priorities)
-        eq = ' + '.join(f'{n.p_eq}\\cdot (({lambda_terms(priorities)}) / \\sum\\lambda)' for n, priorities in nodes)
+        eq = ' + '.join(f'{lup[n.node]}\\cdot (({lambda_terms(priorities)}) / \\sum\\lambda)' for n, priorities in nodes)
         return p_sum, eq
 
-    def equation_table(self, lambdas, bs):
+    def measures_table(self, lambdas, bs):
         def r(num):
             return str(round(num, 3))
 
