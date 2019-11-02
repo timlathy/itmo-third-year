@@ -20,9 +20,6 @@ int query_server(ipc_mode_t mode, int ipc_id) {
       DIE_ON_ERRNO("Unable to access the server's shared memory region");
       break;
     case M_MSGQ:
-      ipc_id = msgget(IPC_KEY, 0644);
-      DIE_ON_ERRNO("Unable to connect to a message queue");
-
       msg.mtype = MSGTYPE_QUERY;
       msgsnd(ipc_id, &msg, 0, 0);
       DIE_ON_ERRNO("Unable to send a query message");
