@@ -68,14 +68,14 @@ int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid) {
 
 int run_mmap_server(pid_t pid, uid_t uid, gid_t gid, const char* file) {
   int fd = open(file, O_CREAT | O_RDWR, 0644);
-  DIE_ON_ERRNO("Unable to open the file for writing");
+  DIE_ON_ERRNO("Unable to open the shared file for writing");
 
   ftruncate(fd, sizeof(server_state_t));
-  DIE_ON_ERRNO("Unable to open the file for writing");
+  DIE_ON_ERRNO("Unable to open the shared file for writing");
 
   server_state_t* state = (server_state_t*) mmap(NULL, sizeof(server_state_t),
     PROT_WRITE, MAP_SHARED, fd, 0);
-  DIE_ON_ERRNO("Unable to mmap the file");
+  DIE_ON_ERRNO("Unable to mmap the shared file");
 
   state->srv_pid = pid;
   state->srv_uid = uid;
@@ -105,9 +105,9 @@ int main(int argc, char** argv) {
       case 's': mode = M_SHMEM; break;
       case 'q': mode = M_MSGQ; break;
       case 'm':
-        mode = M_MMAP;
         ipc_filename = malloc(strlen(optarg));
         strcpy(ipc_filename, optarg);
+        mode = M_MMAP;
         break;
     }
   }
