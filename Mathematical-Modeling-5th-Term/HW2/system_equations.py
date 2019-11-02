@@ -1,3 +1,9 @@
+import os
+os.environ['MPLBACKEND'] = 'Agg'
+
+import matplotlib.pyplot as plt
+import labellines as pltlines
+
 # Regarding node encoding, the first symbol is interpreted as device
 # occupancy (0 = free, 1-3 = occupied by the specified priority class),
 # the rest are for queues (0 = empty, 1-3 = occupied by a priority class).
@@ -134,17 +140,37 @@ class SystemEquations:
             *[['', f'К{i+1}', f'$$u_{i+1} = w_{i+1} + b_{i+1}$$', r(w + b)] for i, (w, b) in enumerate(zip(mean_wait_times, bs))],
         ]
 
-    def param_variation_table(self, lambdas, bs, lambdas_alt, bs_alt):
-        alt_params = [(alt, bs) for alt in lambdas_alt] + [(lambdas, alt) for alt in bs_alt]
+    def param_variation_table(self, lambdas, bs, lambdas_vars, bs_vars):
+        var_params = [(v, bs) for v in lambdas_vars] + [(lambdas, v) for v in bs_vars]
 
         table = []
         for line in self.equation_table(lambdas, bs):
             if line[0] != '': # header
-                table.append([*line[:3], *[''] * len(alt_params)])
+                table.append([*line[:3], *[''] * len(var_params)])
             else: # equation
-                table.append([*line[:2], line[3], *[''] * len(alt_params)])
-        for alt_i, (alt_l, alt_b) in enumerate(alt_params):
-            for i, line in enumerate(self.equation_table(alt_l, alt_b)):
-                table[i][3 + alt_i] = line[3]
+                table.append([*line[:2], line[3], *[''] * len(var_params)])
+        for var_i, (var_l, var_b) in enumerate(var_params):
+            for i, line in enumerate(self.equation_table(var_l, var_b)):
+                table[i][3 + var_i] = line[3]
 
         return table
+
+    def plot_variation(self, table, outfile, param, var_i, var_to_i, var_label, param_label):
+        plot_lines = []
+        for i, line in enumerate(table):
+            if line[0] == param:
+                plot_lines = {
+                    l[1]: [float(v) for v in l[3 + var_i:3 + var_to_i]]
+                    for l in table[i + 1:i + 5]
+                }
+                break
+
+        plt.figure(figsize=(10,6))
+        plt.xlabel(var_label)
+        plt.ylabel(param_label)
+        plt.plot(range(var_i, var_to_i), plot_lines['К1'], label='К1')
+        plt.plot(range(var_i, var_to_i), plot_lines['К2'], label='К2')
+        plt.plot(range(var_i, var_to_i), plot_lines['К3'], label='К3')
+        plt.plot(range(var_i, var_to_i), plot_lines['$$\\sum$$'], label='$\\sum$')
+        pltlines.labelLines(plt.gca().get_lines(), zorder=2, bbox={'pad': 0.2, 'facecolor': 'white', 'edgecolor': 'none'})
+        plt.savefig(outfile)
