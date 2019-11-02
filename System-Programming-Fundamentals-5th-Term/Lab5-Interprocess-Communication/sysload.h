@@ -13,7 +13,7 @@ typedef struct {
   double loadavg[3];
 } server_state_t;
 
-typedef enum { M_UNDEF, M_SHMEM, M_MSGQ } ipc_mode_t;
+typedef enum { M_UNDEF, M_SHMEM, M_MSGQ, M_MMAP } ipc_mode_t;
 
 #define MSGTYPE_QUERY 1
 #define MSGTYPE_REPLY 2

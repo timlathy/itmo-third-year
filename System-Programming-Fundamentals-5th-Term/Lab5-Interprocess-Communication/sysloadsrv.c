@@ -9,6 +9,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/msg.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 
 int run_sysv_shmem_server(pid_t pid, uid_t uid, gid_t gid) {
   errno = 0;
@@ -64,17 +66,49 @@ int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid) {
   return 0;
 }
 
+int run_mmap_server(pid_t pid, uid_t uid, gid_t gid, const char* file) {
+  int fd = open(file, O_CREAT | O_RDWR, 0644);
+  DIE_ON_ERRNO("Unable to open the file for writing");
+
+  ftruncate(fd, sizeof(server_state_t));
+  DIE_ON_ERRNO("Unable to open the file for writing");
+
+  server_state_t* state = (server_state_t*) mmap(NULL, sizeof(server_state_t),
+    PROT_WRITE, MAP_SHARED, fd, 0);
+  DIE_ON_ERRNO("Unable to mmap the file");
+
+  state->srv_pid = pid;
+  state->srv_uid = uid;
+  state->srv_gid = gid;
+
+  printf("Using memory-mapped file %s\n", file);
+
+  while (1) {
+    getloadavg(state->loadavg, 3);
+    sleep(1);
+  }
+
+  return 0;
+}
+
 int main(int argc, char** argv) {
   #define USAGE "Usage: %s mode, where mode is either of:\n"\
     "  -s: use System V shared memory\n"\
-    "  -q: use System V message queue\n"
+    "  -q: use System V message queue\n"\
+    "  -m filename: use memory-mapped file\n"
 
   int c;
   ipc_mode_t mode = M_UNDEF;
-  while ((c = getopt(argc, argv, "sq")) != EOF) {
+  char* ipc_filename = NULL;
+  while ((c = getopt(argc, argv, "sqm:")) != EOF) {
     switch (c) {
       case 's': mode = M_SHMEM; break;
       case 'q': mode = M_MSGQ; break;
+      case 'm':
+        mode = M_MMAP;
+        ipc_filename = malloc(strlen(optarg));
+        strcpy(ipc_filename, optarg);
+        break;
     }
   }
   if (mode == M_UNDEF) {
@@ -92,6 +126,7 @@ int main(int argc, char** argv) {
   switch (mode) {
     case M_SHMEM: return run_sysv_shmem_server(pid, uid, gid);
     case M_MSGQ: return run_sysv_msgq_server(pid, uid, gid);
+    case M_MMAP: return run_mmap_server(pid, uid, gid, ipc_filename);
     case M_UNDEF: return 1; // unreachable
   }
 }
