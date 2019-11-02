@@ -115,7 +115,6 @@ g.build_equations(edge_equations={
 lambdas = [0.5, 0.1, 1.0]
 bs = [1.0, 2.0, 0.5]
 
-
 lambda_vars=[
   [round(l / 4, 2) for l in lambdas],
   [round(l / 2, 2) for l in lambdas],
@@ -123,10 +122,9 @@ lambda_vars=[
   [round(l * 2, 2) for l in lambdas],
 ]
 b_vars=[
-  [1.0, 1.0, 4.0],
-  [3.0, 3.0, 6.0],
-  [4.0, 4.0, 7.0],
-  [5.0, 5.0, 8.0],
+  [0.5, 1.0, 0.25],
+  [1.0, 2.0, 0.5],
+  [2.0, 4.0, 1.0]
 ]
 
 print('Состояния:\n' + ','.join(g.nodes) + "\n")
@@ -139,5 +137,22 @@ write_csv(measures_table, 'характеристики.csv')
 variations = ModelVariations(model, lambdas, bs, lambda_vars, b_vars)
 write_csv(variations.table, 'варьирование-параметров.csv')
 
+print('\nСтрою графики...')
+
 variations.plot('интенсивность-нагрузка.png', 'λ', 'Нагрузка', 'y')
 variations.plot('интенсивность-загрузка.png', 'λ', 'Загрузка', '$\\rho$')
+variations.plot('интенсивность-длина-очереди.png', 'λ', 'Длина очереди', 'l')
+variations.plot('интенсивность-число-заявок.png', 'λ', 'Число заявок', 'm')
+variations.plot('интенсивность-время-ожидания.png', 'λ', 'Среднее время ожидания', 'w')
+#variations.plot('интенсивность-время-пребывания.png', 'λ', 'Среднее время пребывания', 'u')
+variations.plot('интенсивность-вероятность-потери.png', 'λ', 'Вероятность потери', '$\\pi$')
+variations.plot('интенсивность-пропускная-способность.png', 'λ', 'Пропускная способность', '$\\lambda\'$')
+
+variations.plot('длит-обсл-нагрузка.png', 'b', 'Нагрузка', 'y')
+variations.plot('длит-обсл-загрузка.png', 'b', 'Загрузка', '$\\rho$')
+variations.plot('длит-обсл-длина-очереди.png', 'b', 'Длина очереди', 'l')
+variations.plot('длит-обсл-число-заявок.png', 'b', 'Число заявок', 'm')
+variations.plot('длит-обсл-время-ожидания.png', 'b', 'Среднее время ожидания', 'w')
+#variations.plot('длит-обсл-время-пребывания.png', 'b', 'Среднее время пребывания', 'u')
+variations.plot('длит-обсл-вероятность-потери.png', 'b', 'Вероятность потери', '$\\pi$')
+variations.plot('длит-обсл-пропускная-способность.png', 'b', 'Пропускная способность', '$\\lambda\'$')

@@ -13,7 +13,7 @@ class ModelVariations:
 
         self.table = []
         for var_i, (var_l, var_b) in enumerate(var_params):
-            print(f'variation #{var_i}: l = {var_l}, b = {var_b}')
+            print(f'Вариация #{var_i}: l = {var_l}, b = {var_b}')
             measures_table = model.get_measures(var_l, var_b).measures_table()
             if len(self.table) == 0:
                 for line in measures_table:
@@ -30,7 +30,7 @@ class ModelVariations:
             var_to_i = len(self.lambdas_vars)
         elif var == 'b':
             var_i = len(self.lambdas_vars)
-            vat_to_i = var_i + len(self.bs_vars)
+            var_to_i = var_i + len(self.bs_vars)
         else:
             raise f'Unknown variable {var}, possible values: "λ" or "b".'
 
