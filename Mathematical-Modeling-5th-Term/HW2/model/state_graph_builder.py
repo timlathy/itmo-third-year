@@ -57,9 +57,11 @@ class StateGraphBuilder:
         solution = sp.solve(substituted, list(self.symbols['p'].keys()))
         return {self.symbols['p'][p]: (self.p_list.index(p), v) for p, v in solution.items()}
 
-    def adjacency_table_csv(self):
-        return '\n'.join(','.join(map(str, row)) for row in self.adjacency_eqs)
+    def adjacency_table(self):
+        return [[str(c) for c in row] for row in self.adjacency_eqs]
 
-    def probability_table_csv(self, solution):
-        return '\n'.join(','.join([str(i + 1), node, str(round(solution[node][1], 4))])
-                         for i, node in enumerate(self.symbols['p'].values()))
+    def probability_table(self, states):
+        return [
+            [str(i + 1), node, str(round(states[node][1], 4))]
+            for i, node in enumerate(self.symbols['p'].values())
+        ]

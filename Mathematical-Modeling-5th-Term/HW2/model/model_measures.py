@@ -1,20 +1,22 @@
 class ModelMeasures:
-    def __init__(self, nodes):
+    def __init__(self, nodes, lambdas, bs):
         self.nodes = nodes
+        self.lambdas = lambdas
+        self.bs = bs
 
-    def measures_table(self, lambdas, bs):
+    def measures_table(self):
         def r(num):
             return str(round(num, 3))
 
-        priorities = range(len(lambdas))
+        priorities = range(len(self.lambdas))
 
-        ys = [l * b for l, b in zip(lambdas, bs)]
+        ys = [l * b for l, b in zip(self.lambdas, self.bs)]
         occupancies = [self.occupancy(i) for i in priorities]
         queue_lens = [self.queue_len(i) for i in priorities]
         task_counts = [occupancies[i][0] + queue_lens[i][0] for i in priorities]
-        loss_probs = [self.loss_probability(i, lambdas) for i in priorities]
-        loss_prob_p_sum, loss_prob_sum_eq = self.loss_probability(priorities, lambdas)
-        throughputs = [l * (1 - pi) for l, (pi, _) in zip(lambdas, loss_probs)]
+        loss_probs = [self.loss_probability(i) for i in priorities]
+        loss_prob_p_sum, loss_prob_sum_eq = self.loss_probability(priorities)
+        throughputs = [l * (1 - pi) for l, (pi, _) in zip(self.lambdas, loss_probs)]
 
         mean_wait_times = [l / eff for (l, _), eff in zip(queue_lens, throughputs)]
         mean_wait_time_sum = self.queue_len()[0] / sum(throughputs)
@@ -49,7 +51,7 @@ class ModelMeasures:
             ['', '$$\sum$$', f'$$w = l / \\lambda\'$$', r(mean_wait_time_sum)],
 
             ['Среднее время пребывания', '', '', ''],
-            *[['', f'К{i+1}', f'$$u_{i+1} = w_{i+1} + b_{i+1}$$', r(w + b)] for i, (w, b) in enumerate(zip(mean_wait_times, bs))],
+            *[['', f'К{i+1}', f'$$u_{i+1} = w_{i+1} + b_{i+1}$$', r(w + b)] for i, (w, b) in enumerate(zip(mean_wait_times, self.bs))],
         ]
 
     def occupancy(self, priority=None):
@@ -65,7 +67,7 @@ class ModelMeasures:
         eq = ' + '.join(node_eq(n) for n in self.nodes if n.enqueued_count(priority) > 0)
         return p_sum, eq
 
-    def loss_probability(self, priority, lambdas):
+    def loss_probability(self, priority):
         priorities = priority if hasattr(priority, '__iter__') else [priority]
         nodes = []
         for n in self.nodes:
@@ -73,7 +75,10 @@ class ModelMeasures:
             if len(loses_task_to) > 0:
                 nodes.append((n, loses_task_to))
         nodes.sort(key=lambda n: int(n[0].p_eq[3:-1]))
-        p_sum = sum(n.p * sum(lambdas[prio] for prio in priorities) / sum(lambdas) for n, priorities in nodes)
+        p_sum = sum(
+            n.p * sum(self.lambdas[prio] for prio in priorities) / sum(self.lambdas)
+            for n, priorities in nodes
+        )
         lambda_terms = lambda priorities: ' + '.join(f'\\lambda_{prio + 1}' for prio in priorities)
         eq = ' + '.join(f'{n.p_eq}\\cdot (({lambda_terms(priorities)}) / \\sum\\lambda)' for n, priorities in nodes)
         return p_sum, eq

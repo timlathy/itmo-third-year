@@ -1,7 +1,8 @@
-from model import Model, variation_table, variation_plot_to_file
+from model import Model, ModelVariations
 
-def table_to_csv(table):
-  return '\n'.join(','.join(line) for line in table)
+def write_csv(table, file):
+  with open(file, 'w') as f:
+    f.write('\n'.join(','.join(l) for l in table))
 
 model = Model(queues=[1, 1, 1], priorities=[
   [0, 0, 0],
@@ -114,8 +115,6 @@ g.build_equations(edge_equations={
 lambdas = [0.5, 0.1, 1.0]
 bs = [1.0, 2.0, 0.5]
 
-states = g.solve(lambdas, mus=[1 / b for b in bs])
-measures_table = model.get_measures(states).measures_table(lambdas, bs)
 
 lambda_vars=[
   [round(l / 4, 2) for l in lambdas],
@@ -130,16 +129,15 @@ b_vars=[
   [5.0, 5.0, 8.0],
 ]
 
-param_variation_table = variation_table(g, model,
-  lambdas, bs, lambda_vars, b_vars)
+print('Состояния:\n' + ','.join(g.nodes) + "\n")
+write_csv(g.adjacency_table(), 'интенсивности-переходов.csv')
+write_csv(model.state_probability_matrix(lambdas, bs), 'стационарные-вероятности-состояний.csv')
 
-print('\nХарактеристики системы:\n')
-print(table_to_csv(measures_table))
-print('\nВарьирование параметров:\n')
-print(table_to_csv(param_variation_table))
+measures_table = model.get_measures(lambdas, bs).measures_table()
+write_csv(measures_table, 'характеристики.csv')
 
-variation_plot_to_file(param_variation_table, outfile='test.png',
-  param='Нагрузка', var_i=0, var_to_i=len(lambda_vars), var_label='λ', param_label='y')
+variations = ModelVariations(model, lambdas, bs, lambda_vars, b_vars)
+write_csv(variations.table, 'варьирование-параметров.csv')
 
-variation_plot_to_file(param_variation_table, outfile='test2.png',
-  param='Загрузка', var_i=0, var_to_i=len(lambda_vars), var_label='λ', param_label='$\\rho$')
+variations.plot('интенсивность-нагрузка.png', 'λ', 'Нагрузка', 'y')
+variations.plot('интенсивность-загрузка.png', 'λ', 'Загрузка', '$\\rho$')
