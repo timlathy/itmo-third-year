@@ -1,6 +1,6 @@
 from .queue_node import QueueNode
 from .model_measures import ModelMeasures
-from .state_graph import StateGraph
+from .state_graph_builder import StateGraphBuilder
 from .variations import variation_table, variation_plot_to_file
 
 class Model:
@@ -20,6 +20,10 @@ class Model:
         assert len(queues) == len(priorities), "Each priority class has to have a queue"
         self.queues = queues
         self.priorities = priorities
+
+    def state_graph_builder(self):
+      """Returns a state graph builder with a graphviz-like interface"""
+      return StateGraphBuilder(len(self.priorities))
 
     def get_measures(self, state_probabilties):
       """Returns measures for the model with the given state probabilities (computed using `StateGraph`)."""

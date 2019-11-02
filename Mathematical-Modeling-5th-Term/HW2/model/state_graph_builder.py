@@ -1,7 +1,7 @@
 import numpy as np
 import sympy as sp
 
-class StateGraph:
+class StateGraphBuilder:
     nodes = set()
     adjacency = {}
     adjacency_eqs = []

@@ -1,7 +1,14 @@
-from graph_solver import GraphSolver
-from system_equations import priority_queue_eqs
+from model import Model, variation_table, variation_plot_to_file
 
-g = GraphSolver(num_priorities=3)
+def table_to_csv(table):
+  return '\n'.join(','.join(line) for line in table)
+
+model = Model(queues=[1, 1, 1], priorities=[
+  [0, 0, 0],
+  [2, 0, 0], # class #2 has absolute priority over class #1
+  [2, 0, 0]  # class #3 has absolute priority over class #1
+])
+g = model.state_graph_builder()
 
 g.edge('0000', '1000', label='λ1')
 g.edge('0000', '2000', label='λ2')
@@ -106,32 +113,33 @@ g.build_equations(edge_equations={
 
 lambdas = [0.5, 0.1, 1.0]
 bs = [1.0, 2.0, 0.5]
-priorities = [
-  [0, 0, 0],
-  [2, 0, 0], # class #2 has absolute priority over class #1
-  [2, 0, 0]  # class #3 has absolute priority over class #1
+
+states = g.solve(lambdas, mus=[1 / b for b in bs])
+measures_table = model.get_measures(states).measures_table(lambdas, bs)
+
+lambda_vars=[
+  [round(l / 4, 2) for l in lambdas],
+  [round(l / 2, 2) for l in lambdas],
+  [round(l * 1.5, 2) for l in lambdas],
+  [round(l * 2, 2) for l in lambdas],
+]
+b_vars=[
+  [1.0, 1.0, 4.0],
+  [3.0, 3.0, 6.0],
+  [4.0, 4.0, 7.0],
+  [5.0, 5.0, 8.0],
 ]
 
-eqs = g.make_equations(edge_equations)
-ps = g.solve(eqs, lambdas, mus=[1 / b for b in bs])
-e = priority_queue_eqs(ps, queues=[1, 1, 1], priorities=priorities)
+param_variation_table = variation_table(g, model,
+  lambdas, bs, lambda_vars, b_vars)
 
-equation_table = e.equation_table(lambdas, bs)
-param_variation_table = e.param_variation_table(lambdas, bs,
-  lambdas_alt=[
-    [l * 0.5 for l in lambdas],
-    [l * 2 for l in lambdas]
-  ],
-  bs_alt=[
-    [b * 0.5 for b in bs],
-    [b * 2 for b in bs]
-  ])
-
-#print(f'Матрица интенсивностей переходов:\n{",".join(g.nodes)}\n')
-#print(g.adjacency_table_csv())
-#print('\nСтационарные вероятности состояний:\n')
-#print(g.probability_table_csv(ps))
 print('\nХарактеристики системы:\n')
-print(table_to_csv(equation_table))
+print(table_to_csv(measures_table))
 print('\nВарьирование параметров:\n')
 print(table_to_csv(param_variation_table))
+
+variation_plot_to_file(param_variation_table, outfile='test.png',
+  param='Нагрузка', var_i=0, var_to_i=len(lambda_vars), var_label='λ', param_label='y')
+
+variation_plot_to_file(param_variation_table, outfile='test2.png',
+  param='Загрузка', var_i=0, var_to_i=len(lambda_vars), var_label='λ', param_label='$\\rho$')
