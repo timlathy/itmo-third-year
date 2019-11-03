@@ -1,15 +1,21 @@
-from model import Model, ModelVariations
+from model import Model, ModelVariations, BufferingStrategy
+#from graphviz import Digraph
 
 def write_csv(table, file):
   with open(file, 'w') as f:
     f.write('\n'.join(','.join(l) for l in table))
 
-model = Model(queues=[1, 1, 1], priorities=[
-  [0, 0, 0],
-  [2, 0, 0], # class #2 has absolute priority over class #1
-  [2, 0, 0]  # class #3 has absolute priority over class #1
-])
+model = Model(
+  queues=[1, 1, 1],
+  priorities=[
+    [0, 0, 0],
+    [2, 0, 0], # class #2 has absolute priority over class #1
+    [2, 0, 0]  # class #3 has absolute priority over class #1
+  ],
+  buf_strategy=BufferingStrategy.OCCUPY_LOWER_IF_FREE
+)
 g = model.state_graph_builder()
+#g = Digraph('G')
 
 g.edge('0000', '1000', label='λ1')
 g.edge('0000', '2000', label='λ2')
@@ -97,6 +103,8 @@ g.edge('3223', '3220', label='1/3μ3')
 g.edge('3323', '3023', label='2/3μ3')
 g.edge('3323', '2303', label='1/3μ3')
 
+#g.view() # graphviz
+
 g.build_equations(edge_equations={
   'λ1': lambda p: p * g.symbols['l'][0],
   'λ2': lambda p: p * g.symbols['l'][1],
@@ -127,11 +135,15 @@ b_vars=[
   [2.0, 4.0, 1.0]
 ]
 
-print('Состояния:\n' + ','.join(g.nodes) + "\n")
 write_csv(g.adjacency_table(), 'интенсивности-переходов.csv')
 write_csv(model.state_probability_matrix(lambdas, bs), 'стационарные-вероятности-состояний.csv')
 
-measures_table = model.get_measures(lambdas, bs).measures_table()
+measures = model.get_measures(lambdas, bs)
+print('Состояния:')
+for n in measures.nodes:
+  print(n)
+
+measures_table = measures.measures_table()
 write_csv(measures_table, 'характеристики.csv')
 
 variations = ModelVariations(model, lambdas, bs, lambda_vars, b_vars)

@@ -2,12 +2,13 @@ from .model_measures import ModelMeasures
 from .model_variations import ModelVariations
 from .queue_node import QueueNode
 from .state_graph_builder import StateGraphBuilder
+from .buffering_strategy import BufferingStrategy
 
 class Model:
     graph = None
 
-    def __init__(self, queues, priorities):
-        """Constructs a model with the specified queues and priority classes.
+    def __init__(self, queues, priorities, buf_strategy):
+        """Constructs a model with the specified parameters.
 
         Parameters
         ----------
@@ -16,10 +17,13 @@ class Model:
         priorities : list of row lists
             a matrix of relationships between priority classes.
             Example: an absolute 2-3-1 priority is [[0, 0, 0], [2, 0, 2], [2, 0, 0]]
+        buf_stategy : BufferingStrategy
         """
         assert len(queues) == len(priorities), "Each priority class has to have a queue"
+        assert isinstance(buf_strategy, BufferingStrategy)
         self.queues = queues
         self.priorities = priorities
+        self.buf_strategy = buf_strategy
 
     def state_graph_builder(self):
         """Returns a state graph builder with a graphviz-like interface"""
@@ -46,4 +50,4 @@ class Model:
         ]
         nodes.sort(key=lambda n: int(n.p_eq[3:-1]))
 
-        return ModelMeasures(nodes, lambdas, bs)
+        return ModelMeasures(self, nodes, lambdas, bs)

@@ -1,5 +1,6 @@
 class ModelMeasures:
-    def __init__(self, nodes, lambdas, bs):
+    def __init__(self, model, nodes, lambdas, bs):
+        self.model = model
         self.nodes = nodes
         self.lambdas = lambdas
         self.bs = bs
@@ -63,7 +64,7 @@ class ModelMeasures:
         p_sum = sum(n.p * n.enqueued_count(priority) for n in self.nodes)
         def node_eq(n):
             q = n.enqueued_count(priority)
-            return (str(q) if q > 1 else '') + '\\cdot ' + n.p_eq
+            return (str(q) + '\\cdot ' if q > 1 else '') + n.p_eq
         eq = ' + '.join(node_eq(n) for n in self.nodes if n.enqueued_count(priority) > 0)
         return p_sum, eq
 
@@ -71,7 +72,7 @@ class ModelMeasures:
         priorities = priority if hasattr(priority, '__iter__') else [priority]
         nodes = []
         for n in self.nodes:
-            loses_task_to = set(p2 for p in priorities for p2 in n.loses_task_to(p))
+            loses_task_to = set(p2 for p in priorities for p2 in n.loses_task_to(p, self.model.buf_strategy))
             if len(loses_task_to) > 0:
                 nodes.append((n, loses_task_to))
         nodes.sort(key=lambda n: int(n[0].p_eq[3:-1]))

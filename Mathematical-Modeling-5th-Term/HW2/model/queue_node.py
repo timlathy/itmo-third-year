@@ -1,3 +1,5 @@
+from .buffering_strategy import BufferingStrategy
+
 class QueueNode:
     def __init__(self, p_indexed, node, queues, priorities):
         self.p_eq = f'p_{{{p_indexed[0] + 1}}}'
@@ -11,10 +13,12 @@ class QueueNode:
 
     def enqueued_count(self, priority=None):
         if priority is not None:
-            return 1 if self.node[1 + priority] == str(priority + 1) else 0
+            return 1 if self.node[1 + priority] != '0' else 0
         return sum(self.enqueued_count(priority) for priority in range(len(self.device_occupancy)))
 
-    def loses_task_to(self, priority):
+    def loses_task_to(self, priority, buf_strategy):
+        assert isinstance(buf_strategy, BufferingStrategy)
+
         overriden_by_priorities = set()
         for priority2, rels in enumerate(self.priorities):
             if priority2 == priority: continue
@@ -28,11 +32,16 @@ class QueueNode:
                 for priority2, rel in enumerate(self.priorities[priority]):
                     if rel == 2:
                         cannot_override_task = self.is_busy() and not self.is_busy(priority2)
-                        if self.enqueued_count(priority) > 0 and cannot_override_task:
-                            overriden_by_priorities.add(priority)
+                        if not cannot_override_task:
+                            continue
+                        if buf_strategy == BufferingStrategy.OCCUPY_LOWER_IF_FREE:
+                            if self.enqueued_count(priority) > 0 and self.enqueued_count(priority2) > 0:
+                                overriden_by_priorities.add(priority)
+                        else:
+                            raise "Unknown buffering strategy"
             else:
                 overriden_by_priorities.add(priority)
         return overriden_by_priorities
 
     def __repr__(self):
-        return f'p_eq={self.p_eq}, p={self.p}, node={self.node}, occupancy={self.device_occupancy}'
+        return f'{self.p_eq} ({self.node}): p={self.p}, occupancy={self.device_occupancy}'
