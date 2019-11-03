@@ -53,6 +53,7 @@ class ModelMeasures:
 
             ['Среднее время пребывания', '', '', ''],
             *[['', f'К{i+1}', f'$$u_{i+1} = w_{i+1} + b_{i+1}$$', r(w + b)] for i, (w, b) in enumerate(zip(mean_wait_times, self.bs))],
+            ['', '$$\sum$$', f'$$u = w + b$$', r(mean_wait_time_sum + sum(self.bs))],
         ]
 
     def occupancy(self, priority=None):

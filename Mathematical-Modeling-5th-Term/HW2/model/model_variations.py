@@ -2,6 +2,7 @@ import os
 os.environ['MPLBACKEND'] = 'Agg'
 
 import matplotlib.pyplot as plt
+import matplotlib.ticker as pltticker
 import labellines as pltlines
 
 class ModelVariations:
@@ -44,7 +45,7 @@ class ModelVariations:
                 break
 
         plt.figure(figsize=(10,6))
-        plt.xlabel(var)
+        plt.xlabel('Номер опыта')
         plt.ylabel(param_label)
         plt.plot(range(var_i, var_to_i), plot_lines['К1'], label='К1')
         plt.plot(range(var_i, var_to_i), plot_lines['К2'], label='К2')
@@ -52,6 +53,7 @@ class ModelVariations:
         plt.plot(range(var_i, var_to_i), plot_lines['$$\\sum$$'], label='$\\sum$')
 
         plot_line_bbox = {'pad': 0.2, 'facecolor': 'white', 'edgecolor': 'none'}
+        plt.gca().xaxis.set_major_locator(pltticker.MultipleLocator(1))
         pltlines.labelLines(plt.gca().get_lines(), zorder=2, bbox=plot_line_bbox)
 
         plt.savefig(outfile)
