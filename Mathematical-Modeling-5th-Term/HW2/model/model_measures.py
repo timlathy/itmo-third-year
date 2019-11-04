@@ -65,7 +65,7 @@ class ModelMeasures:
         p_sum = sum(n.p * n.enqueued_count(priority) for n in self.nodes)
         def node_eq(n):
             q = n.enqueued_count(priority)
-            return (str(q) + '\\cdot ' if q > 1 else '') + n.p_eq
+            return (str(q) + ' \\cdot ' if q > 1 else '') + n.p_eq
         eq = ' + '.join(node_eq(n) for n in self.nodes if n.enqueued_count(priority) > 0)
         return p_sum, eq
 

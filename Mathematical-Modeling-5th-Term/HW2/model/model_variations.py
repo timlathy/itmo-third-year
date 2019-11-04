@@ -56,4 +56,5 @@ class ModelVariations:
         plt.gca().xaxis.set_major_locator(pltticker.MultipleLocator(1))
         pltlines.labelLines(plt.gca().get_lines(), zorder=2, bbox=plot_line_bbox)
 
+        plt.tight_layout()
         plt.savefig(outfile)

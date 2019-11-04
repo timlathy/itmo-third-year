@@ -11,9 +11,12 @@ class QueueNode:
     def is_busy(self, priority=None):
         return self.device_occupancy[priority] if priority is not None else any(self.device_occupancy)
 
+    def queue_occupancy(self, priority):
+        return 1 if self.node[1 + priority] != '0' else 0
+
     def enqueued_count(self, priority=None):
         if priority is not None:
-            return 1 if self.node[1 + priority] != '0' else 0
+            return sum(1 if q == str(priority + 1) else 0 for q in self.node[1:])
         return sum(self.enqueued_count(priority) for priority in range(len(self.device_occupancy)))
 
     def loses_task_to(self, priority, buf_strategy):
@@ -24,9 +27,9 @@ class QueueNode:
             if priority2 == priority: continue
             if rels[priority] == 2: # has absolute priority over our class?
                 if self.is_busy(priority) and \
-                    self.enqueued_count(priority) > 0 and self.enqueued_count(priority2) > 0:
+                    self.queue_occupancy(priority) > 0 and self.queue_occupancy(priority2) > 0:
                     overriden_by_priorities.add(priority2)
-        if self.enqueued_count(priority) > 0:
+        if self.queue_occupancy(priority) > 0:
             can_override_other_class = any(rel == 2 for rel in self.priorities[priority])
             if can_override_other_class:
                 for priority2, rel in enumerate(self.priorities[priority]):
@@ -35,7 +38,7 @@ class QueueNode:
                         if not cannot_override_task:
                             continue
                         if buf_strategy == BufferingStrategy.OCCUPY_LOWER_IF_FREE:
-                            if self.enqueued_count(priority) > 0 and self.enqueued_count(priority2) > 0:
+                            if self.queue_occupancy(priority) > 0 and self.queue_occupancy(priority2) > 0:
                                 overriden_by_priorities.add(priority)
                         else:
                             raise "Unknown buffering strategy"
