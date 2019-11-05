@@ -14,6 +14,19 @@ typedef struct { char* letters; sem_t sem_begin; sem_t sem_end; } thread_data_t;
 #include <sys/sem.h>
 
 typedef struct { char* letters; int sem_id; } thread_data_t;
+
+void sysv_wait_sem(int sem_id, int sem_num) {
+  struct sembuf op[2] = {
+    { .sem_num = sem_num, .sem_op = 0, .sem_flg = 0 }, // wait for zero
+    { .sem_num = sem_num, .sem_op = 1, .sem_flg = 0 }  // increment
+  };
+  semop(sem_id, op, 2);
+}
+
+void sysv_signal_sem(int sem_id, int sem_num) {
+  struct sembuf op = { .sem_num = sem_num, .sem_op = -1, .sem_flg = 0 };
+  semop(sem_id, &op, 1);
+}
 #endif
 
 void* invert_case_posix_sem_thread(void* arg) {
@@ -24,10 +37,7 @@ void* invert_case_posix_sem_thread(void* arg) {
     T_CHK_ERRNO(sem_wait(&data->sem_begin));
 #endif
 #ifdef SEM_SYSV
-    {
-      struct sembuf op = { .sem_num = 0, .sem_op = 0, .sem_flg = 0 }; // sem #0 = begin
-      T_CHK_ERRNO(semop(data->sem_id, &op, 1));
-    }
+    T_CHK_ERRNO(sysv_wait_sem(data->sem_id, 0)); // sem #0 = begin
 #endif
 
     int case_incr = data->letters[0] == 'a' ? -32 : 32; // 'a' - 32 = 'A', 'A' + 32 = 'a'
@@ -38,10 +48,7 @@ void* invert_case_posix_sem_thread(void* arg) {
     T_CHK_ERRNO(sem_post(&data->sem_end));
 #endif
 #ifdef SEM_SYSV
-    {
-      struct sembuf op = { .sem_num = 1, .sem_op = 1, .sem_flg = 0 }; // sem #1 = end
-      T_CHK_ERRNO(semop(data->sem_id, &op, 1));
-    }
+    T_CHK_ERRNO(sysv_signal_sem(data->sem_id, 1)); // sem #1 = end
 #endif
   }
 }
@@ -54,10 +61,7 @@ void* reverse_posix_sem_thread(void* arg) {
     T_CHK_ERRNO(sem_wait(&data->sem_begin));
 #endif
 #ifdef SEM_SYSV
-    {
-      struct sembuf op = { .sem_num = 0, .sem_op = 0, .sem_flg = 0 }; // sem #0 = begin
-      T_CHK_ERRNO(semop(data->sem_id, &op, 1));
-    }
+    T_CHK_ERRNO(sysv_wait_sem(data->sem_id, 0)); // sem #0 = begin
 #endif
 
     for (int i = 0; i < 26 / 2; ++i) {
@@ -70,10 +74,7 @@ void* reverse_posix_sem_thread(void* arg) {
     T_CHK_ERRNO(sem_post(&data->sem_end));
 #endif
 #ifdef SEM_SYSV
-    {
-      struct sembuf op = { .sem_num = 1, .sem_op = 1, .sem_flg = 0 }; // sem #1 = end
-      T_CHK_ERRNO(semop(data->sem_id, &op, 1));
-    }
+    T_CHK_ERRNO(sysv_signal_sem(data->sem_id, 1)); // sem #1 = end
 #endif
   }
 }
@@ -94,8 +95,11 @@ int main(int argc, char** argv) {
   CHK_ERRNO(sem_init(&reverse_thrd_data.sem_end, 0, 0));
 #endif
 #ifdef SEM_SYSV
+  short init_vals[2] = { 1, 1 };
   CHK_ERRNO(invcase_thrd_data.sem_id = semget(IPC_PRIVATE, 2, 0600 | IPC_CREAT));
   CHK_ERRNO(reverse_thrd_data.sem_id = semget(IPC_PRIVATE, 2, 0600 | IPC_CREAT));
+  CHK_ERRNO(semctl(invcase_thrd_data.sem_id, 0, SETALL, init_vals));
+  CHK_ERRNO(semctl(reverse_thrd_data.sem_id, 0, SETALL, init_vals));
 #endif
 
   if (pthread_create(&invcase_thrd, NULL, invert_case_posix_sem_thread, &invcase_thrd_data) != 0 ||
@@ -115,14 +119,8 @@ int main(int argc, char** argv) {
     CHK_ERRNO(sem_wait(&tdata->sem_end));
 #endif
 #ifdef SEM_SYSV
-    {
-      struct sembuf op = { .sem_num = 0, .sem_op = 1, .sem_flg = 0 }; // sem #0 = begin
-      CHK_ERRNO(semop(tdata->sem_id, &op, 1));
-    }
-    {
-      struct sembuf op = { .sem_num = 1, .sem_op = 0, .sem_flg = 0 }; // sem #1 = end
-      CHK_ERRNO(semop(tdata->sem_id, &op, 1));
-    }
+    CHK_ERRNO(sysv_signal_sem(tdata->sem_id, 0)); // sem #0 = begin
+    CHK_ERRNO(sysv_wait_sem(tdata->sem_id, 1)); // sem #1 = end
 #endif
 
     for (int i = 0; i < 26; ++i)
