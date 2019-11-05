@@ -11,7 +11,7 @@ sysloadclt: sysloadclt.c
 
 semarray: semarray.c
 	$(CC) $(CFLAGS) -pthread -o semarray_posix -DSEM_POSIX semarray.c
-	#$(CC) $(CFLAGS) -pthread -o semarray_sysv -DSEM_SYSV semarray.c
+	$(CC) $(CFLAGS) -pthread -o semarray_sysv -DSEM_SYSV semarray.c
 
 clean:
 	@rm sysloadsrv sysloadclt semarray_posix semarray_sysv
