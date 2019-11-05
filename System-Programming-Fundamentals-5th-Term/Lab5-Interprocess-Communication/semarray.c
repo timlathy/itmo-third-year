@@ -1,33 +1,42 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
 
-#define CHK_ERRNO(expr) do {\
+#ifdef SEM_POSIX
+#include <semaphore.h>
+
+typedef struct { char* letters; sem_t sem_begin; sem_t sem_end; } thread_data_t;
+#endif
+
+#ifdef SEM_SYSV
+typedef struct { char* letters; sem_t sem_begin; sem_t sem_end; } thread_data_t;
+#endif
+
+#define CHK_ERRNO(expr) GEN_CHK_ERRNO(expr, int)
+#define T_CHK_ERRNO(expr) GEN_CHK_ERRNO(expr, void*)
+
+#define GEN_CHK_ERRNO(expr, ty) do {\
   expr;\
   if (errno != 0) {\
     fprintf(stderr, "%s:%d: Encountered an error, %s\n",\
         __FILE__, __LINE__, strerror(errno));\
-    return 1;\
+    return (ty)1;\
   }\
 } while (0)
-
-#include <unistd.h>
-#include <pthread.h>
-#include <semaphore.h>
-
-typedef struct { char* letters; sem_t sem_begin; sem_t sem_end; } thread_data_t;
 
 void* invert_case_posix_sem_thread(void* arg) {
   thread_data_t* data = (thread_data_t*) arg;
 
   while (1) {
-    CHK_ERRNO(sem_wait(&data->sem_begin));
+    T_CHK_ERRNO(sem_wait(&data->sem_begin));
 
     int case_incr = data->letters[0] == 'a' ? -32 : 32; // 'a' - 32 = 'A', 'A' + 32 = 'a'
     for (int i = 0; i < 26; ++i)
       data->letters[i] += case_incr;
 
-    CHK_ERRNO(sem_post(&data->sem_end));
+    T_CHK_ERRNO(sem_post(&data->sem_end));
   }
 }
 
@@ -35,7 +44,7 @@ void* reverse_posix_sem_thread(void* arg) {
   thread_data_t* data = (thread_data_t*) arg;
 
   while (1) {
-    CHK_ERRNO(sem_wait(&data->sem_begin));
+    T_CHK_ERRNO(sem_wait(&data->sem_begin));
 
     for (int i = 0; i < 26 / 2; ++i) {
         int temp = data->letters[i];
@@ -43,7 +52,7 @@ void* reverse_posix_sem_thread(void* arg) {
         data->letters[25 - i] = temp;
     }
 
-    CHK_ERRNO(sem_post(&data->sem_end));
+    T_CHK_ERRNO(sem_post(&data->sem_end));
   }
 }
 
