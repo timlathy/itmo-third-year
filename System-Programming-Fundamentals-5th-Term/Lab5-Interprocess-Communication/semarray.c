@@ -29,7 +29,7 @@ void sysv_signal_sem(int sem_id, int sem_num) {
 }
 #endif
 
-void* invert_case_posix_sem_thread(void* arg) {
+void* invert_case_thread(void* arg) {
   thread_data_t* data = (thread_data_t*) arg;
 
   while (1) {
@@ -53,7 +53,7 @@ void* invert_case_posix_sem_thread(void* arg) {
   }
 }
 
-void* reverse_posix_sem_thread(void* arg) {
+void* reverse_thread(void* arg) {
   thread_data_t* data = (thread_data_t*) arg;
 
   while (1) {
@@ -102,8 +102,8 @@ int main(int argc, char** argv) {
   CHK_ERRNO(semctl(reverse_thrd_data.sem_id, 0, SETALL, init_vals));
 #endif
 
-  if (pthread_create(&invcase_thrd, NULL, invert_case_posix_sem_thread, &invcase_thrd_data) != 0 ||
-      pthread_create(&reverse_thrd, NULL, reverse_posix_sem_thread, &reverse_thrd_data) != 0) {
+  if (pthread_create(&invcase_thrd, NULL, invert_case_thread, &invcase_thrd_data) != 0 ||
+      pthread_create(&reverse_thrd, NULL, reverse_thread, &reverse_thrd_data) != 0) {
     fprintf(stderr, "Unable to create a thread\n");
     return 1;
   }
