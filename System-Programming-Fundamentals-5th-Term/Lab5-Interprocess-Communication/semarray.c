@@ -40,7 +40,7 @@ void* invert_case_thread(void* arg) {
     T_CHK_ERRNO(sysv_wait_sem(data->sem_id, 0)); // sem #0 = begin
 #endif
 
-    int case_incr = data->letters[0] == 'a' ? -32 : 32; // 'a' - 32 = 'A', 'A' + 32 = 'a'
+    int case_incr = data->letters[0] >= 'a' ? -32 : 32; // 'a' - 32 = 'A', 'A' + 32 = 'a'
     for (int i = 0; i < 26; ++i)
       data->letters[i] += case_incr;
 

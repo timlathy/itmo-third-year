@@ -8,7 +8,7 @@ void* invert_case_thread(void* arg) {
   while (1) {
     T_ERR_RET(pthread_mutex_lock(&letters_mutex));
 
-    int case_incr = letters[0] == 'a' ? -32 : 32; // 'a' - 32 = 'A', 'A' + 32 = 'a'
+    int case_incr = letters[0] >= 'a' ? -32 : 32; // 'a' - 32 = 'A', 'A' + 32 = 'a'
     for (int i = 0; i < 26; ++i)
       letters[i] += case_incr;
 
