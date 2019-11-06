@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=c11 -g -Wall -Wextra -pedantic
 
-all: sysloadsrv sysloadclt semarray
+all: sysloadsrv sysloadclt semarray pthreadarray
 
 sysloadsrv: sysloadsrv.c
 	$(CC) $(CFLAGS) -o sysloadsrv sysloadsrv.c
@@ -13,5 +13,8 @@ semarray: semarray.c
 	$(CC) $(CFLAGS) -pthread -o semarray_posix -DSEM_POSIX semarray.c
 	$(CC) $(CFLAGS) -pthread -o semarray_sysv -DSEM_SYSV semarray.c
 
+pthreadarray: pthreadarray.c
+	$(CC) $(CFLAGS) -pthread -o pthreadarray pthreadarray.c
+
 clean:
-	@rm sysloadsrv sysloadclt semarray_posix semarray_sysv
+	@rm sysloadsrv sysloadclt semarray_posix semarray_sysv pthreadarray
