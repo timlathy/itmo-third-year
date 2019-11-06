@@ -22,6 +22,8 @@ class ModelMeasures:
         mean_wait_times = [l / eff for (l, _), eff in zip(queue_lens, throughputs)]
         mean_wait_time_sum = self.queue_len()[0] / sum(throughputs)
 
+        bs_weighted_sum = sum(b * thrp for b, thrp in zip(self.bs, throughputs)) / sum(throughputs)
+
         return [
             ['Нагрузка', '', '', ''],
             *[['', f'К{i+1}', f'$$y_{i+1} = \lambda_{i+1} b_{i+1}$$', r(y)] for i, y in enumerate(ys)],
@@ -37,7 +39,7 @@ class ModelMeasures:
 
             ['Число заявок', '', '', ''],
             *[['', f'К{i+1}', f'$$m_{i+1} = l_{i+1} + \\rho_{i+1}$$', r(t)] for i, t in enumerate(task_counts)],
-            ['', '$$\sum$$', f'$$m_ = l + \\rho$$', r(self.occupancy()[0] + self.queue_len()[0])],
+            ['', '$$\sum$$', f'$$m = l + \\rho$$', r(self.occupancy()[0] + self.queue_len()[0])],
 
             ['Вероятность потери', '', '', ''],
             *[['', f'К{i+1}', f'$$\\pi_{i+1} = {eq}$$', r(pi)] for i, (pi, eq) in enumerate(loss_probs)],
@@ -53,7 +55,7 @@ class ModelMeasures:
 
             ['Среднее время пребывания', '', '', ''],
             *[['', f'К{i+1}', f'$$u_{i+1} = w_{i+1} + b_{i+1}$$', r(w + b)] for i, (w, b) in enumerate(zip(mean_wait_times, self.bs))],
-            ['', '$$\sum$$', f'$$u = w + b$$', r(mean_wait_time_sum + sum(self.bs))],
+            ['', '$$\sum$$', f'$$u = w + b$$', r(mean_wait_time_sum + bs_weighted_sum)],
         ]
 
     def occupancy(self, priority=None):

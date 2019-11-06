@@ -103,6 +103,12 @@ g.edge('3223', '3220', label='1/3μ3')
 g.edge('3323', '3023', label='2/3μ3')
 g.edge('3323', '2303', label='1/3μ3')
 
+# Corrections
+g.edge('3303', '3323', label='λ2')
+g.edge('2220', '2223', label='λ3')
+g.edge('2303', '2323', label='λ2')
+g.edge('3220', '3223', label='λ3')
+
 #g.view() # graphviz
 
 g.build_equations(edge_equations={
