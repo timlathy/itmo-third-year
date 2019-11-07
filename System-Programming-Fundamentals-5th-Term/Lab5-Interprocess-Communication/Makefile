@@ -14,7 +14,11 @@ semarray: semarray.c
 	$(CC) $(CFLAGS) -pthread -o semarray_sysv -DSEM_SYSV semarray.c
 
 pthreadarray: pthreadarray.c
-	$(CC) $(CFLAGS) -pthread -o pthreadarray pthreadarray.c
+	$(CC) $(CFLAGS) -pthread -o pthread_mutex -DMUTEX pthreadarray.c
+	$(CC) $(CFLAGS) -pthread -o pthread_rwlock -DRWLOCK pthreadarray.c
 
 clean:
-	@rm sysloadsrv sysloadclt semarray_posix semarray_sysv pthreadarray
+	@rm sysloadsrv sysloadclt \
+		semarray_posix semarray_sysv \
+		pthread_mutex pthread_rwlock \
+		sysloadsocksrv
