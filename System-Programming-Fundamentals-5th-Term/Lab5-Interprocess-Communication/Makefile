@@ -17,6 +17,9 @@ pthreadarray: pthreadarray.c
 	$(CC) $(CFLAGS) -pthread -o pthread_mutex -DMUTEX pthreadarray.c
 	$(CC) $(CFLAGS) -pthread -o pthread_rwlock -DRWLOCK pthreadarray.c
 
+sysloadsocksrv: sysloadsocksrv.c
+	$(CC) $(CFLAGS) -o sysloadsocksrv sysloadsocksrv.c
+
 clean:
 	@rm sysloadsrv sysloadclt \
 		semarray_posix semarray_sysv \
