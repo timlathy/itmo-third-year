@@ -20,8 +20,11 @@ pthreadarray: pthreadarray.c
 sysloadsocksrv: sysloadsocksrv.c
 	$(CC) $(CFLAGS) -o sysloadsocksrv sysloadsocksrv.c
 
+sysloadsockclt: sysloadsockclt.c
+	$(CC) $(CFLAGS) -o sysloadsockclt sysloadsockclt.c
+
 clean:
 	@rm sysloadsrv sysloadclt \
 		semarray_posix semarray_sysv \
 		pthread_mutex pthread_rwlock \
-		sysloadsocksrv
+		sysloadsocksrv sysloadsockclt
