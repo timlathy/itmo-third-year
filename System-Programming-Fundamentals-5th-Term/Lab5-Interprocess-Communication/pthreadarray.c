@@ -4,6 +4,7 @@
 #include <pthread.h>
 
 volatile char letters[26];
+
 #ifdef MUTEX
 pthread_mutex_t letters_mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
@@ -57,14 +58,36 @@ void* reverse_thread(void* arg) {
   }
 }
 
+#ifdef RWLOCK
+void* count_uppercase_thread(void* arg) {
+  while (1) {
+    T_ERR_RET(pthread_rwlock_rdlock(&letters_lock));
+
+    int uppercase = 0;
+    for (int i = 0; i < 26; ++i)
+      if (letters[0] <= 'Z') uppercase++;
+
+    printf("Upper case letters: %d\n", uppercase);
+
+    T_ERR_RET(pthread_rwlock_unlock(&letters_lock));
+
+    sleep(1);
+  }
+}
+#endif
+
 int main(int argc, char** argv) {
   for (int i = 0; i < 26; ++i)
     letters[i] = 'a' + i;
 
   pthread_t invcase_thrd, reverse_thrd;
-
   ERR_RET(pthread_create(&invcase_thrd, NULL, invert_case_thread, NULL));
   ERR_RET(pthread_create(&reverse_thrd, NULL, reverse_thread, NULL));
+
+#ifdef RWLOCK
+  pthread_t count_upper_thrd;
+  ERR_RET(pthread_create(&count_upper_thrd, NULL, count_uppercase_thread, NULL));
+#endif
 
   while (1) {
 #ifdef MUTEX
