@@ -40,6 +40,7 @@ sub getloadavg {
 }
 
 sub handlesig {
+  $runtime = time() - $starttime;
   print "The server is shutting down: $_[0]\n";
   print "State snapshot:\nRuntime: ${runtime}s\nLoad average:\n" .
          "  1 minute: $l1\n  5 minutes: $l5\n  15 minutes: $l15\n";

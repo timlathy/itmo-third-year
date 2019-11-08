@@ -13,6 +13,7 @@
 #include "sysloadsock.h"
 
 volatile sig_atomic_t last_sig = 0;
+time_t starttime;
 
 void handle_signal(int sig) {
   last_sig = sig;
@@ -20,6 +21,7 @@ void handle_signal(int sig) {
 
 void check_signals(server_state_t* state) {
   if (last_sig == 0) return;
+  state->runtime = difftime(time(NULL), starttime);
   psignal(last_sig, "The server is shutting down");
   printf("State snapshot:\nRuntime: %.0lfs\nLoad average:\n"
          "  1 minute: %.2lf\n  5 minutes: %.2lf\n  15 minutes: %.2lf\n",
@@ -39,8 +41,8 @@ int setup_signal_handlers() {
 }
 
 int main(unused(int argc), unused(char** argv)) {
+  starttime = time(NULL);
   server_state_t state = { .pid = getpid(), .uid = getuid(), .gid = getgid() };
-  time_t starttime = time(NULL);
 
   printf("Started a server with pid=%jd, uid=%jd, gid=%jd\n",
       (intmax_t) state.pid, (intmax_t) state.uid, (intmax_t) state.gid);
