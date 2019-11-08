@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-char letters[26];
+volatile char letters[26];
 
 #ifdef MUTEX
 pthread_mutex_t letters_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
 #endif
 
     char out[27];
-    memcpy(out, letters, 26);
+    memcpy(out, (const void*)letters, 26);
     out[26] = '\0';
     puts(out);
 

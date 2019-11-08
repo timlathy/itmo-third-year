@@ -10,7 +10,7 @@
 #include "error.h"
 #include "sysloadsock.h"
 
-int main(int argc, char** argv) {
+int main(unused(int argc), unused(char** argv)) {
   int sockfd;
   CHK_ERRNO(sockfd = socket(AF_UNIX, SOCK_STREAM, 0));
 

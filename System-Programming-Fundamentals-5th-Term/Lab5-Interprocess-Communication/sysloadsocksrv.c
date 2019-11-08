@@ -37,7 +37,7 @@ int setup_signal_handlers() {
   return 0;
 }
 
-int main(int argc, char** argv) {
+int main(unused(int argc), unused(char** argv)) {
   server_state_t state = { .pid = getpid(), .uid = getuid(), .gid = getgid() };
 
   printf("Started a server with pid=%jd, uid=%jd, gid=%jd\n",

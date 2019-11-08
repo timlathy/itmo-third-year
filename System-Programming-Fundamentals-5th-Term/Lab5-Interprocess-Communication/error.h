@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#define unused(x) x __attribute__((unused))
+
 #define CHK_ERRNO(expr) GEN_CHK_ERRNO(expr, return 1)
 #define T_CHK_ERRNO(expr) GEN_CHK_ERRNO(expr, pthread_exit((void*)1))
 

@@ -56,7 +56,6 @@ int main(int argc, char** argv) {
     "  -m file: connect to the server using a memory-mapped file\n"
 
   int c, ipc_id;
-  char* ipc_filename = NULL;
   server_state_t* state = NULL;
 
   while ((c = getopt(argc, argv, "s:q:m:")) != EOF) {

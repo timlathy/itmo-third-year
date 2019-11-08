@@ -5,7 +5,7 @@
 #ifdef SEM_POSIX
 #include <semaphore.h>
 
-typedef struct { char* letters; sem_t sem_begin; sem_t sem_end; } thread_data_t;
+typedef struct { volatile char* letters; sem_t sem_begin; sem_t sem_end; } thread_data_t;
 #endif
 
 #ifdef SEM_SYSV
@@ -13,7 +13,7 @@ typedef struct { char* letters; sem_t sem_begin; sem_t sem_end; } thread_data_t;
 #include <sys/ipc.h>
 #include <sys/sem.h>
 
-typedef struct { char* letters; int sem_id; } thread_data_t;
+typedef struct { volatile char* letters; int sem_id; } thread_data_t;
 
 void sysv_wait_sem(int sem_id, int sem_num) {
   struct sembuf op[2] = {
@@ -79,7 +79,7 @@ void* reverse_thread(void* arg) {
   }
 }
 
-int main(int argc, char** argv) {
+int main(unused(int argc), unused(char** argv)) {
   volatile char letters[26];
   for (int i = 0; i < 26; ++i)
     letters[i] = 'a' + i;

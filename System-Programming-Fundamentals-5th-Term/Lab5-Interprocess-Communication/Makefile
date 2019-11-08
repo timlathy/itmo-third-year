@@ -1,7 +1,9 @@
 CC=gcc
-CFLAGS=-std=c11 -g -Wall -Wextra -pedantic
+CFLAGS=-std=c11 -g -Wall -Wextra -pedantic -Wno-address-of-packed-member
 
-all: sysloadsrv sysloadclt semarray pthreadarray
+all: sysloadsrv sysloadclt \
+	semarray pthreadarray \
+	sysloadsocksrv sysloadsockclt unnamedpipe
 
 sysloadsrv: sysloadsrv.c
 	$(CC) $(CFLAGS) -o sysloadsrv sysloadsrv.c
