@@ -23,8 +23,12 @@ sysloadsocksrv: sysloadsocksrv.c
 sysloadsockclt: sysloadsockclt.c
 	$(CC) $(CFLAGS) -o sysloadsockclt sysloadsockclt.c
 
+unnamedpipe: unnamedpipe.c
+	$(CC) $(CFLAGS) -o unnamedpipe unnamedpipe.c
+
 clean:
 	@rm sysloadsrv sysloadclt \
 		semarray_posix semarray_sysv \
 		pthread_mutex pthread_rwlock \
-		sysloadsocksrv sysloadsockclt
+		sysloadsocksrv sysloadsockclt \
+		unnamedpipe
