@@ -10,6 +10,7 @@ typedef struct {
   pid_t srv_pid;
   uid_t srv_uid;
   gid_t srv_gid;
+  double runtime;
   double loadavg[3];
 } server_state_t;
 

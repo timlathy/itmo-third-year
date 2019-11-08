@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 
 // IPC
 #include <sys/ipc.h>
@@ -12,7 +13,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 
-int run_sysv_shmem_server(pid_t pid, uid_t uid, gid_t gid) {
+int run_sysv_shmem_server(pid_t pid, uid_t uid, gid_t gid, time_t starttime) {
   errno = 0;
 
   int shmemid = shmget(IPC_PRIVATE, sizeof(server_state_t), IPC_CREAT | 0644);
@@ -30,13 +31,14 @@ int run_sysv_shmem_server(pid_t pid, uid_t uid, gid_t gid) {
 
   while (1) {
     getloadavg(state->loadavg, 3);
+    state->runtime = difftime(time(NULL), starttime);
     sleep(1);
   }
 
   return 0;
 }
 
-int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid) {
+int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid, time_t starttime) {
   errno = 0;
 
   int mqid = msgget(IPC_PRIVATE, IPC_CREAT | 0644);
@@ -55,6 +57,7 @@ int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid) {
     DIE_ON_ERRNO("Unable to receive an incoming query message");
 
     getloadavg(state.loadavg, 3);
+    state.runtime = difftime(time(NULL), starttime);
 
     msg.mtype = MSGTYPE_REPLY;
     memcpy(msg.mtext, &state, sizeof(server_state_t));
@@ -66,7 +69,7 @@ int run_sysv_msgq_server(pid_t pid, uid_t uid, gid_t gid) {
   return 0;
 }
 
-int run_mmap_server(pid_t pid, uid_t uid, gid_t gid, const char* file) {
+int run_mmap_server(pid_t pid, uid_t uid, gid_t gid, time_t starttime, const char* file) {
   int fd = open(file, O_CREAT | O_RDWR, 0644);
   DIE_ON_ERRNO("Unable to open the shared file for writing");
 
@@ -85,6 +88,7 @@ int run_mmap_server(pid_t pid, uid_t uid, gid_t gid, const char* file) {
 
   while (1) {
     getloadavg(state->loadavg, 3);
+    state->runtime = difftime(time(NULL), starttime);
     sleep(1);
   }
 
@@ -119,14 +123,15 @@ int main(int argc, char** argv) {
   pid_t pid = getpid();
   uid_t uid = getuid();
   gid_t gid = getgid();
+  time_t starttime = time(NULL);
 
   printf("Started a server with pid=%jd, uid=%jd, gid=%jd\n",
       (intmax_t) pid, (intmax_t) uid, (intmax_t) gid);
 
   switch (mode) {
-    case M_SHMEM: return run_sysv_shmem_server(pid, uid, gid);
-    case M_MSGQ: return run_sysv_msgq_server(pid, uid, gid);
-    case M_MMAP: return run_mmap_server(pid, uid, gid, ipc_filename);
+    case M_SHMEM: return run_sysv_shmem_server(pid, uid, gid, starttime);
+    case M_MSGQ: return run_sysv_msgq_server(pid, uid, gid, starttime);
+    case M_MMAP: return run_mmap_server(pid, uid, gid, starttime, ipc_filename);
     case M_UNDEF: return 1; // unreachable
   }
 }
