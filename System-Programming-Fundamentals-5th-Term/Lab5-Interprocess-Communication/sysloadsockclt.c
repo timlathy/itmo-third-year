@@ -24,8 +24,8 @@ int main(unused(int argc), unused(char** argv)) {
   server_state_t state;
   CHK_ERRNO(read(sockfd, &state, sizeof(server_state_t)));
 
-  printf("Connected to server with pid=%jd, uid=%jd, gid=%jd\n",
-      (intmax_t) state.pid, (intmax_t) state.uid, (intmax_t) state.gid);
+  printf("Connected to server with pid=%jd, uid=%jd, gid=%jd, runtime=%.0lfs\n",
+      (intmax_t) state.pid, (intmax_t) state.uid, (intmax_t) state.gid, state.runtime);
   printf("Load average:\n  1 minute: %.2lf\n  5 minutes: %.2lf\n  15 minutes: %.2lf\n",
       state.loadavg[0], state.loadavg[1], state.loadavg[2]);
 

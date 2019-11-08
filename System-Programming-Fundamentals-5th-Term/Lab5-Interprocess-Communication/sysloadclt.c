@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  printf("Connected to server with pid=%jd, uid=%jd, gid=%jd, runtime=%.1lfs\n",
+  printf("Connected to server with pid=%jd, uid=%jd, gid=%jd, runtime=%.0lfs\n",
       (intmax_t) state->srv_pid, (intmax_t) state->srv_uid, (intmax_t) state->srv_gid, state->runtime);
   printf("Load average:\n  1 minute: %.2lf\n  5 minutes: %.2lf\n  15 minutes: %.2lf\n",
       state->loadavg[0], state->loadavg[1], state->loadavg[2]);

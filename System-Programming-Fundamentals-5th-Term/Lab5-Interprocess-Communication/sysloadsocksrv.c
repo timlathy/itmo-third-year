@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <time.h>
 
 #include <sys/un.h>
 #include <sys/types.h>
@@ -20,9 +21,9 @@ void handle_signal(int sig) {
 void check_signals(server_state_t* state) {
   if (last_sig == 0) return;
   psignal(last_sig, "The server is shutting down");
-  printf("State snapshot:\nLoad average:\n"
+  printf("State snapshot:\nRuntime: %.0lfs\nLoad average:\n"
          "  1 minute: %.2lf\n  5 minutes: %.2lf\n  15 minutes: %.2lf\n",
-         state->loadavg[0], state->loadavg[1], state->loadavg[2]);
+         state->runtime, state->loadavg[0], state->loadavg[1], state->loadavg[2]);
   exit(0);
 }
 
@@ -39,6 +40,7 @@ int setup_signal_handlers() {
 
 int main(unused(int argc), unused(char** argv)) {
   server_state_t state = { .pid = getpid(), .uid = getuid(), .gid = getgid() };
+  time_t starttime = time(NULL);
 
   printf("Started a server with pid=%jd, uid=%jd, gid=%jd\n",
       (intmax_t) state.pid, (intmax_t) state.uid, (intmax_t) state.gid);
@@ -70,6 +72,7 @@ int main(unused(int argc), unused(char** argv)) {
     CHK_ERRNO();
 
     getloadavg(state.loadavg, 3);
+    state.runtime = difftime(time(NULL), starttime);
 
     write(cltfd, (const void*) &state, sizeof(server_state_t));
     if (errno != 0)
