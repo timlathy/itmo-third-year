@@ -1,9 +1,11 @@
 #define _DEFAULT_SOURCE // rwlock
 #include "error.h"
 #include <unistd.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include <pthread.h>
 
-volatile char letters[26];
+char letters[26];
 
 #ifdef MUTEX
 pthread_mutex_t letters_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -12,8 +14,11 @@ pthread_mutex_t letters_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_rwlock_t letters_lock = PTHREAD_RWLOCK_INITIALIZER;
 #endif
 
-void* invert_case_thread(void* arg) {
+void* invcase_thread(void* arg) {
+  unsigned int interval = *(unsigned int*)arg;
   while (1) {
+    usleep(interval);
+
 #ifdef MUTEX
     T_ERR_RET(pthread_mutex_lock(&letters_mutex));
 #endif
@@ -35,7 +40,10 @@ void* invert_case_thread(void* arg) {
 }
 
 void* reverse_thread(void* arg) {
+  unsigned int interval = *(unsigned int*)arg;
   while (1) {
+    usleep(interval);
+
 #ifdef MUTEX
     T_ERR_RET(pthread_mutex_lock(&letters_mutex));
 #endif
@@ -59,8 +67,11 @@ void* reverse_thread(void* arg) {
 }
 
 #ifdef RWLOCK
-void* count_uppercase_thread(void* arg) {
+void* uppercnt_thread(void* arg) {
+  unsigned int interval = *(unsigned int*)arg;
   while (1) {
+    usleep(interval);
+
     T_ERR_RET(pthread_rwlock_rdlock(&letters_lock));
 
     int uppercase = 0;
@@ -70,26 +81,53 @@ void* count_uppercase_thread(void* arg) {
     printf("Upper case letters: %d\n", uppercase);
 
     T_ERR_RET(pthread_rwlock_unlock(&letters_lock));
-
-    sleep(1);
   }
 }
 #endif
 
+bool try_parse_uint(const char* str, unsigned int* val) {
+  errno = 0;
+  char* endptr;
+  *val = strtoul(str, &endptr, 10);
+  return errno == 0 && endptr != str && *endptr == '\0';
+}
+
 int main(int argc, char** argv) {
+  unsigned int invcase_interval, reverse_interval, print_interval;
+#ifdef RWLOCK
+  unsigned int uppercnt_interval;
+  if (argc != 5
+      || !try_parse_uint(argv[4], &uppercnt_interval)
+#endif
+#ifdef MUTEX
+  if (argc != 4
+#endif
+      || !try_parse_uint(argv[1], &invcase_interval)
+      || !try_parse_uint(argv[2], &reverse_interval)
+      || !try_parse_uint(argv[3], &print_interval)) {
+    fprintf(stderr, "Usage: %s invcase_int reverse_int print_int"
+#ifdef RWLOCK
+      " uppercnt_int"
+#endif
+      "\n    (intervals are expresssed in microseconds)\n", argv[0]);
+    return 1;
+  }
+
   for (int i = 0; i < 26; ++i)
     letters[i] = 'a' + i;
 
   pthread_t invcase_thrd, reverse_thrd;
-  ERR_RET(pthread_create(&invcase_thrd, NULL, invert_case_thread, NULL));
-  ERR_RET(pthread_create(&reverse_thrd, NULL, reverse_thread, NULL));
+  ERR_RET(pthread_create(&invcase_thrd, NULL, invcase_thread, &invcase_interval));
+  ERR_RET(pthread_create(&reverse_thrd, NULL, reverse_thread, &reverse_interval));
 
 #ifdef RWLOCK
-  pthread_t count_upper_thrd;
-  ERR_RET(pthread_create(&count_upper_thrd, NULL, count_uppercase_thread, NULL));
+  pthread_t uppercnt_thrd;
+  ERR_RET(pthread_create(&uppercnt_thrd, NULL, uppercnt_thread, &uppercnt_interval));
 #endif
 
   while (1) {
+    usleep(print_interval);
+
 #ifdef MUTEX
     ERR_RET(pthread_mutex_lock(&letters_mutex));
 #endif
@@ -108,8 +146,6 @@ int main(int argc, char** argv) {
 #ifdef RWLOCK
     ERR_RET(pthread_rwlock_unlock(&letters_lock));
 #endif
-
-    sleep(1);
   }
 
   return 0;
