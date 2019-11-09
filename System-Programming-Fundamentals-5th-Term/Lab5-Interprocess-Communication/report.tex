@@ -1,0 +1,102 @@
+\documentclass[en, listings]{labreport}
+\subject{System Software Fundamentals}
+\titleparts{Lab Work \#5}{Interprocess Communication and Thread Synchronization}
+\students{Timothy Labushev}
+
+\lstdefinestyle{lablisting}{
+  basicstyle=\scriptsize\ttfamily,
+  numbers=left,
+  stepnumber=1,
+  numbersep=10pt,
+  showspaces=false,
+  showstringspaces=false
+}
+
+\usepackage{verbatim}
+
+\begin{document}
+
+\maketitlepage
+
+\section*{Assignment}
+
+\subsection*{Part I}
+
+Using C, implement a server that stores its \verb|PID|, \verb|UID|, \verb|GID| on launch
+and continuously updates:
+\begin{itemize}
+\item The number of seconds passed since the process start;
+\item Average system load for the last 1, 5, and 15 minutes.
+\end{itemize}
+
+The server should support the following communication channels:
+\begin{enumerate}
+\item System V shared memory
+\item System V message queue
+\item Memory-mapped file
+\end{enumerate}
+
+\subsection*{Part II}
+
+Write a progam in C which creates an array of lowercase Latin letters and
+mutates it in concurrently running threads. \textit{Thread \#1} inverts the case,
+\textit{thread \#2} reverses the array in place.
+
+The following operations should be implemented:
+\begin{enumerate}
+\item Each second the main thread alternately wakes up one of the mutating threads,
+  waits until they complete an operation, and outputs the array to \verb|stdout|.
+  \textit{POSIX semaphores} are used for interthread synchronization.
+\item Each second the main thread alternately wakes up one of the mutating threads,
+  waits until they complete an operation, and outputs the array to \verb|stdout|.
+  \textit{System V semaphores} are used for interthread synchronization.
+\item The main thread outputs the array to \verb|stdout| at a fixed time interval
+  (in microseconds). The threads perform their operations at a fixed time interval
+  (in microseconds) as well, locking the shared resource using
+  \textit{pthread mutexes}.
+\item The main thread outputs the array to \verb|stdout| at a fixed time interval
+  (in microseconds). \textit{Thread \#1} and \textit{thread \#2} perform their
+  operations at a fixed time interval (in microseconds) as well,
+  acquiring the shared resource for writing. Yet another thread prints the
+  number of uppercase letters in the array at a fixed time interval,
+  acquiring the shared resource for reading. \textit{pthread read-write locks}
+  are used for interthread synchronization.
+\end{enumerate}
+
+\subsection*{Part III}
+
+The following tasks should be done in C and Perl:
+\begin{enumerate}
+\item Implement a client-server pair communicating over Unix domain sockets.
+  The behavior of the server should be based on the first part of the assignment.
+\item Add custom signal handling for \verb|HUP|, \verb|INT|, \verb|TERM|,
+  \verb|USR1|, \verb|USR2| on the server.
+\item Create a program that launches a child process via \verb|fork()| and
+  replaces its \verb|stdin| with the read end of an unnamed pipe. The parent
+  process outputs each second character of a file specified in arguments
+  to the write end of the pipe. The child process launches the \textit{wc}
+  utility counting characters.
+\end{enumerate}
+
+\section*{General Requirements}
+
+\begin{itemize}
+\item Write a Makefile to compile the source code to separate executables,
+  one for each assignment
+\item Insert \verb|use strict; use warnings qw(FATAL all);| in Perl scripts
+  and enable \textit{taint mode} with \verb|#!/usr/bin/perl -T|.
+\end{itemize}
+
+\section*{Code Listing}
+
+\verb|.c| and \verb|.pl| files are available at
+\begin{verbatim}
+https://github.com/timlathy/itmo-third-year/tree/master/
+System-Programming-Fundamentals-5th-Term/Lab5-Interprocess-Communication
+\end{verbatim}
+
+\subsection*{Makefile}
+
+\lstinputlisting[style=lablisting]{Makefile}
+
+\end{document}
