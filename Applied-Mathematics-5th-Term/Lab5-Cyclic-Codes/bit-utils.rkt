@@ -2,11 +2,14 @@
 
 (require data/bit-vector)
 
-(provide resize-bit-vector modulo2-rem)
+(provide resize-bit-vector or-bit-vectors modulo2-rem)
 
 (define (resize-bit-vector src-vec new-size [fill #f])
   (for/bit-vector #:length new-size #:fill fill
     ([x (in-bit-vector src-vec)]) x))
+
+(define (or-bit-vectors av bv)
+  (for/bit-vector ([a (in-bit-vector av)] [b (in-bit-vector bv)]) (or a b)))
 
 (define (modulo2-rem divident divisor)
   (define result (bit-vector-copy divident))

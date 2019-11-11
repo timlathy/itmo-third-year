@@ -4,11 +4,17 @@
 
 (define bit-utils-tests
   (test-suite "bit-utils.rkt tests"
-    (test-case "resize-bit-vector creates a new bit vector"
+    (test-case "resize-bit-vector"
       (define src (string->bit-vector "10011"))
       (define res (resize-bit-vector src 12))
       (check-equal? (bit-vector->string src) "10011")
       (check-equal? (bit-vector->string res) "100110000000"))
+
+    (test-case "or-bit-vectors"
+      (define a (string->bit-vector "100110001"))
+      (define b (string->bit-vector "001100111"))
+      (define res (or-bit-vectors a b))
+      (check-equal? (bit-vector->string res) "101110111"))
 
     (test-case "module2-rem"
       (define cases '(
