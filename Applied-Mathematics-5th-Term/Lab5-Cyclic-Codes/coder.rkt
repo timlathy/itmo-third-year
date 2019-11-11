@@ -1,8 +1,8 @@
 #lang racket
 
-(require data/bit-vector math/base)
+(require data/bit-vector math/base "bit-utils.rkt")
 
-(provide decode-cc)
+(provide encode-cc decode-cc)
 
 ; https://www.partow.net/programming/polynomials/index.html
 (define (generator-polynomial bits)
@@ -16,12 +16,29 @@
     [8 "100011101"]
 )))
 
-(define (decode-cc message)
-  (define message-bits (bit-vector-length message))
-  (define check-bits (exact-ceiling (log (add1 message-bits) 2)))
-  (define info-bits (- message-bits check-bits))
+(define (encode-cc data)
+  (define info-bits (bit-vector-length data))
+  (define check-bits (exact-round
+    (log2 (+ (add1 info-bits) (log2 (add1 info-bits))))))
+  (define polynomial (generator-polynomial check-bits))
 
-  (define gp (generator-polynomial check-bits))
-  (bit-vector->string gp)
+  (define message (resize-bit-vector data (+ info-bits check-bits)))
+  (define rem (modulo2-rem message polynomial))
+
+  (or-bit-vectors message rem)
 )
 
+(define (decode-cc message)
+  (define message-bits (bit-vector-length message))
+  (define check-bits (exact-round (log (add1 message-bits) 2)))
+  (define info-bits (- message-bits check-bits))
+
+  (define polynomial (generator-polynomial check-bits))
+  (define rem (modulo2-rem message polynomial))
+
+  (cond
+    [(= 0 (bit-vector-popcount rem)) (bit-vector-copy message 0 info-bits)]
+    [else 'error])
+)
+
+(define (log2 x) (log x 2))
