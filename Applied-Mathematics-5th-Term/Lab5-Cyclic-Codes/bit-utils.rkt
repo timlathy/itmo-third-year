@@ -2,7 +2,7 @@
 
 (require data/bit-vector)
 
-(provide resize-bit-vector or-bit-vectors modulo2-rem)
+(provide resize-bit-vector or-bit-vectors shl-bit-vector modulo2-rem)
 
 (define (resize-bit-vector src-vec new-size [fill #f])
   (for/bit-vector #:length new-size #:fill fill
@@ -10,6 +10,16 @@
 
 (define (or-bit-vectors av bv)
   (for/bit-vector ([a (in-bit-vector av)] [b (in-bit-vector bv)]) (or a b)))
+
+(define (shl-bit-vector v)
+  (define len (bit-vector-length v))
+  (for/bit-vector ([i (in-range len)])
+    (bit-vector-ref v (wrap-index (add1 i) len))))
+
+(define (wrap-index i len) (cond
+  [(< i 0) (sub1 len)]
+  [(= i len) 0]
+  [else i]))
 
 (define (modulo2-rem divident divisor)
   (define result (bit-vector-copy divident))

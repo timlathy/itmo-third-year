@@ -16,6 +16,10 @@
       (define res (or-bit-vectors a b))
       (check-equal? (bit-vector->string res) "101110111"))
 
+    (test-case "shl-bit-vector"
+      (define res (shl-bit-vector (string->bit-vector "0101011101")))
+      (check-equal? (bit-vector->string res) "1010111010"))
+
     (test-case "module2-rem"
       (define cases '(
         ("10011" "10011" "00000")
