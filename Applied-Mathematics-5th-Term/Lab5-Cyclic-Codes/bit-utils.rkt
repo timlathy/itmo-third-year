@@ -2,14 +2,18 @@
 
 (require data/bit-vector)
 
-(provide resize-bit-vector or-bit-vectors shl-bit-vector modulo2-rem)
+(provide or-bit-vectors xor-bit-vectors
+         resize-bit-vector shl-bit-vector modulo2-rem)
+
+(define (or-bit-vectors av bv) (zip-bit-vectors av bv or))
+(define (xor-bit-vectors av bv) (zip-bit-vectors av bv xor))
+
+(define-syntax-rule (zip-bit-vectors av bv op)
+  (for/bit-vector ([a (in-bit-vector av)] [b (in-bit-vector bv)]) (op a b)))
 
 (define (resize-bit-vector src-vec new-size [fill #f])
   (for/bit-vector #:length new-size #:fill fill
     ([x (in-bit-vector src-vec)]) x))
-
-(define (or-bit-vectors av bv)
-  (for/bit-vector ([a (in-bit-vector av)] [b (in-bit-vector bv)]) (or a b)))
 
 (define (shl-bit-vector v)
   (define len (bit-vector-length v))
