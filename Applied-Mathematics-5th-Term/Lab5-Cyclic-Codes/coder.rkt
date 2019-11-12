@@ -24,9 +24,7 @@
 
   (define message (pad-trailing-bit-vector data (+ info-bits check-bits)))
   (define rem (modulo2-rem message polynomial))
-
-  (or-bit-vectors message rem)
-)
+  (or-bit-vectors message rem))
 
 (define (decode-cc message)
   (define message-bits (bit-vector-length message))
@@ -36,37 +34,19 @@
   (define polynomial (generator-polynomial check-bits))
   (define rem (modulo2-rem message polynomial))
 
-  (display (~a "=== msg=" (bit-vector->string message) "\n"))
-
   (cond
     [(= 0 (bit-vector-popcount rem)) (bit-vector-copy message 0 info-bits)]
     [else
       (define bit-i (lookup-error-bit message polynomial))
-      (bit-vector-set! message bit-i (not (bit-vector-ref message bit-i)))
-      (values 'corrected (bit-vector-copy message 0 info-bits))]))
+      (for/bit-vector #:length info-bits ([(b i) (in-indexed (in-bit-vector message))])
+        (if (= i bit-i) (not b) b))]))
 
 (define (lookup-error-bit message polynomial)
   (define msg-len (bit-vector-length message))
-  (define table (for/hash ([i (in-range msg-len)])
-    (define msg (make-bit-vector msg-len #f))
-    (bit-vector-set! msg i #t)
-    (define chksum (modulo2-rem msg polynomial))
-    (values chksum i)))
+  (define table (for/hash ([error-bit-i (in-range msg-len)])
+    (define error-msg (for/bit-vector ([i (in-range msg-len)]) (= i error-bit-i)))
+    (define chksum (modulo2-rem error-msg polynomial))
+    (values chksum error-bit-i)))
   (hash-ref table (modulo2-rem message polynomial)))
-
-;(define (correct-errors-cc message polynomial [lshift 0])
-;  (define popcnt (bit-vector-popcount (modulo2-rem message polynomial)))
-;  (cond
-;    [(and (= 0 popcnt) (= 0 lshift)) message]
-;    [(= 1 popcnt)
-;      (define msg-long-polynomial
-;        (pad-leading-bit-vector polynomial (bit-vector-length message)))
-;      (define xored-message (xor-bit-vectors message msg-long-polynomial))
-;      (display (~a "message=" (bit-vector->string message) ", polynomial=" (bit-vector->string polynomial) ", xor=" (bit-vector->string xored-message)))
-;      (define (unshift message lsh)
-;        (if (> 0 lsh) (unshift (shr-bit-vector message) (sub1 lsh)) message))
-;      (unshift xored-message lshift)]
-;    [(> popcnt 1)
-;     (correct-errors-cc (shl-bit-vector message) polynomial (add1 lshift))]))
 
 (define (log2 x) (log x 2))
