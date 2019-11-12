@@ -1,0 +1,52 @@
+\documentclass[listings]{labreport}
+\usepackage{csvsimple}
+\usepackage{verbatim}
+\subject{Прикладная математика}
+\titleparts{Лабораторная работа №5}{Циклическое кодирование}
+\students{Лабушев Тимофей}
+
+\makeatletter
+\patchcmd{\verbatim@input}{\@verbatim}{\footnotesize\@verbatim}{}{}
+\makeatother
+
+\begin{document}
+
+\maketitlepage
+
+\section*{Цель работы}
+
+Получить практические навыки построения циклического кода
+по заданным характеристикам и проверка его свойства
+по обнаружению и исправлению ошибок.
+
+\section*{Задание}
+
+\begin{enumerate}
+\item Вычислить параметры кода и найти образующий многочлен,
+  воспользовавшись таблицей неприводимых многочленов. 
+\item Проверить, имеются ли ошибки в исследуемой комбинации,
+  при наличии ошибок – исправить их.
+\item Провести программный контроль выполнения
+  на примере случайных кодовых комбинаций.
+\end{enumerate}
+
+\section*{Исходный код}
+
+\subsection*{Кодирование}
+
+\verbatiminput{coder.rkt}
+
+\subsection*{Битовые операции}
+
+\verbatiminput{bit-utils.rkt}
+
+\subsection*{Тестирование}
+
+\verbatiminput{coder-test.rkt}
+
+\section*{Выводы}
+
+В ходе выполнения лабораторной работы были изучены приципы построения
+и декодирования циклических кодов.
+
+\end{document}

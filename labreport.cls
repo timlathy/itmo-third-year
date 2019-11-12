@@ -65,7 +65,7 @@
 \else
   \newcommand{\titlelogo}{
     \includegraphics[trim=0 0 0 3cm, width=10cm]{itmo-ru.pdf}}
-  \newcommand{\titleorganization}{ФГАОУ ВО «Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики»}
+  \newcommand{\titleorganization}{ФГАОУ ВО «Национальный исследовательский университет ИТМО»}
   \newcommand{\titledepartment}{Факультет программной инженерии и компьютерной техники}
   \newcommand{\titlesubject}{\uppercase{Название предмета}}
   \newcommand{\titlemain}{Лабораторная работа №1}
