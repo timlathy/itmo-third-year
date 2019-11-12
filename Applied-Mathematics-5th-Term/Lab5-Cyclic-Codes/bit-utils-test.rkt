@@ -4,12 +4,6 @@
 
 (define bit-utils-tests
   (test-suite "bit-utils.rkt tests"
-    (test-case "resize-bit-vector"
-      (define src (bitvec "10011"))
-      (define res (resize-bit-vector src 12))
-      (check-bit-equal? src "10011")
-      (check-bit-equal? res "100110000000"))
-
     (test-case "or-bit-vectors"
       (define res (or-bit-vectors (bitvec "100110001") (bitvec "001100111")))
       (check-bit-equal? res "101110111"))
@@ -17,6 +11,18 @@
     (test-case "xor-bit-vectors"
       (define res (xor-bit-vectors (bitvec "0101110") (bitvec "1100110")))
       (check-bit-equal? res "1001000"))
+
+    (test-case "pad-leading-bit-vector"
+      (define src (bitvec "10011"))
+      (define res (pad-leading-bit-vector src 12))
+      (check-bit-equal? src "10011")
+      (check-bit-equal? res "000000010011"))
+
+    (test-case "pad-trailing-bit-vector"
+      (define src (bitvec "10011"))
+      (define res (pad-trailing-bit-vector src 12))
+      (check-bit-equal? src "10011")
+      (check-bit-equal? res "100110000000"))
 
     (test-case "shl-bit-vector"
       (define res (shl-bit-vector (bitvec "0101011101")))

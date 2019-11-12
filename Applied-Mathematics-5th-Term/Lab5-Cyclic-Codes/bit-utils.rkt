@@ -3,7 +3,8 @@
 (require data/bit-vector)
 
 (provide or-bit-vectors xor-bit-vectors
-         resize-bit-vector shl-bit-vector shr-bit-vector modulo2-rem)
+         pad-leading-bit-vector pad-trailing-bit-vector
+         shl-bit-vector shr-bit-vector modulo2-rem)
 
 (define (or-bit-vectors av bv) (zip-bit-vectors av bv or))
 (define (xor-bit-vectors av bv) (zip-bit-vectors av bv xor))
@@ -11,12 +12,17 @@
 (define-syntax-rule (zip-bit-vectors av bv op)
   (for/bit-vector ([a (in-bit-vector av)] [b (in-bit-vector bv)]) (op a b)))
 
-(define (resize-bit-vector src-vec new-size [fill #f])
-  (for/bit-vector #:length new-size #:fill fill
-    ([x (in-bit-vector src-vec)]) x))
-
 (define (shl-bit-vector v) (shift-bit-vector-indexes v add1))
 (define (shr-bit-vector v) (shift-bit-vector-indexes v sub1))
+
+(define (pad-leading-bit-vector src-vec new-size [pad #f])
+  (define pad-len (- new-size (bit-vector-length src-vec)))
+  (for/bit-vector ([i (in-range new-size)])
+    (if (< i pad-len) pad (bit-vector-ref src-vec (- i pad-len)))))
+
+(define (pad-trailing-bit-vector src-vec new-size [fill #f])
+  (for/bit-vector #:length new-size #:fill fill
+    ([x (in-bit-vector src-vec)]) x))
 
 (define (shift-bit-vector-indexes v shifter)
   (define len (bit-vector-length v))
