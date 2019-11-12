@@ -22,6 +22,10 @@
       (define res (shl-bit-vector (bitvec "0101011101")))
       (check-bit-equal? res "1010111010"))
 
+    (test-case "shr-bit-vector"
+      (define res (shr-bit-vector (bitvec "11010100")))
+      (check-bit-equal? res "01101010"))
+
     (test-case "module2-rem"
       (define cases '(
         ("10011" "10011" "00000")

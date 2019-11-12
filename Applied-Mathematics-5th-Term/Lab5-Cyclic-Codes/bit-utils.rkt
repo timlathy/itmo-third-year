@@ -3,7 +3,7 @@
 (require data/bit-vector)
 
 (provide or-bit-vectors xor-bit-vectors
-         resize-bit-vector shl-bit-vector modulo2-rem)
+         resize-bit-vector shl-bit-vector shr-bit-vector modulo2-rem)
 
 (define (or-bit-vectors av bv) (zip-bit-vectors av bv or))
 (define (xor-bit-vectors av bv) (zip-bit-vectors av bv xor))
@@ -15,10 +15,13 @@
   (for/bit-vector #:length new-size #:fill fill
     ([x (in-bit-vector src-vec)]) x))
 
-(define (shl-bit-vector v)
+(define (shl-bit-vector v) (shift-bit-vector-indexes v add1))
+(define (shr-bit-vector v) (shift-bit-vector-indexes v sub1))
+
+(define (shift-bit-vector-indexes v shifter)
   (define len (bit-vector-length v))
   (for/bit-vector ([i (in-range len)])
-    (bit-vector-ref v (wrap-index (add1 i) len))))
+    (bit-vector-ref v (wrap-index (shifter i) len))))
 
 (define (wrap-index i len) (cond
   [(< i 0) (sub1 len)]
