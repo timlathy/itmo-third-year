@@ -104,4 +104,9 @@ writecf(approxacf)
 plot(approxacf, type = "b", main = "График 5. Автокорреляция случайной последовательности", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
 ```
 
+## Cross-Correlation of Source and Generated Series
+
+```{r}
+labccf <- ccf(labdata, approxdata, plot = FALSE)[1:10]$acf
+writecf(labccf)
 ```
