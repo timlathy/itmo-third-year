@@ -3,14 +3,14 @@ title: "Lab1"
 output: html_notebook
 ---
 
-## Dependencies
+# Dependencies
 
 ```{r}
 install.packages("readxl")
 library("readxl")
 ```
 
-## Distribution Properties
+# Distribution Properties
 
 ```{r}
 confeps <- function(sample, conf) {
@@ -31,37 +31,46 @@ distprops <- function(data, samplecnts = c(10, 50, 100, 200, 300)) {
     cfvars = sapply(samples, function(s) sd(s) / mean(s))
   )
 }
+
+writeprops <- function(props) {
+  colnames(props) <- c("Мат. ож.", "Дов. инт (0.9)", "Дов. инт (0.95)", "Дов. инт. (0.99)", "Дисперсия", "С. к. о.", "К-т вариации")
+  write.csv(format(t(props), ditigs = 4))
+}
 ```
 
-## Lab Data
+# Lab Data
 
 ```{r}
 labdata <- unlist(read_excel("3302_Лабушев-Нестеров.xlsx", col_names = FALSE))
-proptbl <- distprops(labdata)
-colnames(proptbl) <- c("Мат. ож.", "Дов. инт (0.9)", "Дов. инт (0.95)", "Дов. инт. (0.99)", "Дисперсия", "С. к. о.", "К-т вариации")
-write.csv(t(proptbl))
+writeprops(distprops(labdata))
 ```
 
-## Sequence Plot
+## Plot
 
 ```{r}
-plot(labdata, type="h", xlab="Порядковый номер элемента", ylab="Значение элемента")
+plot(labdata, type = "h", main = "График 1. Значения исходной последовательности", xlab = "Порядковый номер элемента", ylab = "Значение элемента")
 ```
 
-## Table 2. Autocorrelation 
+# Autocorrelation
 
 ```{r}
-atable <- acf(labdata, plot=FALSE, lag.max=10)$acf[2:11]
+atable <- acf(labdata, plot = FALSE, lag.max = 10)$acf[2:11]
 write.csv(format(t(atable), digits = 3))
 ```
 
-## Autocorrelation Plot
+## Plot
 
 ```{r}
-plot(atable, type="b", xlab="Сдвиг последовательности", ylab="Коэффициент автокорреляции")
+plot(atable, type = "b", main = "График 2. Автокорреляция исходной последовательности", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
 ```
 
-## Densities
+# Histogram
+
+```{r}
+hist(labdata, breaks = 100, main = "График 3. Гистограмма распределения частот последовательности", xlab = "Интервалы значений", ylab = "Частота")
+```
+
+# Approximation
 
 ```{r}
 hist(labdata, breaks=100, main="Гистограмма распределения частот", xlab="Интервалы значений", ylab="Частота")
