@@ -10,31 +10,36 @@ install.packages("readxl")
 library("readxl")
 ```
 
-## Table 1
+## Distribution Properties
 
 ```{r}
-labdata <- unlist(read_excel("3302_Лабушев-Нестеров.xlsx", col_names = FALSE))
-
-samplecnt <- c(10, 50, 100, 200, 300)
-samples <- sapply(samplecnt, function(sc) labdata[1:sc])
-
-epsStudentT <- function(sample, conf) {
+confeps <- function(sample, conf) {
   int <- t.test(sample, conf.level = conf)$conf.int
   (int[2] - int[1]) / 2
 }
 
-table1 <- data.frame(
-  means = sapply(samples, mean),
-  epsilon90 = sapply(samples, epsStudentT, conf = 0.9),
-  epsilon95 = sapply(samples, epsStudentT, conf = 0.95),
-  epsilon99 = sapply(samples, epsStudentT, conf = 0.99),
-  variances = sapply(samples, var),
-  stddevs = sapply(samples, sd),
-  coeffvars = sapply(samples, function(s) sd(s) / mean(s)))
+distprops <- function(data, samplecnts = c(10, 50, 100, 200, 300)) {
+  samples <- sapply(samplecnts, function(cnt) data[1:cnt])
+  data.frame(
+    row.names = samplecnts,
+    means = sapply(samples, mean),
+    epsilon90 = sapply(samples, confeps, conf = 0.9),
+    epsilon95 = sapply(samples, confeps, conf = 0.95),
+    epsilon99 = sapply(samples, confeps, conf = 0.99),
+    variances = sapply(samples, var),
+    stddevs = sapply(samples, sd),
+    cfvars = sapply(samples, function(s) sd(s) / mean(s))
+  )
+}
+```
 
-rownames(table1) <- samplecnt
-colnames(table1) <- c("Мат. ож.", "Дов. инт (0.9)", "Дов. инт (0.95)", "Дов. инт. (0.99)", "Дисперсия", "С. к. о.", "К-т вариации")
-write.csv(t(table1))
+## Lab Data
+
+```{r}
+labdata <- unlist(read_excel("3302_Лабушев-Нестеров.xlsx", col_names = FALSE))
+proptbl <- distprops(labdata)
+colnames(proptbl) <- c("Мат. ож.", "Дов. инт (0.9)", "Дов. инт (0.95)", "Дов. инт. (0.99)", "Дисперсия", "С. к. о.", "К-т вариации")
+write.csv(t(proptbl))
 ```
 
 ## Sequence Plot
