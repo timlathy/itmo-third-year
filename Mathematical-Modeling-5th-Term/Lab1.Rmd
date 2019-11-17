@@ -72,8 +72,13 @@ hist(labdata, breaks = 100, main = "График 3. Гистограмма ра�
 
 # Approximation
 
+Erlang distribution: $\nu = \frac{1}{\sqrt{k}}, k \in N \implies k = \lceil \frac{1}{\nu^2} \rceil$
+
 ```{r}
-hist(labdata, breaks=100, main="Гистограмма распределения частот", xlab="Интервалы значений", ylab="Частота")
+cfvar <- sd(labdata) / mean(labdata)
+k <- ceiling(1 / cfvar^2)
+approxdata <- rgamma(length(labdata), shape = k, scale = mean(labdata) / k)
+writeprops(distprops(approxdata))
 ```
 
 ## Approximation
