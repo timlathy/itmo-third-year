@@ -54,14 +54,19 @@ plot(labdata, type = "h", main = "График 1. Значения исходн�
 # Autocorrelation
 
 ```{r}
-atable <- acf(labdata, plot = FALSE, lag.max = 10)$acf[2:11]
-write.csv(format(t(atable), digits = 3))
+writecf <- function(cfs) {
+  frame <- data.frame(cfs, row.names = 1:10)
+  write.table(format(t(frame), digits = 3, trim = TRUE), sep = ",", row.names = FALSE)
+}
+
+labacf <- acf(labdata, plot = FALSE)[1:10]$acf
+writecf(labacf)
 ```
 
 ## Plot
 
 ```{r}
-plot(atable, type = "b", main = "График 2. Автокорреляция исходной последовательности", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
+plot(labacf, type = "b", main = "График 2. Автокорреляция исходной последовательности", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
 ```
 
 # Histogram
@@ -81,8 +86,12 @@ approxdata <- rgamma(length(labdata), shape = k, scale = mean(labdata) / k)
 writeprops(distprops(approxdata))
 ```
 
-## Approximation
+## Autocorrelation
 
 ```{r}
+approxacf <- acf(approxdata, plot = FALSE)[1:10]$acf
+writecf(approxacf)
+plot(approxacf, type = "b", main = "График 5. Автокорреляция случайной последовательности", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
+```
 
 ```
