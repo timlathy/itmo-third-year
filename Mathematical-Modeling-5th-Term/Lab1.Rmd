@@ -34,7 +34,7 @@ distprops <- function(data, samplecnts = c(10, 50, 100, 200, 300)) {
 
 writeprops <- function(props) {
   colnames(props) <- c("Мат. ож.", "Дов. инт (0.9)", "Дов. инт (0.95)", "Дов. инт. (0.99)", "Дисперсия", "С. к. о.", "К-т вариации")
-  write.csv(format(t(props), ditigs = 4))
+  write.csv(format(t(props), ditigs = 4, trim = TRUE))
 }
 ```
 
@@ -47,8 +47,10 @@ writeprops(distprops(labdata))
 
 ## Plot
 
+**График 1. Значения исходной последовательности**
+
 ```{r}
-plot(labdata, type = "h", main = "График 1. Значения исходной последовательности", xlab = "Порядковый номер элемента", ylab = "Значение элемента")
+plot(labdata, type = "h", xlab = "Порядковый номер элемента", ylab = "Значение элемента")
 ```
 
 # Autocorrelation
@@ -65,14 +67,18 @@ writecf(labacf)
 
 ## Plot
 
+**График 2. Автокорреляция исходной последовательности**
+
 ```{r}
-plot(labacf, type = "b", main = "График 2. Автокорреляция исходной последовательности", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
+plot(labacf, type = "b", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
 ```
 
 # Histogram
 
+**График 3. Гистограмма распределения частот последовательности**
+
 ```{r}
-hist(labdata, breaks = 100, main = "График 3. Гистограмма распределения частот последовательности", xlab = "Интервалы значений", ylab = "Частота")
+hist(labdata, breaks = 40, main = "", xlab = "Интервалы значений", ylab = "Частота")
 ```
 
 # Approximation
@@ -88,20 +94,24 @@ writeprops(distprops(approxdata))
 
 ## Probability Densitiy Functions Comparison Plot
 
+**График 4. Сравнение функций плотности**
+
 ```{r}
 labpdf <- density(labdata, n = 60, bw = "SJ")
 approxpdf <- density(approxdata, bw = "SJ")
-plot(labpdf$x, labpdf$y, col = "black", lwd = 2, type = "h", main = "График 4. Сравнение функций плотности", xlab = "Интервалы", ylab = "Плотность")
+plot(labpdf$x, labpdf$y, col = "black", lwd = 2, type = "h", xlab = "Интервалы", ylab = "Плотность")
 lines(approxpdf$x, approxpdf$y, col = "red", lwd = 2)
 legend(60, 0.08, legend = c("Исходные данные", "Аппроксимация"), col = c("black", "red"), lwd = 2, xjust = 1)
 ```
 
 ## Autocorrelation
 
+**График 5. Автокорреляция случайной последовательности**
+
 ```{r}
 approxacf <- acf(approxdata, plot = FALSE)[1:10]$acf
 writecf(approxacf)
-plot(approxacf, type = "b", main = "График 5. Автокорреляция случайной последовательности", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
+plot(approxacf, type = "b", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
 ```
 
 ## Cross-Correlation of Source and Generated Series
