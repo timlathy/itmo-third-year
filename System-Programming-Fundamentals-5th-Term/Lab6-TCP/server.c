@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -48,12 +49,22 @@ int handle_client(int fd) {
   return 0;
 }
 
+bool try_parse_ushort(const char* str, unsigned short* val) {
+  errno = 0;
+  char* endptr;
+  *val = strtoul(str, &endptr, 10);
+  return *str != '-' && errno == 0 && endptr != str && *endptr == '\0';
+}
+
 int main(int argc, char** argv) {
   int sockfd;
   CHK_ERRNO(sockfd = socket(AF_INET, SOCK_STREAM, 0));
 
-  int port = 9090;
-  int backlog = 2;
+  unsigned short port;
+  if (argc != 2 || !try_parse_ushort(argv[1], &port)) {
+    fprintf(stderr, "Usage: %s port\n", argv[0]);
+    return 1;
+  }
 
   struct sockaddr_in srv_addr = {
     .sin_family = AF_INET,
@@ -65,7 +76,9 @@ int main(int argc, char** argv) {
     .sin_port = htons(port)
   };
   CHK_ERRNO(bind(sockfd, (struct sockaddr*) &srv_addr, sizeof(struct sockaddr_in)));
-  CHK_ERRNO(listen(sockfd, backlog));
+  CHK_ERRNO(listen(sockfd, 2)); // TODO: tweak the backlog -- what should it be set to?
+
+  printf("Listening on %d\n", port);
 
   while (1) {
     int clientfd;
