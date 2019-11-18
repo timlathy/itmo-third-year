@@ -18,7 +18,7 @@ int handle_client(int fd) {
   char buf[CLIENT_BUFSIZE];
   int bytes_read, request_len = 0;
   while ((bytes_read = read(fd, buf, CLIENT_BUFSIZE)) > 0) {
-    request = realloc(request, request_len + bytes_read + 1);
+    request = realloc(request, request_len + bytes_read);
     memcpy(request + request_len, buf, bytes_read);
     request_len += bytes_read;
 
@@ -29,13 +29,22 @@ int handle_client(int fd) {
         return 1;
       }
       else if (request_len > 4 && request[request_len - 4] == '\r' && request[request_len - 3] == '\n') {
+        request_len -= 1;
         break;
       }
     }
   }
-  request[request_len] = '\0';
 
-  printf("Received request: %s", request);
+  char* path_start = request;
+  for (char* path_end = request; path_end < request + request_len; ++path_end) {
+    if (*path_end == '\r') {
+      *path_end = '\0';
+      printf("Directory: [%s]\n", path_start);
+      path_end += 2; // skip LF
+      path_start = path_end;
+    }
+  }
+
   return 0;
 }
 
