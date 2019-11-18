@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L // dprintf
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -40,11 +41,13 @@ int handle_client(int fd) {
   for (char* path_end = request; path_end < request + request_len; ++path_end) {
     if (*path_end == '\r') {
       *path_end = '\0';
-      printf("Directory: [%s]\n", path_start);
+      dprintf(fd, "Directory: [%s]\r\n", path_start);
       path_end += 2; // skip LF
       path_start = path_end;
     }
   }
+
+  dprintf(fd, "\r\n");
 
   return 0;
 }
