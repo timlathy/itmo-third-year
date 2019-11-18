@@ -6,8 +6,19 @@ use IO::Socket::INET;
 
 my $port = shift or die "Usage $0 port\n";
 
-my $resp = send_request("/home/dir1\r\n/home/dir1/nested\r\n\r\n");
-is $resp, "Directory: [/home/dir1]\r\nDirectory: [/home/dir1/nested]\r\n\r\n";
+`rm -rf test; mkdir -p test/abc; touch test/h; touch test/abc/h; mkdir test/forbidden; chmod u-r test/forbidden`;
+
+my $resp = send_request("test/forbidden\r\n./test\r\n\r\n");
+is $resp, "Failed to open test/forbidden: Permission denied\r\n" .
+  "\r\n" .
+  "Contents of ./test:\r\n" .
+  "forbidden\r\n" .
+  ".\r\n" .
+  "h\r\n" .
+  "..\r\n" .
+  "abc\r\n" .
+  "\r\n" .
+  "\r\n";
 
 $resp = send_request("\r\n");
 is $resp, "Malformed request: make sure you're sending at least one path, " .
