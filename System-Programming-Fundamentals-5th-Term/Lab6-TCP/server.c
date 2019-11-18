@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 
 #include "error.h"
+#include "dir.h"
 
 #define CLIENT_BUFSIZE 512
 
@@ -49,14 +50,14 @@ malformed:
 
 void handle_client(int fd) {
   int request_len;
-  char* request = read_request(fd, &request_len);
-  if (!request) return;
+  char* paths = read_request(fd, &request_len);
+  if (!paths) return;
 
-  char* path_start = request;
-  for (char* path_end = request; path_end < request + request_len; ++path_end) {
+  char* path_start = paths;
+  for (char* path_end = paths; path_end < paths + request_len; ++path_end) {
     if (*path_end == '\r') {
       *path_end = '\0';
-      dprintf(fd, "Directory: [%s]\r\n", path_start);
+      print_dir(fd, path_start);
       path_end += 2; // skip LF
       path_start = path_end;
     }
