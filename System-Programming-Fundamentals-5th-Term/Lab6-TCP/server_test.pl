@@ -9,6 +9,11 @@ my $port = shift or die "Usage $0 port\n";
 my $resp = send_request("/home/dir1\r\n/home/dir1/nested\r\n\r\n");
 is $resp, "Directory: [/home/dir1]\r\nDirectory: [/home/dir1/nested]\r\n\r\n";
 
+$resp = send_request("\r\n");
+is $resp, "Malformed request: make sure you're sending at least one path, " .
+  "each path on a separate line, each line terminated by CRLF, " .
+  "and the request terminated by an empty line.\r\n";
+
 done_testing();
 
 sub send_request {

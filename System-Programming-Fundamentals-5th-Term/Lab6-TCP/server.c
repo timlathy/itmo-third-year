@@ -14,28 +14,43 @@
 // <request> ::= <path> { <path> } CR LF
 // <path> ::= <non-empty string not including NUL or CR or LF> CR LF
 
-int handle_client(int fd) {
+const char MALFORMED_REQ_ERR[] = "Malformed request: "
+  "make sure you're sending at least one path, "
+  "each path on a separate line, each line terminated by CRLF, "
+  "and the request terminated by an empty line.\r\n";
+
+char* read_request(int fd, int* request_len) {
   char* request = NULL;
+  *request_len = 0;
 
   char buf[CLIENT_BUFSIZE];
-  int bytes_read, request_len = 0;
+  int bytes_read;
   while ((bytes_read = read(fd, buf, CLIENT_BUFSIZE)) > 0) {
-    request = realloc(request, request_len + bytes_read);
-    memcpy(request + request_len, buf, bytes_read);
-    request_len += bytes_read;
+    request = realloc(request, *request_len + bytes_read);
+    memcpy(request + *request_len, buf, bytes_read);
+    *request_len += bytes_read;
 
-    if (request_len < 2) continue;
-    if (request[request_len - 2] == '\r' && request[request_len - 1] == '\n') {
-      if (request_len == 2) {
-        fprintf(stderr, "Malformed request: empty pathstr recieved\n");
-        return 1;
-      }
-      else if (request_len > 4 && request[request_len - 4] == '\r' && request[request_len - 3] == '\n') {
-        request_len -= 1;
-        break;
+    if (*request_len < 2) continue;
+    if (request[*request_len - 2] == '\r' && request[*request_len - 1] == '\n') {
+      if (*request_len == 2)
+        goto malformed;
+      if (*request_len > 4 && request[*request_len - 4] == '\r' && request[*request_len - 3] == '\n') {
+        *request_len -= 1;
+        return request;
       }
     }
   }
+
+malformed:
+  write(fd, MALFORMED_REQ_ERR, sizeof(MALFORMED_REQ_ERR) - 1);
+  free(request);
+  return NULL;
+}
+
+void handle_client(int fd) {
+  int request_len;
+  char* request = read_request(fd, &request_len);
+  if (!request) return;
 
   char* path_start = request;
   for (char* path_end = request; path_end < request + request_len; ++path_end) {
@@ -48,8 +63,6 @@ int handle_client(int fd) {
   }
 
   dprintf(fd, "\r\n");
-
-  return 0;
 }
 
 bool try_parse_ushort(const char* str, unsigned short* val) {
@@ -88,7 +101,7 @@ int main(int argc, char** argv) {
     CHK_ERRNO(clientfd = accept(sockfd, NULL, NULL));
 
     printf("Client connected: %d\n", clientfd);
-    ERR_RET(handle_client(clientfd));
+    handle_client(clientfd);
 
     CHK_ERRNO(close(clientfd));
   }
