@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -T
 
 use strict;
 use warnings qw(FATAL all);
@@ -6,8 +6,8 @@ use IO::Socket::INET;
 
 use constant USAGE => "Usage $0 host port [files...]\n";
 
-my $host = shift or die USAGE;
-my $port = shift or die USAGE;
+my ($host) = shift =~ /([A-Za-z0-9.]+)/ or die USAGE;
+my ($port) = shift =~ /(\d+)/ or die USAGE;
 
 scalar @ARGV or die USAGE;
 my $request = join("\r\n", @ARGV) . "\r\n\r\n";
@@ -18,15 +18,6 @@ my $clt = new IO::Socket::INET(
 
 $clt->send($request);
 
-my $response = "";
-while (1) {
-  $clt->recv(my $chunk, 1024);
-  if (scalar $chunk) {
-    $response .= $chunk;
-  }
-  else {
-    last
-  }
+while (<$clt>) {
+  print;
 }
-
-print $response;
