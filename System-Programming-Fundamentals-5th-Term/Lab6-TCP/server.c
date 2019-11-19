@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <pthread.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -48,10 +49,14 @@ malformed:
   return NULL;
 }
 
-void handle_client(int fd) {
+void* process_request(void* fdptr) {
+  int fd = *(int*)fdptr;
+  printf("Client connected: %d\n", fd);
+
   int request_len;
   char* paths = read_request(fd, &request_len);
-  if (!paths) return;
+  if (!paths)
+    goto connection_end;
 
   char* path_start = paths;
   for (char* path_end = paths; path_end < paths + request_len; ++path_end) {
@@ -64,6 +69,10 @@ void handle_client(int fd) {
   }
 
   dprintf(fd, "\r\n");
+
+connection_end:
+  close(fd);
+  return NULL;
 }
 
 bool try_parse_ushort(const char* str, unsigned short* val) {
@@ -101,10 +110,8 @@ int main(int argc, char** argv) {
     int clientfd;
     CHK_ERRNO(clientfd = accept(sockfd, NULL, NULL));
 
-    printf("Client connected: %d\n", clientfd);
-    handle_client(clientfd);
-
-    CHK_ERRNO(close(clientfd));
+    pthread_t client_thrd;
+    ERR_RET(pthread_create(&client_thrd, NULL, process_request, &clientfd));
   }
 
   return 0;
