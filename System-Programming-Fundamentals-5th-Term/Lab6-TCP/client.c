@@ -12,10 +12,10 @@ const char CRLF[] = "\r\n";
 
 int make_request(int serverfd, int argc, char **argv) {
   for (int i = 3; i < argc; ++i) {
-    write(serverfd, argv[i], strlen(argv[i]));
-    write(serverfd, CRLF, sizeof(CRLF));
+    CHK_ERRNO(write(serverfd, argv[i], strlen(argv[i])));
+    CHK_ERRNO(write(serverfd, CRLF, sizeof(CRLF) - 1));
   }
-  write(serverfd, CRLF, sizeof(CRLF));
+  CHK_ERRNO(write(serverfd, CRLF, sizeof(CRLF) - 1));
 
   char buf[READ_BUFSIZE];
   int bytes_read;
