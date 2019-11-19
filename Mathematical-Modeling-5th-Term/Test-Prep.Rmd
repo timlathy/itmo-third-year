@@ -4,23 +4,37 @@ output:
   html_document: default
 ---
 
-The first *raw moment* is the *mean* $\mu$.
+## Moment
 
-The second *central moment* is the *variance*, the square of the *standard deviation*, $\sigma^2$.
-**Important**: note that this is the *дисперсия* in Russian and **not** the coefficient of variation.
+According to Wikipedia, a *moment* is a "specific quantitative measure of the shape of a function".
+If the function is a probability distribution, then:
 
-The coeffient of variation is defined as the ratio of the standard deviation to the mean, $c_v = \frac{\sigma}{\mu}$.
+* the first *raw moment* is the *mean* $\mu$.
+* the second *central moment* is the *variance* $\sigma^2$, i.e. the square of the *standard deviation*.
 
-The appropriate distribution for series can be determined based on $c_v$:
+Note that *variance* is called *дисперсия* in Russian. Do not confuse it with the *coefficient of variation*,
+defined as the ratio of the standard deviation to the mean, $c_v = \frac{\sigma}{\mu}$.
 
-* $c_v = 0$ indicates the *degenerate distribution*
+## Probability distribution fitting
 
-* $0 < c_v < 1$ indicates the *hypoexponential distribution*, which is a general case of the *Erlang distribution*. The latter is easier to estimate the parameters for: $k \geqslant \frac{1}{c_v^2}$.
+The appropriate distribution for a series can be determined based on $c_v$:
 
-An example task from the test:
+* $c_v = 0$ indicates the *degenerate distribution*.
 
-> Given the first raw moment of a series is 10 and the second central moment is 4,
-> find the closest fitting distribution.
+* $0 < c_v < 1$ indicates the *hypoexponential distribution*, which is a general case of the *Erlang distribution*. The latter is easier to estimate the parameters for ($k \geqslant \frac{1}{c_v^2}$), and it's the one we'll see in the test problems.
 
-In other words, $\mu = 10, \sigma^2 = 4$, implying $c_v = \frac{\sqrt{4}}{10} = 0.2$, which is more than 0 and less than 1. Pick the Erlang distribution: $k = \lceil \frac{1}{0.2^2} \rceil = 25$.
+* $c_v = 1$ indicates the *exponential distribution*.
 
+* $c_v > 1$ indicates the *hyperexponential distribution*.
+
+### Example tasks
+
+> Find the closest fitting distribution for a series given the first raw moment is 10 and the second central moment is 4.
+
+In other words, $\mu = 10$, $\sigma^2 = 4$, implying $c_v = \frac{\sqrt{4}}{10} = 0.2$, which is more than 0 and less than 1. Pick the Erlang distribution: $k = \frac{1}{0.2^2} = 25$.
+
+> Find the closest fitting distribution for a series given the first raw moment is 4 and the second raw moment is 24.
+
+The second central moment ($\sigma^2$) can also be computed as the second raw moment - (the first raw moment)^2: $\sigma^2 = 24 - \mu^2 = 24 - 4^2 = 8$
+
+$c_v = \frac{\sqrt{8}}{4} = \sqrt{\frac{1}{2}}$. Seeing that $0 < c_v < 1$, we can conclude this is the Erlang distribution as well. $k = \frac{1}{\sqrt{\frac{1}{2}}^2} = 2$.
