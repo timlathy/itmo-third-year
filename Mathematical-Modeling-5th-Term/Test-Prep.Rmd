@@ -1,0 +1,26 @@
+---
+title: "Test-Prep"
+output:
+  html_document: default
+---
+
+The first *raw moment* is the *mean* $\mu$.
+
+The second *central moment* is the *variance*, the square of the *standard deviation*, $\sigma^2$.
+**Important**: note that this is the *дисперсия* in Russian and **not** the coefficient of variation.
+
+The coeffient of variation is defined as the ratio of the standard deviation to the mean, $c_v = \frac{\sigma}{\mu}$.
+
+The appropriate distribution for series can be determined based on $c_v$:
+
+* $c_v = 0$ indicates the *degenerate distribution*
+
+* $0 < c_v < 1$ indicates the *hypoexponential distribution*, which is a general case of the *Erlang distribution*. The latter is easier to estimate the parameters for: $k \geqslant \frac{1}{c_v^2}$.
+
+An example task from the test:
+
+> Given the first raw moment of a series is 10 and the second central moment is 4,
+> find the closest fitting distribution.
+
+In other words, $\mu = 10, \sigma^2 = 4$, implying $c_v = \frac{\sqrt{4}}{10} = 0.2$, which is more than 0 and less than 1. Pick the Erlang distribution: $k = \lceil \frac{1}{0.2^2} \rceil = 25$.
+
