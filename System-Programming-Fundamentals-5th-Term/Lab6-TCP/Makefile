@@ -1,10 +1,13 @@
 CC=gcc
 CFLAGS=-std=c11 -g -Wall -Wextra -pedantic
 
-all: server
+all: server client
 
 server: server.c dir.h
 	$(CC) $(CFLAGS) -pthread -o server server.c
 
+client: client.c
+	$(CC) $(CFLAGS) -o client client.c
+
 clean:
-	@rm server
+	@rm server client
