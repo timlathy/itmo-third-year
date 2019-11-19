@@ -2,6 +2,7 @@
 
 use strict;
 use warnings qw(FATAL all);
+use threads;
 use IO::Socket::INET;
 
 use constant USAGE => "Usage $0 port\n";
@@ -14,6 +15,16 @@ my $server = IO::Socket::INET->new(
 print "Listening on $port\n";
 
 while (my $clt = $server->accept()) {
+  threads->create(\&process_request, $clt)->detach();
+}
+
+sub process_request {
+  my $clt = shift;
+
+  my $cltaddr = $clt->peerhost;
+  my $cltport = $clt->peerport;
+  print "Client connected: $cltaddr:$cltport\n";
+
   my $request = "";
   while (<$clt>) {
     $request .= $_;
