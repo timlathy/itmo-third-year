@@ -4,6 +4,8 @@ output:
   html_document: default
 ---
 
+# Probability Theory Basics
+
 ## Moment
 
 According to Wikipedia, a *moment* is a "specific quantitative measure of the shape of a function".
@@ -15,7 +17,7 @@ If the function is a probability distribution, then:
 Note that *variance* is called *дисперсия* in Russian. Do not confuse it with the *coefficient of variation*,
 defined as the ratio of the standard deviation to the mean, $c_v = \frac{\sigma}{\mu}$.
 
-## Probability distribution fitting
+## Probability Distribution Fitting
 
 The appropriate distribution for a series can be determined based on $c_v$:
 
@@ -27,7 +29,7 @@ The appropriate distribution for a series can be determined based on $c_v$:
 
 * $c_v > 1$ indicates the *hyperexponential distribution*.
 
-### Example tasks
+### Example Tasks
 
 > Find the closest fitting distribution for a series given the first raw moment is 10 and the second central moment is 4.
 
@@ -38,3 +40,49 @@ In other words, $\mu = 10$, $\sigma^2 = 4$, implying $c_v = \frac{\sqrt{4}}{10} 
 The second central moment ($\sigma^2$) can also be computed as the second raw moment - (the first raw moment)^2: $\sigma^2 = 24 - \mu^2 = 24 - 4^2 = 8$
 
 $c_v = \frac{\sqrt{8}}{4} = \sqrt{\frac{1}{2}}$. Seeing that $0 < c_v < 1$, we can conclude this is the Erlang distribution as well. $k = \frac{1}{\sqrt{\frac{1}{2}}^2} = 2$.
+
+# Markovian Processes
+
+State transitions of a system can be described by a *stochastic matrix*.
+Each of its entries represents a probability ($p_{ij} \geqslant 0$), and the sum of each row is 1.
+
+To analyze the system, we use its *transition rate matrix* (*intensity matrix*, *generator matrix*).
+For $i \neq j$, the elements are non-negative and describe the rate of the transitions from state $i$ to state $j$. The elements $q_{ii}$ are chosen such that the sum of each row is zero. Why? I found the following explanation intuitive: "[because] the probability mass flowing out of state $i$ will go to some other states (is conserved)".
+
+## Queueing Models
+
+Models with exponential distribution of arrival and service times are described with an M/M/c/K notation,
+where $c$ is the number of servers and $K$ is the queue capacity. If $K$ is omitted, the queue is assumed to be unbounded ($\infty$).
+
+### Parameters
+
+* the mean rate of arrival $\lambda$,
+
+* the mean rate of service $\mu = \frac{1}{b}$, where $b$ is the mean service time
+
+### Basic Formulas
+
+The utilization is $\rho = \frac{\lambda}{c\mu} = \lambda b$. It shows the probability that the server is busy or the proportion of time the server is busy.
+
+The mean length of the queue is $L_q = \frac{\rho^2}{1 - \rho}$ for the M/M/1 queue.
+
+The mean waiting time in the system is $W = W_q + b$, where $W_q$ is the mean waiting time in the queue.
+
+For the M/G/1 queue, based on the *Pollaczek–Khinchine* formula, the following also holds: $W_q = \frac{\lambda b^2 (1 + c_v^2)}{2(1 - \rho)}$.
+
+### Example tasks
+
+> Find the utilization for an M/G/1 model with the mean rate of arrival = 0.4, the mean rate of service = 0.5 and the coefficient of variation of the service time = 3.
+
+$\lambda = 0.4$, $\mu = 0.5$, $\frac{\sigma}{\mu} = 3$.
+
+$\rho = \frac{\lambda}{\mu} = \frac{0.4}{0.5} = 0.8$.
+
+> Find the mean waiting time in the system for an M/G/1 model with the mean rate of arrival = 0.1, the mean rate of service = 0.2, the coefficient of variation of service time = 3.
+
+$\lambda = 0.1$, $\mu = 0.2 \implies b = 5$, $c_v = 3$.
+
+$W = W_q + b$, $W_q = \frac{\lambda b^2 (1 + c_v^2)}{2(1 - \rho)}$, $\rho = \lambda b = 0.5$.
+
+$W_q = \frac{0.1 * 5^2 (1 + 3^2)}{2(1 - 0.5)} = 0.1 * 25 * 10 = 25$, $W = 25 + 5 = 30$.
+
