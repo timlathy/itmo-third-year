@@ -1,0 +1,18 @@
+@startuml
+
+left to right direction
+
+actor User as user
+actor "Local Client" <<Software>> as client
+actor "Remote Server" <<Software>> as server
+
+rectangle {
+  user -- (browse remote directory)
+  (browse remote directory) .> (print directory listing) : include
+  (print directory listing) -- client
+  (browse remote directory) .> (get directory listing) : include
+  (get directory listing) -- client
+  (get directory listing) -- server
+}
+
+@enduml
