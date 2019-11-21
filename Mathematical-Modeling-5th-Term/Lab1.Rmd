@@ -6,8 +6,9 @@ output: html_notebook
 # Dependencies
 
 ```{r}
-install.packages("readxl")
-library("readxl")
+install.packages(c("readxl", "sdprisk"))
+library(readxl)
+library(sdprisk)
 ```
 
 # Distribution Properties
@@ -70,7 +71,8 @@ writecf(labacf)
 **График 2. Автокорреляция исходной последовательности**
 
 ```{r}
-plot(labacf, type = "b", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
+plot(labacf, type = "h", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции", lwd = 4)
+abline(h=0)
 ```
 
 # Histogram
@@ -83,12 +85,24 @@ hist(labdata, breaks = 40, main = "", xlab = "Интервалы значени�
 
 # Approximation
 
-Erlang distribution: $\nu = \frac{1}{\sqrt{k}}, k \in N \implies k = \lceil \frac{1}{\nu^2} \rceil$
+Hypoexponential distribution:
+
+$$\nu = \frac{1}{\sqrt{k}}, k \in N \implies k = \lceil \frac{1}{\nu^2} \rceil$$
+
+$$t_1 = \frac{t}{k}(1 + \sqrt{\frac{k_2}{k_1}(kv^2-1)}),\ t_2 = \frac{t}{k}(1 - \sqrt{\frac{k_1}{k_2}(kv^2-1)}),\ t = mean(data),\ v = cfvar(data)$$
 
 ```{r}
 cfvar <- sd(labdata) / mean(labdata)
 k <- ceiling(1 / cfvar^2)
-approxdata <- rgamma(length(labdata), shape = k, scale = mean(labdata) / k)
+```
+
+In our case, $k = 2$. Based on $k_1 \leq k$ we let $k_1 = 1$. $k_2 = k - k_1 = 1$.
+
+```{r}
+k1 <- 1; k2 <- k - k1
+t1 <- mean(labdata) / k * (1 + sqrt((k2 / k1) * (k * cfvar^2 - 1)))
+t2 <- mean(labdata) / k * (1 - sqrt((k1 / k2) * (k * cfvar^2 - 1)))
+approxdata <- rhypoexp(length(labdata), rate=c(1 / t1, 1 / t2))
 writeprops(distprops(approxdata))
 ```
 
@@ -97,11 +111,11 @@ writeprops(distprops(approxdata))
 **График 4. Сравнение функций плотности**
 
 ```{r}
-labpdf <- density(labdata, n = 60, bw = "SJ")
+labpdf <- density(labdata, n = 60, bw = 0.2)
 approxpdf <- density(approxdata, bw = "SJ")
-plot(labpdf$x, labpdf$y, col = "black", lwd = 2, type = "h", xlab = "Интервалы", ylab = "Плотность")
+plot(labpdf$x, labpdf$y, lwd = 2, type = "h", xlab = "Интервалы", ylab = "Плотность", main = "Функции плотности")
 lines(approxpdf$x, approxpdf$y, col = "red", lwd = 2)
-legend(60, 0.08, legend = c("Исходные данные", "Аппроксимация"), col = c("black", "red"), lwd = 2, xjust = 1)
+legend(58, 0.12, legend = c("Исходной последовательности", "Сгенерированной последовательности"), col = c("black", "red"), lwd = 2, xjust = 1)
 ```
 
 ## Autocorrelation
@@ -111,7 +125,8 @@ legend(60, 0.08, legend = c("Исходные данные", "Аппроксим
 ```{r}
 approxacf <- acf(approxdata, plot = FALSE)[1:10]$acf
 writecf(approxacf)
-plot(approxacf, type = "b", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции")
+plot(approxacf, type = "h", xlab = "Сдвиг последовательности", ylab = "Коэффициент автокорреляции", lwd = 4)
+abline(h=0)
 ```
 
 ## Cross-Correlation of Source and Generated Series
