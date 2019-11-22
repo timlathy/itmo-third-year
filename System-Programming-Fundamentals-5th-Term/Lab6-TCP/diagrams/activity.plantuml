@@ -1,0 +1,30 @@
+@startuml
+|Client|
+start
+:Read arguments;
+if (Directory paths and connection info given?) then (Yes)
+  :Request connection;
+  |Server|
+  :Spawn a handler thread;
+  :Acknowledge connection;
+  |Client|
+  :Send directory paths;
+  |Server|
+  while (Unlisted directories left?) is (Yes)
+    :Attempt to list directory contents;
+    if (Operation succeeded?) then (Yes)
+      :Append listing to response;
+    else (No)
+      :Append error message to response;
+    endif
+  endwhile (No)
+  :Send accumulated response;
+  |Client|
+  :Display response;
+  stop
+else (no)
+  |Client|
+  :print usage;
+  stop
+endif
+@enduml

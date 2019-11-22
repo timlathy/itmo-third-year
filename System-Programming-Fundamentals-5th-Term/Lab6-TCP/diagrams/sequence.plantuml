@@ -6,21 +6,18 @@ User -> Client: Give directory paths and connection info
 Client -> Server: Send TCP connection request
 Client <-- Server: Accept TCP connection
 
-loop Specified directories
+Client -> Server: Send directory paths
 
-Client -> Server: Send path
-Server -> System: List directory
-
+loop Received directories
+  Server -> System: List directory contents
   alt Directory valid
     Server <-- System: Return files in a directory
-    Client <-- Server: Send list of files
   else Directory invalid
-    Server <-- System: Return error code
-    Client <-- Server: Send error message
+    Server <-- System: Return error message
   end
-
 end
 
-User <-- Client: Display the accumulated listings
+Client <-- Server: Send accumulated listings
+User <-- Client: Display accumulated listings
 
 @enduml
