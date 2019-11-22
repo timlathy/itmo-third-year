@@ -1,0 +1,33 @@
+@startuml
+
+left to right direction
+
+node "Server Machine" as server_node {
+  artifact server <<Executable>> as server_exe
+  artifact server.pl <<Script>> as server_pl
+  
+  artifact "libc" <<OS Component>> as server_libc
+  artifact "Perl 5.30" <<Interpreter>> as server_perl
+  artifact "POSIX-Compliant OS" <<OS>> as server_os
+  
+  server_exe ..> server_libc
+  server_libc ..> server_os
+  server_pl ..> server_perl
+}
+
+node "End User Machine" as client_node {
+  artifact client <<Executable>> as client_exe
+  artifact client.pl <<Script>> as client_pl
+  
+  artifact "libc" <<OS Component>> as client_libc
+  artifact "Perl 5.30" <<Interpreter>> as client_perl
+  artifact "POSIX-Compliant OS" <<OS>> as client_os
+  
+  client_exe ..> client_libc
+  client_libc ..> client_os
+  client_pl ..> client_perl
+}
+
+client_node -right-> server_node : TCP/IP
+
+@enduml

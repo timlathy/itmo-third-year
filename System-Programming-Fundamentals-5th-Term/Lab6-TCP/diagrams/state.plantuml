@@ -1,0 +1,29 @@
+@startuml
+
+[*] --> ClientInitialization
+
+state ClientInitialization {
+  [*] --> CheckingArgs
+  CheckingArgs --> ErrorDisplay : Incorrect arguments
+  ErrorDisplay -> [*]
+  CheckingArgs -> ConnectingToServer : Connection info
+  ConnectingToServer --> ErrorDisplay : Error message
+  ConnectingToServer --> SendingRequest : Directory paths
+  SendingRequest --> ServerProcessing : Packed request
+}
+
+state ServerProcessing {
+  [*] --> ReadingRequest
+  ReadingRequest --> ListingDirContents : Directory paths
+  ListingDirContents --> ListingDirContents : Next directory path
+  ListingDirContents --> SendingResponse : Directory content listings
+  SendingResponse --> ClientDisplay : Packed response
+}
+
+state ClientDisplay {
+  [*] --> ReadingResponse
+  ReadingResponse --> DisplayingListings : Directory content listings
+  DisplayingListings --> [*]
+}
+
+@enduml

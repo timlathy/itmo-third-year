@@ -1,0 +1,17 @@
+@startuml
+
+package Server {
+  TCPConnection --> [HandlerThreadSpawner]
+  TCPConnection --> [ClientCommunication]
+  [HandlerThreadSpawner] --> [HandlerThread]
+  [HandlerThread] --> [ClientCommunication]
+}
+
+package Client {
+  Entrypoint --> [ServerCommunication]
+  Entrypoint --> [ArgumentProcessing]
+  [ServerCommunication] --> [ResponsePrinting]
+  [ServerCommunication] --> TCPConnection
+}
+
+@enduml
