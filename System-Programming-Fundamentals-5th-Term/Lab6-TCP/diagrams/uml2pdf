@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+for diagram in *.plantuml; do
+  echo $diagram
+  plantuml -tsvg "$diagram"
+  inkscape "${diagram%.*}.svg" --export-pdf="${diagram%.*}.pdf"
+  rm "${diagram%.*}.svg"
+done
