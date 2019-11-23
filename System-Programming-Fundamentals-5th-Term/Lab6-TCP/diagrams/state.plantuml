@@ -7,7 +7,7 @@ state ClientInitialization {
   CheckingArgs --> ErrorDisplay : Incorrect arguments
   ErrorDisplay -> [*]
   CheckingArgs -> ConnectingToServer : Connection info
-  ConnectingToServer --> ErrorDisplay : Error message
+  ConnectingToServer --> ErrorDisplay : Error
   ConnectingToServer --> SendingRequest : Directory paths
   SendingRequest --> ServerProcessing : Packed request
 }

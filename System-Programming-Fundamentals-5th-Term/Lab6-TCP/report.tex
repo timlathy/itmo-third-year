@@ -44,11 +44,50 @@ https://github.com/timlathy/itmo-third-year/tree/master/
 System-Programming-Fundamentals-5th-Term/Lab6-TCP
 \end{verbatim}
 
+\section*{Communication Protocol}
+
+The following text protocol was implemented:
+
+\begin{verbatim}
+<request> ::= <path> { <path> } CR LF
+<path> ::= <non-empty string not including NUL or CR or LF> CR LF
+\end{verbatim}
+
+\newpage
+
+\section*{Example Telnet Interaction}
+
+\begin{verbatim}
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+test
+test-protected
+.
+
+Contents of test:
+.
+h
+..
+abc
+
+Failed to open test-protected: Permission denied
+
+Contents of .:
+test-protected
+.
+test
+..
+
+
+Connection closed by foreign host.
+\end{verbatim}
+
 \section*{Diagrams}
 
 \subsection*{BPMN}
 \noindent
-\includegraphics[width=\textwidth]{diagrams/bpmn}
+\includegraphics[width=1.05\textwidth]{diagrams/bpmn}
 
 \subsection*{UML Use Case}
 \noindent
