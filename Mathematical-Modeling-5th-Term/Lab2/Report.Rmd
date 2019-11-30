@@ -1,0 +1,30 @@
+---
+title: "Результаты моделирования"
+output: word_document
+---
+
+```{r setup, include = FALSE}
+library(jsonlite)
+library(dplyr)
+library(flextable)
+```
+
+## Исследование влияния загрузки на длительность переходного режима
+
+Таблица 2. Результаты моделирования варианта 1
+
+```{r, echo = FALSE}
+results <- jsonlite::fromJSON("results.json", flatten = TRUE)
+
+results %>%
+  select(task_count, utilization, loss_probability, mean_wait_time, mean_residence_time) %>%
+  flextable() %>%
+  set_header_labels(
+    task_count = "Заявок",
+    utilization = "Загрузка",
+    loss_probability = "Вер. потери",
+    mean_wait_time = "Время ожидания",
+    mean_residence_time = "Время пребывания") %>%
+  theme_box() %>%
+  autofit()
+```
