@@ -7,16 +7,19 @@ output: word_document
 library(jsonlite)
 library(dplyr)
 library(flextable)
+library(ggplot2)
 ```
 
 ## Исследование влияния загрузки на длительность переходного режима
 
-Таблица 2. Результаты моделирования варианта 1
+Таблица 1. Результаты моделирования варианта 1
 
 ```{r, echo = FALSE}
-results <- jsonlite::fromJSON("results.json", flatten = TRUE)
+results <- jsonlite::fromJSON("results.json")
+table1 <- filter(results, model == 0)
 
-results %>%
+table1 %>%
+  filter(task_count %in% c(100, 300, 1000, 3000, 5000, 7000, 9000, 10000)) %>%
   select(task_count, utilization, loss_probability, mean_wait_time, mean_residence_time) %>%
   flextable() %>%
   set_header_labels(
@@ -28,3 +31,10 @@ results %>%
   theme_box() %>%
   autofit()
 ```
+```{r, echo = FALSE}
+ggplot(table1, aes(x = task_count)) +
+  geom_line(aes(y = mean_wait_time)) +
+  labs(x = "Число заявок", y = "Среднее время ожидания")
+```
+
+График 1. Зависимость среднего времени ожидания от числа заявок
