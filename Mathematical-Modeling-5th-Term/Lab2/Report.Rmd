@@ -12,29 +12,65 @@ library(ggplot2)
 
 ## Исследование влияния загрузки на длительность переходного режима
 
-Таблица 1. Результаты моделирования варианта 1
-
 ```{r, echo = FALSE}
 results <- jsonlite::fromJSON("results.json")
-table1 <- filter(results, model == 0)
+transient1 <- filter(results, model == 0)
+transient2 <- filter(results, model == 1)
+transient3 <- filter(results, model == 2)
 
-table1 %>%
-  filter(task_count %in% c(100, 300, 1000, 3000, 5000, 7000, 9000, 10000)) %>%
-  select(task_count, utilization, loss_probability, mean_wait_time, mean_residence_time) %>%
-  flextable() %>%
-  set_header_labels(
-    task_count = "Заявок",
-    utilization = "Загрузка",
-    loss_probability = "Вер. потери",
-    mean_wait_time = "Время ожидания",
-    mean_residence_time = "Время пребывания") %>%
-  theme_box() %>%
-  autofit()
+transient_state_table <- function(data, model) {
+  data %>%
+    filter(task_count %in% c(300, 1000, 5000, 10000, 20000, 40000, 80000)) %>%
+    select(task_count, utilization, loss_probability, mean_wait_time, mean_residence_time) %>%
+    flextable() %>%
+    set_header_labels(
+      task_count = "Заявок",
+      utilization = "Загрузка",
+      loss_probability = "Вер. потери",
+      mean_wait_time = "Время ожидания",
+      mean_residence_time = "Время пребывания") %>%
+    theme_box() %>%
+    autofit()
+}
 ```
+
+Таблица 1. Результаты моделирования варианта 1 ($\rho \approx 0.1$)
+
 ```{r, echo = FALSE}
-ggplot(table1, aes(x = task_count)) +
-  geom_line(aes(y = mean_wait_time)) +
-  labs(x = "Число заявок", y = "Среднее время ожидания")
+transient_state_table(transient1)
+```
+
+Таблица 2. Результаты моделирования варианта 2 ($\rho \approx 0.5$)
+
+```{r, echo = FALSE}
+transient_state_table(transient2)
+```
+
+Таблица 3. Результаты моделирования варианта 3 ($\rho \approx 0.9$)
+
+```{r, echo = FALSE}
+transient_state_table(transient3)
+```
+
+### Графики зависимостей
+
+```{r, echo = FALSE}
+transient_state_plot <- function(data, y, ylabel) {
+  ggplot(results, aes(x = task_count, group = factor(model))) +
+    geom_line(aes(y = y, color = factor(model))) +
+    scale_color_discrete(labels = c("0.1", "0.5", "0.9")) +
+    labs(x = "Число заявок", y = ylabel, color = "Загрузка")
+}
+```
+
+```{r, echo = FALSE}
+transient_state_plot(results, y = results$mean_wait_time, ylabel = "Среднее время ожидания")
 ```
 
 График 1. Зависимость среднего времени ожидания от числа заявок
+
+```{r, echo = FALSE}
+transient_state_plot(results, y = results$loss_probability, ylabel = "Вероятность потери")
+```
+
+График 2. Зависимость вероятности потери от числа заявок
