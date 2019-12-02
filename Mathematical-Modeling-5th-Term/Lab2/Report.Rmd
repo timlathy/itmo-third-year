@@ -8,18 +8,18 @@ library(jsonlite)
 library(dplyr)
 library(flextable)
 library(ggplot2)
+
+load_models <- . %>% paste0("model", ., ".json") %>% lapply(jsonlite::fromJSON) %>% bind_rows(.id = "model")
 ```
 
-## Исследование влияния загрузки на длительность переходного режима
+## 1. Исследование влияния загрузки на длительность переходного режима
 
 ```{r, echo = FALSE}
-transient1 <- jsonlite::fromJSON("model0.json")
-transient2 <- jsonlite::fromJSON("model1.json")
-transient3 <- jsonlite::fromJSON("model2.json")
+ms_transient <- load_models(0:2)
 
 transient_state_table <- function(data, model) {
   data %>%
-    filter(task_count %in% c(300, 1000, 10000, 50000, 80000, 100000, 200000)) %>%
+    filter(task_count %in% c(300, 1000, 10000, 50000, 80000, 100000, 200000, 400000, 600000, 800000, 1000000)) %>%
     select(task_count, utilization, loss_probability, mean_wait_time, mean_residence_time) %>%
     flextable() %>%
     set_header_labels(
@@ -36,28 +36,26 @@ transient_state_table <- function(data, model) {
 Таблица 1. Результаты моделирования варианта 1 ($\rho \approx 0.1$)
 
 ```{r, echo = FALSE}
-transient_state_table(transient1)
+transient_state_table(ms_transient[ms_transient$model == 1,])
 ```
 
 Таблица 2. Результаты моделирования варианта 2 ($\rho \approx 0.5$)
 
 ```{r, echo = FALSE}
-transient_state_table(transient2)
+transient_state_table(ms_transient[ms_transient$model == 2,])
 ```
 
 Таблица 3. Результаты моделирования варианта 3 ($\rho \approx 0.9$)
 
 ```{r, echo = FALSE}
-transient_state_table(transient3)
+transient_state_table(ms_transient[ms_transient$model == 3,])
 ```
 
 ### Графики зависимостей
 
 ```{r, echo = FALSE}
-results <- bind_rows(transient1, transient2, transient3, .id = "model")
-
 transient_state_plot <- function(data, y, ylabel) {
-  ggplot(results, aes(x = task_count, group = factor(model))) +
+  ggplot(data, aes(x = task_count, group = factor(model))) +
     geom_line(aes(y = y, color = factor(model))) +
     scale_x_continuous(breaks = scales::pretty_breaks(n = 8), labels = function(x) format(x, scientific = FALSE)) +
     scale_color_discrete(labels = c("0.1", "0.5", "0.9")) +
@@ -66,13 +64,14 @@ transient_state_plot <- function(data, y, ylabel) {
 ```
 
 ```{r, echo = FALSE}
-transient_state_plot(results, y = results$mean_wait_time, ylabel = "Среднее время ожидания")
+ms_transient_plt <- ms_transient[ms_transient$task_count <= 600000,]
+transient_state_plot(ms_transient_plt, y = ms_transient_plt$mean_wait_time, ylabel = "Среднее время ожидания")
 ```
 
 График 1. Зависимость среднего времени ожидания от числа заявок
 
 ```{r, echo = FALSE}
-transient_state_plot(results, y = results$loss_probability, ylabel = "Вероятность потери")
+transient_state_plot(ms_transient_plt, y = ms_transient_plt$loss_probability, ylabel = "Вероятность потери")
 ```
 
 График 2. Зависимость вероятности потери от числа заявок
