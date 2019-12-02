@@ -59,6 +59,7 @@ results <- bind_rows(transient1, transient2, transient3, .id = "model")
 transient_state_plot <- function(data, y, ylabel) {
   ggplot(results, aes(x = task_count, group = factor(model))) +
     geom_line(aes(y = y, color = factor(model))) +
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 8), labels = function(x) format(x, scientific = FALSE)) +
     scale_color_discrete(labels = c("0.1", "0.5", "0.9")) +
     labs(x = "Число заявок", y = ylabel, color = "Загрузка")
 }
