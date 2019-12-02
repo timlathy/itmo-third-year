@@ -13,14 +13,13 @@ library(ggplot2)
 ## Исследование влияния загрузки на длительность переходного режима
 
 ```{r, echo = FALSE}
-results <- jsonlite::fromJSON("results.json")
-transient1 <- filter(results, model == 0)
-transient2 <- filter(results, model == 1)
-transient3 <- filter(results, model == 2)
+transient1 <- jsonlite::fromJSON("model0.json")
+transient2 <- jsonlite::fromJSON("model1.json")
+transient3 <- jsonlite::fromJSON("model2.json")
 
 transient_state_table <- function(data, model) {
   data %>%
-    filter(task_count %in% c(300, 1000, 5000, 10000, 20000, 40000, 80000)) %>%
+    filter(task_count %in% c(300, 1000, 10000, 50000, 80000, 100000, 200000)) %>%
     select(task_count, utilization, loss_probability, mean_wait_time, mean_residence_time) %>%
     flextable() %>%
     set_header_labels(
@@ -55,6 +54,8 @@ transient_state_table(transient3)
 ### Графики зависимостей
 
 ```{r, echo = FALSE}
+results <- bind_rows(transient1, transient2, transient3, .id = "model")
+
 transient_state_plot <- function(data, y, ylabel) {
   ggplot(results, aes(x = task_count, group = factor(model))) +
     geom_line(aes(y = y, color = factor(model))) +
