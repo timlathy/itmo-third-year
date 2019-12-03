@@ -236,3 +236,35 @@ queue_cap_mwt_lp_plot(ms_queue_cap09)
 ```
 
 График 10. Нормированный график зависимости среднего времени ожидания и вероятности потери от емкости накопителя при утилизации = 0.9
+
+```{r, echo = FALSE, fig.width = 7, fig.height = 4}
+ms_num_servers <- load_results(38:40) %>%
+  filter(task_count <= 800000)
+
+ggplot(ms_num_servers, aes(x = task_count, group = factor(model))) +
+  geom_line(aes(y = mean_wait_time, color = factor(model))) +
+  task_count_scale +
+  scale_color_discrete(labels = c("1", "2", "3")) +
+  labs(x = "Число заявок", y = "Среднее время ожидания", color = "Кол-во приборов")
+```
+
+График 11. График зависимости среднего времени ожидания от числа заявок для количества приборов от 1 до 3 и утилизации = 0.5
+
+```{r, echo = FALSE, fig.width = 7, fig.height = 4}
+ms_util_num_servers <- load_results(35:43) %>%
+  filter(task_count == 1000000) %>%
+  inner_join(mutate(models[35:43,], model = paste0(row_number())), by = "model") %>%
+  mutate(util = cut(utilization, breaks = c(0, 0.3, 0.6, 1), labels = c("0.1", "0.5", "0.9")))
+
+ggplot(ms_util_num_servers, aes(x = num_servers, group = factor(util))) +
+  geom_line(aes(y = mean_wait_time, color = factor(util))) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 3)) +
+  labs(x = "Количество приборов", y = "Среднее время ожидания", color = "Загрузка")
+```
+
+```{r, echo = FALSE, fig.width = 7, fig.height = 4}
+ggplot(ms_util_num_servers, aes(x = num_servers, group = factor(util))) +
+  geom_line(aes(y = loss_probability, color = factor(util))) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 3)) +
+  labs(x = "Количество приборов", y = "Вероятность потери", color = "Загрузка")
+```
