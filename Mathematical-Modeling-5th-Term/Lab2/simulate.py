@@ -83,73 +83,76 @@ def simulate(model, task_counts):
 # === Runner
 
 models = [
-    #3.2.1
-    #varying utilization
-    #utilization = 0.1
+    # === 3.2.1
+    # utilization = 0.1
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 50), service_dist=DExp(1 / 10)),
-    #utilization = 0.5
+    # utilization = 0.5
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
-    #utilization = 0.9
+    # utilization = 0.9
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
 
-    #3.2.2
-    #vary lambda
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
-    #increase
+    # === 3.2.2
+    # increase lambda
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 15), service_dist=DExp(1 / 30)),
-    #decrease
+    # decrease lambda
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 45), service_dist=DExp(1 / 30)),
-
-    #vary mu
+    # default
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
-    #increase
+    # increase mu
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 15)),
-    #decrease
+    # decrease mu
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 45)),
 
-    #try different service distributions
+    # exponential arrival distributions
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DUniform(1, 10)),
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DErlang2(1 / 9)),
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DHyperexp(1 / 30, 1 / 30, 1 / 30)),
-
-    #try different arrival distributions
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
+    # traced arrival distribution
     Model(num_servers=2, queue_capacity=10, arrival_dist=DTrace(), service_dist=DExp(1 / 30)),
+    # approximated (hyperexponential) arrival distribution
     Model(num_servers=2, queue_capacity=10, arrival_dist=DHypoexp2(1 / 8.55, 1 / 1.3), service_dist=DExp(1 / 30)),
 
-    #3.2.3
-    #varying queue capacity to determine at which point can we treat the model as a model with infinite queue
-    #utilization = 0.5
-    #loss probability is 0 at 14 (but the results can vary actually...) if running 100k tasks
+    # exponential service distribution
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
+    # uniform service distribution
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DUniform(1, 10)),
+    # erlang service distribution
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DErlang2(1 / 9)),
+    # hyperexponential service distribution
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DHyperexp(1 / 30, 1 / 30, 1 / 30)),
+
+    # === 3.2.3
+    # vary queue capacity to determine at which point can we treat the model as a model with infinite queue
+    # utilization = 0.5
+    # loss probability is 0 at 14 (but the results can vary actually...) if running 100k tasks
     Model(num_servers=2, queue_capacity=8, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     Model(num_servers=2, queue_capacity=12, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     Model(num_servers=2, queue_capacity=14, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     Model(num_servers=2, queue_capacity=16, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=18, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
 
-    #utilization 0.9
-    #loss probability is 0 at 70 (results can vary greatly) if running 100k tasks
+    # utilization = 0.9
+    # loss probability is 0 at 70 (results can vary greatly) if running 100k tasks
     Model(num_servers=2, queue_capacity=55, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
     Model(num_servers=2, queue_capacity=60, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
     Model(num_servers=2, queue_capacity=65, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
     Model(num_servers=2, queue_capacity=70, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
     Model(num_servers=2, queue_capacity=75, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
+    Model(num_servers=2, queue_capacity=80, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
 
-    #3.2.4
-    #varying servers count (1,2,3) and utilization (0.1, 0.5, 0.9)
-    #and varying lambda & mu to keep utilization and load constant
-    #utilization = 0.1
+    # === 3.2.4
+    # Vary server count (1, 2, 3) and utilization (0.1, 0.5, 0.9)
+    # (changing lambda & mu to keep utilization and load constant)
+    # utilization = 0.1
     Model(num_servers=1, queue_capacity=10, arrival_dist=DExp(1 / 200), service_dist=DExp(1 / 20)),
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 50), service_dist=DExp(1 / 10)),
     Model(num_servers=3, queue_capacity=10, arrival_dist=DExp(1 / 20), service_dist=DExp(1 / 6)),
 
-    #utilization = 0.5
+    # utilization = 0.5
     Model(num_servers=1, queue_capacity=10, arrival_dist=DExp(1 / 40), service_dist=DExp(1 / 20)),
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     Model(num_servers=3, queue_capacity=10, arrival_dist=DExp(1 / 24), service_dist=DExp(1 / 36)),
 
-    #utilization = 0.9
+    # utilization = 0.9
     Model(num_servers=1, queue_capacity=10, arrival_dist=DExp(1 / 60), service_dist=DExp(1 / 54)),
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 20), service_dist=DExp(1 / 36)),
     Model(num_servers=3, queue_capacity=10, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 27))

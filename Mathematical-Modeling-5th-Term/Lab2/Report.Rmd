@@ -79,7 +79,7 @@ transient_state_plot(ms_transient_plt, y = ms_transient_plt$loss_probability, yl
 ## 2. Исследование влияния распределений потока заявок и времени обслуживания на среднее время ожидания
 
 ```{r, echo  = FALSE}
-ms_exp_var <- load_models(4:8)
+ms_exp_var <- load_models(3:7)
 
 ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
     `1`="Увеличение l", `2`="Уменьшение l", `3`="", `4`="Увеличение mu", `5`="Уменьшение mu"))
