@@ -95,16 +95,16 @@ models = [
     # increase lambda
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 15), service_dist=DExp(1 / 30)),
     # decrease lambda
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 45), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 60), service_dist=DExp(1 / 30)),
     # default
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     # increase mu
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 15)),
     # decrease mu
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 45)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 60)),
 
     # exponential arrival distributions
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 9.85), service_dist=DExp(1 / 30)),
     # traced arrival distribution
     Model(num_servers=2, queue_capacity=10, arrival_dist=DTrace(), service_dist=DExp(1 / 30)),
     # approximated (hyperexponential) arrival distribution
@@ -113,11 +113,11 @@ models = [
     # exponential service distribution
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     # uniform service distribution
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DUniform(1, 10)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DUniform(0, 60)),
     # erlang service distribution
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DErlang2(1 / 9)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DErlang2(1 / 15)),
     # hyperexponential service distribution
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DHyperexp(1 / 30, 1 / 30, 1 / 30)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DHyperexp(1 / 2, 1 / 40, 1 / 20)),
 
     # === 3.2.3
     # vary queue capacity to determine at which point can we treat the model as a model with infinite queue
