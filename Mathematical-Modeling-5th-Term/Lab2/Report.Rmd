@@ -12,7 +12,11 @@ library(tidyr)
 
 models <- jsonlite::fromJSON("models.json", flatten = TRUE)
 
-load_results <- . %>% paste0("model", ., ".json") %>% lapply(jsonlite::fromJSON) %>% bind_rows(.id = "model")
+load_results <- . %>%
+  lapply(function(n) n - 1) %>%
+  paste0("model", ., ".json") %>%
+  lapply(jsonlite::fromJSON) %>%
+  bind_rows(.id = "model")
 ```
 
 ```{r, echo = FALSE}
@@ -46,7 +50,7 @@ models_table <- function(selector)
 Таблица 1. Исследуемые варианты
 
 ```{r, echo = FALSE}
-ms_transient <- load_results(0:2)
+ms_transient <- load_results(1:3)
 models_table(1:3)
 ```
 
@@ -118,7 +122,7 @@ transient_state_plot(ms_transient_plt, y = ms_transient_plt$loss_probability, yl
 
 График 2. Зависимость вероятности потери от числа заявок
 
-## 2. Исследование влияния распределений потока заявок и времени обслуживания на среднее время ожидания
+## 2. Исследование влияния распределений потока заявок и времени обслуживания на среднее время ожидания и вероятность потери
 
 Таблица 5. Исследуемые варианты
 
@@ -127,7 +131,7 @@ models_table(4:8)
 ```
 
 ```{r, echo  = FALSE}
-ms_exp_var <- load_results(3:7)
+ms_exp_var <- load_results(4:8)
 
 ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
     `1`="Увеличение l", `2`="Уменьшение l", `3`="", `4`="Увеличение mu", `5`="Уменьшение mu"))
@@ -140,66 +144,99 @@ ggplot(ms_exp_var_plt, aes(x = model, y = mean_wait_time)) +
 
 График 3. Зависимость среднего времени ожидания от параметров экспоненциального распределения интенсивности поступления и обслуживания
 
-### Распределения интенсивности обслуживания
+```{r, echo  = FALSE}
+ggplot(ms_exp_var_plt, aes(x = model, y = loss_probability)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "Экспоненциальное распределение", y = "Среднее время ожидания") +
+  theme_minimal()
+```
 
-Таблица 6. Исследуемые варианты
+График 4. Зависимость вероятности потери от параметров экспоненциального распределения интенсивности поступления и обслуживания
+
+
+```{r, echo  = FALSE}
+ms_exp_var <- load_results(12:15)
+
+ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
+    `1`="Экспоненциальное", `2`="Равномерное", `3`="Эрланга 2-го порядка", `4`="Гиперэкспоненциальное"))
+
+ggplot(ms_exp_var_plt, aes(x = model, y = mean_wait_time)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "", y = "Среднее время ожидания") +
+  theme_minimal()
+```
+
+График 5. Зависимость среднего времени ожидания от закона распределения интенсивности обработки заявок
+
+```{r, echo  = FALSE}
+ms_exp_var <- load_results(12:15)
+
+ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
+    `1`="Экспоненциальное", `2`="Равномерное", `3`="Эрланга 2-го порядка", `4`="Гиперэкспоненциальное"))
+
+ggplot(ms_exp_var_plt, aes(x = model, y = loss_probability)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "", y = "Вероятность потери") +
+  theme_minimal()
+```
+
+График 6. Зависимость вероятности потери от закона распределения интенсивности обработки заявок
+
+```{r, echo  = FALSE}
+ms_exp_var <- load_results(9:11)
+
+ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
+    `1`="Экспоненциальное", `2`="Трасса", `3`="Гипоэкспоненциальное"))
+
+ggplot(ms_exp_var_plt, aes(x = model, y = mean_wait_time)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "", y = "Среднее время ожидания") +
+  theme_minimal()
+```
+
+График 7. Зависимость времени ожидания от закона распределения интенсивности поступления заявок
+
+```{r, echo  = FALSE}
+ms_exp_var <- load_results(9:11)
+
+ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
+    `1`="Экспоненциальное", `2`="Трасса", `3`="Гипоэкспоненциальное"))
+
+ggplot(ms_exp_var_plt, aes(x = model, y = loss_probability)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "", y = "Вероятность потери") +
+  theme_minimal()
+```
+
+График 8. Зависимость вероятности потери от закона распределения интенсивности поступления заявок
 
 ```{r, echo = FALSE}
-models_table(12:15)
+models_enum <- models[16:34,] %>% mutate(model = paste0(row_number()))
+data <- load_results(16:34) %>% inner_join(models_enum, by = "model") %>% filter(task_count == 1000000)
+
+data05 <- data %>%
+  filter(utilization < 0.6) %>%
+  mutate(mwt=mean_wait_time/max(mean_wait_time), lp=loss_probability/max(loss_probability)) %>%
+  gather(prop, value, mwt, lp)
+
+ggplot(data05, aes(x = queue_capacity, y = value, color = prop)) +
+  geom_line() +
+  scale_color_manual(labels=c("mwt"="Среднее время ожидания", "lp"="Вероятность потери"), values=c("mwt"="steelblue", "lp"="orange")) +
+  labs(x = "Емкость накопителя", y = "", color = "")
 ```
 
-```{r, echo  = FALSE}
-ms_exp_var <- load_results(11:14)
+График 9. Нормированный график зависимости среднего времени ожидания и вероятности потери от емкости накопителя при утилизации = 0.5
 
-ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
-    `1`="Экспоненциальное", `2`="Равномерное", `3`="Эрланга 2-го порядка", `4`="Гиперэкспоненциальное"))
+```{r, echo = FALSE}
+data09 <- data %>%
+  filter(utilization > 0.6) %>%
+  mutate(mwt=mean_wait_time/max(mean_wait_time), lp=loss_probability/max(loss_probability)) %>%
+  gather(prop, value, mwt, lp)
 
-ggplot(ms_exp_var_plt, aes(x = model, y = mean_wait_time)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  labs(x = "", y = "Среднее время ожидания") +
-  theme_minimal()
+ggplot(data09, aes(x = queue_capacity, y = value, color = prop)) +
+  geom_line() +
+  scale_color_manual(labels=c("mwt"="Среднее время ожидания", "lp"="Вероятность потери"), values=c("mwt"="blue", "lp"="red")) +
+  labs(x = "Емкость накопителя", y = "", color = "")
 ```
 
-График 4. Зависимость среднего времени ожидания от закона распределения интенсивности обслуживания
-
-```{r, echo  = FALSE}
-ms_exp_var <- load_results(11:14)
-
-ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
-    `1`="Экспоненциальное", `2`="Равномерное", `3`="Эрланга 2-го порядка", `4`="Гиперэкспоненциальное"))
-
-ggplot(ms_exp_var_plt, aes(x = model, y = loss_probability)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  labs(x = "", y = "Вероятность потери") +
-  theme_minimal()
-```
-
-График 5. Зависимость вероятности потери от закона распределения интенсивности обработки заявок
-
-```{r, echo  = FALSE}
-ms_exp_var <- load_results(8:10)
-
-ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
-    `1`="Экспоненциальное", `2`="Трасса", `3`="Гипоэкспоненциальное"))
-
-ggplot(ms_exp_var_plt, aes(x = model, y = mean_wait_time)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  labs(x = "", y = "Среднее время ожидания") +
-  theme_minimal()
-```
-
-График 6. Зависимость времени ожидания от закона распределения интенсивности поступления заявок
-
-```{r, echo  = FALSE}
-ms_exp_var <- load_results(8:10)
-
-ms_exp_var_plt <- mutate(ms_exp_var[ms_exp_var$task_count == 1000000,], model=recode_factor(model,
-    `1`="Экспоненциальное", `2`="Трасса", `3`="Гипоэкспоненциальное"))
-
-ggplot(ms_exp_var_plt, aes(x = model, y = loss_probability)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  labs(x = "", y = "Вероятность потери") +
-  theme_minimal()
-```
-
-График 7. Зависимость вероятности потери от закона распределения интенсивности поступления заявок
+График 10. Нормированный график зависимости среднего времени ожидания и вероятности потери от емкости накопителя при утилизации = 0.9
