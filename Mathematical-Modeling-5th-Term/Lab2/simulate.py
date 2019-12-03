@@ -122,22 +122,27 @@ models = [
     # === 3.2.3
     # vary queue capacity to determine at which point can we treat the model as a model with infinite queue
     # utilization = 0.5
-    # loss probability is 0 at 14 (but the results can vary actually...) if running 100k tasks
-    Model(num_servers=2, queue_capacity=8, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=1, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=5, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
-    Model(num_servers=2, queue_capacity=12, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     Model(num_servers=2, queue_capacity=14, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
-    Model(num_servers=2, queue_capacity=16, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
     Model(num_servers=2, queue_capacity=18, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=22, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=30, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=40, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
 
     # utilization = 0.9
-    # loss probability is 0 at 70 (results can vary greatly) if running 100k tasks
-    Model(num_servers=2, queue_capacity=55, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
+    Model(num_servers=2, queue_capacity=1, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
+    Model(num_servers=2, queue_capacity=5, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
+    Model(num_servers=2, queue_capacity=15, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
+    Model(num_servers=2, queue_capacity=20, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
+    Model(num_servers=2, queue_capacity=35, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
     Model(num_servers=2, queue_capacity=60, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
-    Model(num_servers=2, queue_capacity=65, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
     Model(num_servers=2, queue_capacity=70, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
-    Model(num_servers=2, queue_capacity=75, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
     Model(num_servers=2, queue_capacity=80, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
+    Model(num_servers=2, queue_capacity=90, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
+    Model(num_servers=2, queue_capacity=120, arrival_dist=DExp(1 / 10), service_dist=DExp(1 / 18)),
 
     # === 3.2.4
     # Vary server count (1, 2, 3) and utilization (0.1, 0.5, 0.9)
