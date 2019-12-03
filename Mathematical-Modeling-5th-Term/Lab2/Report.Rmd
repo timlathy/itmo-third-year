@@ -8,18 +8,52 @@ library(jsonlite)
 library(dplyr)
 library(flextable)
 library(ggplot2)
+library(tidyr)
+
+models <- jsonlite::fromJSON("models.json", flatten = TRUE)
 
 load_results <- . %>% paste0("model", ., ".json") %>% lapply(jsonlite::fromJSON) %>% bind_rows(.id = "model")
 ```
 
+```{r, echo = FALSE}
+# https://stackoverflow.com/a/57193998
+fit_flextable <- function(table, pgwidth = 8){
+  table_af <- autofit(table)
+  width(table_af, width = dim(table_af)$widths * pgwidth / flextable_dim(table_af)$widths)
+}
+
+models_table <- function(selector)
+  models[selector,] %>%
+    mutate(id = row_number()) %>%
+    select(
+      id, num_servers, queue_capacity,
+      arrival_dist.kind, arrival_dist.mean, service_dist.kind, service_dist.mean) %>%
+    flextable() %>%
+    set_header_labels(
+      id = "№",
+      num_servers = "Приборы",
+      queue_capacity = "Накопитель",
+      arrival_dist.kind = "Р-е инт. поступления",
+      arrival_dist.mean = "М.О. пост.",
+      service_dist.kind = "Р-е инт. обслуживания",
+      service_dist.mean = "М.О. обсл.") %>%
+    theme_box() %>%
+    fit_flextable()
+```
+
 ## 1. Исследование влияния загрузки на длительность переходного режима
+
+Таблица 1. Исследуемые варианты
 
 ```{r, echo = FALSE}
 ms_transient <- load_results(0:2)
+models_table(1:3)
+```
 
+```{r, echo = FALSE}
 lagdiff <- . %>% { (. / lag(.) - 1) * 100 } %>% { ifelse(is.finite(.), round(., digits = 2), 0) }
 
-transient_state_table <- function(data, model) {
+transient_state_table <- function(data, model)
   data %>%
     filter(task_count %in% c(300, 1000, 10000, 50000, 80000, 100000, 200000, 400000, 600000, 800000, 1000000)) %>%
     mutate(
@@ -38,23 +72,22 @@ transient_state_table <- function(data, model) {
       mean_wait_time_diff = "ВО %",
       mean_residence_time = "Время пребывания") %>%
     theme_box() %>%
-    autofit()
-}
+    fit_flextable()
 ```
 
-Таблица 1. Результаты моделирования варианта 1 ($\rho \approx 0.1$)
+Таблица 2. Результаты моделирования варианта 1 ($\rho \approx 0.1$)
 
 ```{r, echo = FALSE}
 transient_state_table(ms_transient[ms_transient$model == 1,])
 ```
 
-Таблица 2. Результаты моделирования варианта 2 ($\rho \approx 0.5$)
+Таблица 3. Результаты моделирования варианта 2 ($\rho \approx 0.5$)
 
 ```{r, echo = FALSE}
 transient_state_table(ms_transient[ms_transient$model == 2,])
 ```
 
-Таблица 3. Результаты моделирования варианта 3 ($\rho \approx 0.9$)
+Таблица 4. Результаты моделирования варианта 3 ($\rho \approx 0.9$)
 
 ```{r, echo = FALSE}
 transient_state_table(ms_transient[ms_transient$model == 3,])
@@ -87,6 +120,12 @@ transient_state_plot(ms_transient_plt, y = ms_transient_plt$loss_probability, yl
 
 ## 2. Исследование влияния распределений потока заявок и времени обслуживания на среднее время ожидания
 
+Таблица 5. Исследуемые варианты
+
+```{r, echo = FALSE}
+models_table(4:8)
+```
+
 ```{r, echo  = FALSE}
 ms_exp_var <- load_results(3:7)
 
@@ -101,6 +140,13 @@ ggplot(ms_exp_var_plt, aes(x = model, y = mean_wait_time)) +
 
 График 3. Зависимость среднего времени ожидания от параметров экспоненциального распределения интенсивности поступления и обслуживания
 
+### Распределения интенсивности обслуживания
+
+Таблица 6. Исследуемые варианты
+
+```{r, echo = FALSE}
+models_table(12:15)
+```
 
 ```{r, echo  = FALSE}
 ms_exp_var <- load_results(11:14)
@@ -114,7 +160,7 @@ ggplot(ms_exp_var_plt, aes(x = model, y = mean_wait_time)) +
   theme_minimal()
 ```
 
-График 4. Зависимость среднего времени ожидания от закона распределения интенсивности обработки заявок
+График 4. Зависимость среднего времени ожидания от закона распределения интенсивности обслуживания
 
 ```{r, echo  = FALSE}
 ms_exp_var <- load_results(11:14)

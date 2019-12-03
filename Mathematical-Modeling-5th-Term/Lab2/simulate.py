@@ -13,31 +13,31 @@ SimResult = namedtuple('SimResult', 'utilization task_count loss_probability mea
 
 class DExp(Distribution):
     def __new__(cls, rate):
-        dist = Distribution.__new__(cls, kind='Exponential', mean=(1 / rate))
+        dist = Distribution.__new__(cls, kind='Экспоненциальное', mean=(1 / rate))
         dist.d = ciw.dists.Exponential(rate)
         return dist
 
 class DUniform(Distribution):
     def __new__(cls, a, b):
-        dist = Distribution.__new__(cls, kind='Uniform', mean=((a + b) / 2))
+        dist = Distribution.__new__(cls, kind='Равномерное', mean=((a + b) / 2))
         dist.d = ciw.dists.Uniform(a, b)
         return dist
 
 class DHypoexp2(Distribution):
     def __new__(cls, rate1, rate2):
-        dist = Distribution.__new__(cls, kind='Hypoexponential', mean=(1 / rate1 + 1 / rate2))
+        dist = Distribution.__new__(cls, kind='Гипоэкспоненциальное', mean=(1 / rate1 + 1 / rate2))
         dist.d = ciw.dists.Exponential(rate1) + ciw.dists.Exponential(rate2)
         return dist
 
 class DErlang2(Distribution):
     def __new__(cls, rate):
-        dist = Distribution.__new__(cls, kind='Erlang', mean=(2 / rate))
+        dist = Distribution.__new__(cls, kind='Эрланга 2-й степени', mean=(2 / rate))
         dist.d = ciw.dists.Exponential(rate) + ciw.dists.Exponential(rate)
         return dist
 
 class DHyperexp(Distribution):
     def __new__(cls, qq, tt_1, tt_2):
-        dist = Distribution.__new__(cls, kind='Hyperexponential', mean=(qq / tt_1 + (1 - qq) / tt_2))
+        dist = Distribution.__new__(cls, kind='Гиперэкспоненциальное', mean=(qq / tt_1 + (1 - qq) / tt_2))
         dist.d = ciw.dists.CombinedDistribution(
             ciw.dists.Exponential(tt_1),
             ciw.dists.Exponential(tt_2),
@@ -50,7 +50,7 @@ class DTrace(Distribution):
         with open('trace.txt', 'r') as f:
             trace = [float(v) for v in f.read().splitlines()]
 
-        dist = Distribution.__new__(cls, kind='Trace', mean=(sum(trace) / len(trace)))
+        dist = Distribution.__new__(cls, kind='Трасса', mean=(sum(trace) / len(trace)))
         dist.d = ciw.dists.Sequential(trace)
         return dist
 
