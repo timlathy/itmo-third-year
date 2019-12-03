@@ -17,16 +17,25 @@ load_models <- . %>% paste0("model", ., ".json") %>% lapply(jsonlite::fromJSON) 
 ```{r, echo = FALSE}
 ms_transient <- load_models(0:2)
 
+lagdiff <- . %>% { (. / lag(.) - 1) * 100 } %>% { ifelse(is.finite(.), round(., digits = 2), 0) }
+
 transient_state_table <- function(data, model) {
   data %>%
     filter(task_count %in% c(300, 1000, 10000, 50000, 80000, 100000, 200000, 400000, 600000, 800000, 1000000)) %>%
-    select(task_count, utilization, loss_probability, mean_wait_time, mean_residence_time) %>%
+    mutate(
+      mean_wait_time_diff = lagdiff(mean_wait_time),
+      loss_probability_diff = lagdiff(loss_probability)) %>%
+    select(
+      task_count, utilization, loss_probability, loss_probability_diff,
+      mean_wait_time, mean_wait_time_diff, mean_residence_time) %>%
     flextable() %>%
     set_header_labels(
       task_count = "Заявок",
       utilization = "Загрузка",
       loss_probability = "Вер. потери",
+      loss_probability_diff = "Вер. П %",
       mean_wait_time = "Время ожидания",
+      mean_wait_time_diff = "ВО %",
       mean_residence_time = "Время пребывания") %>%
     theme_box() %>%
     autofit()
