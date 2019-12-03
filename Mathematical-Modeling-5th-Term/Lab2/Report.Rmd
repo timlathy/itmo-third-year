@@ -217,9 +217,33 @@ ggplot(ms_arvl_dist_var, aes(x = model, y = loss_probability)) +
 
 График 8. Зависимость вероятности потери от закона распределения интенсивности поступления заявок
 
-## 3. Исследование влияния емкости накопителя на среднее время ожидания и вероятность потери
+## 3. Исследование влияния емкости накопителя
+
+### 3.1. Длительность переходного процесса
 
 Таблица 8. Исследуемые варианты
+
+```{r, echo = FALSE}
+models_table(16:18)
+```
+
+```{r, echo = FALSE, fig.width = 7, fig.height = 4}
+ms_queue_cap_trans <- load_results(16:18) %>%
+  filter(task_count <= 800000) %>%
+  inner_join(mutate(models[16:18,], model = paste0(row_number())), by = "model")
+
+ggplot(ms_queue_cap_trans, aes(x = task_count, group = factor(model))) +
+  geom_line(aes(y = mean_wait_time, color = factor(model))) +
+  task_count_scale +
+  scale_color_discrete(labels = models[16:18,]$queue_capacity) +
+  labs(x = "Число заявок", y = "Среднее время ожидания", color = "Емк. накопителя")
+```
+
+График 9. Зависимость среднего времени ожидания от емкости накопителя ($\rho \approx 0.5$)
+
+### 3.2. Среднее время ожидания и вероятность потери
+
+Таблица 9. Исследуемые варианты
 
 ```{r, echo = FALSE}
 models_table(c(16, 24))
@@ -250,7 +274,7 @@ ms_queue_cap05 <- ms_queue_cap %>%
 queue_cap_mwt_lp_plot(ms_queue_cap05)
 ```
 
-График 9. Нормированный график зависимости среднего времени ожидания и вероятности потери от емкости накопителя при утилизации = 0.5
+График 10. Нормированный график зависимости среднего времени ожидания и вероятности потери от емкости накопителя ($\rho \approx 0.5$)
 
 ```{r, echo = FALSE, fig.width = 7, fig.height = 4}
 ms_queue_cap09 <- ms_queue_cap %>%
@@ -260,11 +284,11 @@ ms_queue_cap09 <- ms_queue_cap %>%
 queue_cap_mwt_lp_plot(ms_queue_cap09)
 ```
 
-График 10. Нормированный график зависимости среднего времени ожидания и вероятности потери от емкости накопителя при утилизации = 0.9
+График 11. Нормированный график зависимости среднего времени ожидания и вероятности потери от емкости накопителя ($\rho \approx 0.9$)
 
 ## 4. Исследование влияния количества приборов на среднее время ожидания и вероятность потери
 
-Таблица 9. Исследуемые варианты
+Таблица 10. Исследуемые варианты
 
 ```{r, echo = FALSE}
 models_table(35:43)
@@ -281,7 +305,7 @@ ggplot(ms_num_servers, aes(x = task_count, group = factor(model))) +
   labs(x = "Число заявок", y = "Среднее время ожидания", color = "Кол-во приборов")
 ```
 
-График 11. График зависимости среднего времени ожидания от числа заявок для количества приборов от 1 до 3 и утилизации = 0.5
+График 12. График зависимости среднего времени ожидания от числа заявок для количества приборов от 1 до 3 ($\rho \approx 0.5$)
 
 ```{r, echo = FALSE, fig.width = 7, fig.height = 4}
 ms_util_num_servers <- load_results(35:43) %>%
@@ -295,9 +319,13 @@ ggplot(ms_util_num_servers, aes(x = num_servers, group = factor(util))) +
   labs(x = "Количество приборов", y = "Среднее время ожидания", color = "Загрузка")
 ```
 
+График 13. График зависимости среднего времени ожидания от числа приборов
+
 ```{r, echo = FALSE, fig.width = 7, fig.height = 4}
 ggplot(ms_util_num_servers, aes(x = num_servers, group = factor(util))) +
   geom_line(aes(y = loss_probability, color = factor(util))) +
   scale_x_continuous(breaks = scales::pretty_breaks(n = 3)) +
   labs(x = "Количество приборов", y = "Вероятность потери", color = "Загрузка")
 ```
+
+График 14. График зависимости вероятности потери от числа приборов
