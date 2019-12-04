@@ -104,11 +104,11 @@ models = [
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 60)),
 
     # exponential arrival distributions
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 9.85), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 9.85), service_dist=DExp(1 / 10)),
     # traced arrival distribution
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DTrace(), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DTrace(), service_dist=DExp(1 / 10)),
     # approximated (hyperexponential) arrival distribution
-    Model(num_servers=2, queue_capacity=10, arrival_dist=DHypoexp2(1 / 8.55, 1 / 1.3), service_dist=DExp(1 / 30)),
+    Model(num_servers=2, queue_capacity=10, arrival_dist=DHypoexp2(1 / 8.55, 1 / 1.3), service_dist=DExp(1 / 10)),
 
     # exponential service distribution
     Model(num_servers=2, queue_capacity=10, arrival_dist=DExp(1 / 30), service_dist=DExp(1 / 30)),
