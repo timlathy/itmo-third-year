@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="278pt"
+   height="200pt"
+   viewBox="0.00 0.00 278.00 200.38"
+   version="1.1"
+   id="svg197"
+   sodipodi:docname="mealy.svg"
+   inkscape:version="1.0beta2 (unknown)">
+  <metadata
+     id="metadata203">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs201" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     inkscape:document-rotation="0"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     id="namedview199"
+     showgrid="false"
+     inkscape:zoom="2.115"
+     inkscape:cx="98.357985"
+     inkscape:cy="127.66722"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="edge14" />
+  <g
+     id="graph0"
+     class="graph"
+     transform="scale(1 1) rotate(0) translate(4 189.9396)">
+    <title
+       id="title2">g</title>
+    <polygon
+       fill="#ffffff"
+       stroke="transparent"
+       points="-4,-189.9396 274,-189.9396 274,10.4358 -4,10.4358 "
+       id="polygon4"
+       transform="translate(3.7013345,0.86808576)" />
+    <g
+       id="clust1"
+       class="cluster">
+      <title
+         id="title6">cluster_a1</title>
+    </g>
+    <g
+       id="clust2"
+       class="cluster">
+      <title
+         id="title9">cluster_a2</title>
+    </g>
+    <g
+       id="clust3"
+       class="cluster">
+      <title
+         id="title12">cluster_a3</title>
+    </g>
+    <g
+       id="clust4"
+       class="cluster">
+      <title
+         id="title15">cluster_a4</title>
+    </g>
+    <g
+       id="clust5"
+       class="cluster">
+      <title
+         id="title18">cluster_a5</title>
+    </g>
+    <!-- b1 -->
+    <g
+       id="node1"
+       class="node">
+      <title
+         id="title21">b1</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="31.9505"
+         cy="-149.596"
+         rx="20.8887"
+         ry="20.8887"
+         id="ellipse23" />
+      <text
+         text-anchor="middle"
+         x="31.9505"
+         y="-145.396"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text25">b1</text>
+    </g>
+    <!-- b1&#45;&gt;b1 -->
+    <g
+       id="edge1"
+       class="edge">
+      <title
+         id="title28">b1-&gt;b1</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="M51.8591,-156.1466C61.7877,-157.053 70.644,-154.8695 70.644,-149.596 70.644,-146.3001 67.1845,-144.2112 62.1659,-143.3293"
+         id="path30" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="61.9517,-139.8222 51.8591,-143.0454 61.7589,-146.8195 61.9517,-139.8222"
+         id="polygon32" />
+      <text
+         text-anchor="start"
+         x="52.0916"
+         y="-160.3673"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text34">z1w1</text>
+    </g>
+    <!-- b7 -->
+    <g
+       id="node7"
+       class="node">
+      <title
+         id="title37">b7</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="28.9055"
+         cy="-28.2763"
+         rx="20.8887"
+         ry="20.8887"
+         id="ellipse39" />
+      <text
+         text-anchor="middle"
+         x="28.9055"
+         y="-24.0763"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text41">b7</text>
+    </g>
+    <!-- b1&#45;&gt;b7 -->
+    <g
+       id="edge14"
+       class="edge">
+      <title
+         id="title44">b1-&gt;b7</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="M31.4271,-128.7404C30.9477,-109.6439 30.2319,-81.1243 29.6853,-59.3451"
+         id="path46" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="33.1822,-59.1748 29.4323,-49.2658 26.1844,-59.3505 33.1822,-59.1748"
+         id="polygon48" />
+      <text
+         text-anchor="start"
+         x="-0.1304671"
+         y="-105.42966"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text50">z2w2</text>
+    </g>
+    <!-- b2 -->
+    <g
+       id="node2"
+       class="node">
+      <title
+         id="title53">b2</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="188.5533"
+         cy="-146.8462"
+         rx="20.8887"
+         ry="20.8887"
+         id="ellipse55" />
+      <text
+         text-anchor="middle"
+         x="188.5533"
+         y="-142.6462"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text57">b2</text>
+    </g>
+    <!-- b4 -->
+    <g
+       id="node4"
+       class="node">
+      <title
+         id="title60">b4</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="192.8797"
+         cy="-30.1436"
+         rx="20.8887"
+         ry="20.8887"
+         id="ellipse62" />
+      <text
+         text-anchor="middle"
+         x="192.8797"
+         y="-25.9436"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text64">b4</text>
+    </g>
+    <!-- b2&#45;&gt;b4 -->
+    <g
+       id="edge5"
+       class="edge"
+       transform="translate(-7.5338187,-0.3858159)">
+      <title
+         id="title67">b2-&gt;b4</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="m 189.12764,-126.61911 c -3.33871,11.68006 -10.32654,43.616263 -1.62688,71.243848"
+         id="path69"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="195.24,-60.9499 192.113,-50.827 188.2448,-60.6905 "
+         id="polygon71"
+         transform="rotate(-19.887663,195.08594,-45.634942)" />
+      <text
+         text-anchor="start"
+         x="170.51167"
+         y="-103.32632"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text73">z2w2</text>
+    </g>
+    <!-- b6 -->
+    <g
+       id="node6"
+       class="node">
+      <title
+         id="title76">b6</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="78.7042"
+         cy="-32.1921"
+         rx="20.8887"
+         ry="20.8887"
+         id="ellipse78" />
+      <text
+         text-anchor="middle"
+         x="78.7042"
+         y="-27.9921"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text80">b6</text>
+    </g>
+    <!-- b2&#45;&gt;b6 -->
+    <g
+       id="edge12"
+       class="edge">
+      <title
+         id="title83">b2-&gt;b6</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="m 175.19233,-130.92596 c -31.25427,28.00343 -70.89148,65.949557 -77.597021,73.507547"
+         id="path85"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="102.514,-51.9843 93.0686,-47.1848 97.4595,-56.827 "
+         id="polygon87"
+         transform="rotate(0.12251101,1618.1863,-884.36599)" />
+      <text
+         text-anchor="start"
+         x="141.46217"
+         y="-126.61079"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text89">z1w1</text>
+    </g>
+    <!-- b3 -->
+    <g
+       id="node3"
+       class="node">
+      <title
+         id="title92">b3</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="241.5621"
+         cy="-151.0792"
+         rx="20.8887"
+         ry="20.8887"
+         id="ellipse94" />
+      <text
+         text-anchor="middle"
+         x="241.5621"
+         y="-146.8792"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text96">b3</text>
+    </g>
+    <!-- b3&#45;&gt;b4 -->
+    <g
+       id="edge6"
+       class="edge"
+       transform="translate(5.694254,1.924916)">
+      <title
+         id="title99">b3-&gt;b4</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="m 244.94016,-133.64588 c 0.0995,20.22916 -9.72648,59.416715 -37.78909,80.533082"
+         id="path101"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="207.6631,-57.4953 200.682,-49.5257 201.1695,-60.1094 "
+         id="polygon103"
+         transform="rotate(26.181575,199.31663,-46.758205)" />
+      <text
+         text-anchor="start"
+         x="229.16904"
+         y="-109.50783"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text105">z2w2</text>
+    </g>
+    <!-- b3&#45;&gt;b6 -->
+    <g
+       id="edge13"
+       class="edge">
+      <title
+         id="title108">b3-&gt;b6</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="m 227.61544,-135.47737 c -8.32071,48.021523 -120.1091,85.089128 -122.84078,85.878047"
+         id="path110"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="101.6852,-53.3018 105.8125,-47.648 95.672,-44.5787 "
+         id="polygon112"
+         transform="rotate(16.741696,103.04923,-48.314736)" />
+      <text
+         text-anchor="start"
+         x="210.21774"
+         y="-118.9128"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text114">z1w1</text>
+    </g>
+    <!-- b4&#45;&gt;b2 -->
+    <g
+       id="edge3"
+       class="edge"
+       transform="translate(6.600505,0.14641574)">
+      <title
+         id="title117">b4-&gt;b2</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="m 193.67524,-50.24162 c 6.4833,-17.638098 9.98127,-44.341078 -2.01696,-70.63251"
+         id="path119"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="193.1882,-116.2993 186.193,-116.0399 189.3201,-126.1627 "
+         id="polygon121"
+         transform="rotate(-14.710213,191.10176,-129.52552)" />
+      <text
+         text-anchor="start"
+         x="186.4631"
+         y="-72.991226"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text123">z1w1</text>
+    </g>
+    <!-- b4&#45;&gt;b4 -->
+    <g
+       id="edge7"
+       class="edge">
+      <title
+         id="title126">b4-&gt;b4</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="M212.7883,-36.6942C222.717,-37.6005 231.5732,-35.417 231.5732,-30.1436 231.5732,-26.8477 228.1137,-24.7588 223.0951,-23.8768"
+         id="path128" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="222.8809,-20.3697 212.7883,-23.593 222.6881,-27.3671 222.8809,-20.3697"
+         id="polygon130" />
+      <text
+         text-anchor="start"
+         x="219.65462"
+         y="-39.220261"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text132">z2w2</text>
+    </g>
+    <!-- b5 -->
+    <g
+       id="node5"
+       class="node">
+      <title
+         id="title135">b5</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="123.4981"
+         cy="-145.9907"
+         rx="20.8887"
+         ry="20.8887"
+         id="ellipse137" />
+      <text
+         text-anchor="middle"
+         x="123.4981"
+         y="-141.7907"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text139">b5</text>
+    </g>
+    <!-- b5&#45;&gt;b1 -->
+    <g
+       id="edge2"
+       class="edge">
+      <title
+         id="title142">b5-&gt;b1</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="M102.7245,-146.8088C90.9025,-147.2744 75.8712,-147.8663 62.7045,-148.3849"
+         id="path144" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="62.4964,-144.8903 52.6419,-148.7812 62.7719,-151.8848 62.4964,-144.8903"
+         id="polygon146" />
+      <text
+         text-anchor="start"
+         x="69.8065"
+         y="-135.2067"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text148">z1w1</text>
+    </g>
+    <!-- b5&#45;&gt;b3 -->
+    <g
+       id="edge4"
+       class="edge">
+      <title
+         id="title151">b5-&gt;b3</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="M141.6471,-156.1348C154.3476,-162.3017 171.9318,-169.0191 188.452,-169.1394 196.806,-169.2003 205.5247,-167.1925 213.4256,-164.4956"
+         id="path153" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="214.8516,-167.6966 222.9072,-160.8149 212.3183,-161.1711 214.8516,-167.6966"
+         id="polygon155" />
+      <text
+         text-anchor="start"
+         x="158.1552"
+         y="-173.3396"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text157">z2w2</text>
+    </g>
+    <!-- b6&#45;&gt;b4 -->
+    <g
+       id="edge8"
+       class="edge">
+      <title
+         id="title160">b6-&gt;b4</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="M99.6458,-31.8164C117.1083,-31.5031 142.2362,-31.0522 162.0063,-30.6975"
+         id="path162" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="162.1354,-34.1959 172.071,-30.5169 162.0097,-27.197 162.1354,-34.1959"
+         id="polygon164" />
+      <text
+         text-anchor="start"
+         x="105.2957"
+         y="-35.371"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text166">z1w2</text>
+    </g>
+    <!-- b6&#45;&gt;b5 -->
+    <g
+       id="edge10"
+       class="edge">
+      <title
+         id="title169">b6-&gt;b5</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="M86.3029,-51.4965C93.3816,-69.4799 104.03,-96.5322 112.1219,-117.0897"
+         id="path171" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="108.9426,-118.5685 115.8621,-126.5916 115.4561,-116.0046 108.9426,-118.5685"
+         id="polygon173" />
+      <text
+         text-anchor="start"
+         x="90.401283"
+         y="-90.888557"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text175">z2w2</text>
+    </g>
+    <!-- b7&#45;&gt;b4 -->
+    <g
+       id="edge9"
+       class="edge">
+      <title
+         id="title178">b7-&gt;b4</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="M47.7429,-18.6518C56.8337,-14.7115 68.0568,-10.8491 78.7046,-9.8987 107.7433,-7.3068 140.4659,-14.1262 163.4113,-20.5383"
+         id="path180" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="162.6363,-23.9585 173.2175,-23.4205 164.6103,-17.2426 162.6363,-23.9585"
+         id="polygon182" />
+      <text
+         text-anchor="start"
+         x="81.195"
+         y="2.2358"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text184">z1w2</text>
+    </g>
+    <!-- b7&#45;&gt;b5 -->
+    <g
+       id="edge11"
+       class="edge">
+      <title
+         id="title187">b7-&gt;b5</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="M42.0582,-44.644C58.1537,-64.6739 85.5456,-98.7613 104.0706,-121.8145"
+         id="path189" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="101.4648,-124.1593 110.4571,-129.762 106.9214,-119.7745 101.4648,-124.1593"
+         id="polygon191" />
+      <text
+         text-anchor="start"
+         x="36.240681"
+         y="-73.968544"
+         font-family="Times,serif"
+         font-size="14.00"
+         fill="#000000"
+         id="text193">z2w2</text>
+    </g>
+  </g>
+</svg>
