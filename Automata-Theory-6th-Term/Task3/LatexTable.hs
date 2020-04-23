@@ -22,6 +22,7 @@ render h env cols rows =
             | env == MathCells = "$" ++ c ++ "$"
             | otherwise        = c
 
-prependRowHeader :: [a] -> [[a]] -> [[a]]
+prependRowHeader :: Monoid a => [a] -> [[a]] -> [[a]]
 prependRowHeader (h:hs) (cs:css) = (h:cs) : prependRowHeader hs css
+prependRowHeader [] (cs:css) = (mempty:cs) : prependRowHeader [] css
 prependRowHeader _ _ = []
