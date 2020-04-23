@@ -124,4 +124,24 @@ D_2 & = \bar{x_1}\bar{x_2}Q_1\bar{Q_2}Q_3 \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\ba
 D_3 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}Q_2Q_3 \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}Q_2Q_3 \lor \bar{x_1}x_2Q_1\bar{Q_2}\bar{Q_3} \lor \\ & \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}\bar{Q_1}Q_2Q_3 \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} = \\ & = 0 \lor 3 \lor 4 \lor 8 \lor 11 \lor 12 \lor 16 \lor 19 \lor 20
 \end{align*}
 
+\section*{Синтез автомата на T-триггерах}
+
+С учетом закона функционирования T-триггера построим таблицу
+сигналов функций возбуждения:
+
+\begin{tabular}{|*{7}{c|}}
+\hline
+$x_1x_2/Q_1Q_2Q_3$ & 000 & 001 & 010 & 011 & 100 & 101\\\hline
+00 & 001 & 001 & 110 & 110 & 101 & 111\\\hline
+01 & 011 & 011 & 010 & 000 & 001 & 001\\\hline
+10 & 101 & 101 & 000 & 010 & 111 & 101\\\hline
+11 & $T_1T_2T_3$ & $T_1T_2T_3$ & $T_1T_2T_3$ & $T_1T_2T_3$ & $T_1T_2T_3$ & $T_1T_2T_3$\\\hline
+\end{tabular}
+
+\begin{align*}
+T_1 & = \bar{x_1}\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}Q_2Q_3 \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}Q_3 \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 \lor \\ & \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}Q_3 = \\ & = 2 \lor 3 \lor 4 \lor 5 \lor 16 \lor 17 \lor 20 \lor 21 \\
+T_2 & = \bar{x_1}\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}Q_2Q_3 \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}Q_3 \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}x_2\bar{Q_1}Q_2\bar{Q_3} \lor \\ & \lor x_1\bar{x_2}\bar{Q_1}Q_2Q_3 \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3}   = \\ & = 2 \lor 3 \lor 5 \lor 8 \lor 9 \lor 10 \lor 19 \lor 20 \\
+T_3 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}Q_3 \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}Q_3 \lor \\ & \lor \bar{x_1}x_2Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2Q_1\bar{Q_2}Q_3 \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}Q_3 = \\ & = 0 \lor 1 \lor 4 \lor 5 \lor 8 \lor 9 \lor 12 \lor 13 \lor 16 \lor 17 \lor 20 \lor 21
+\end{align*}
+
 \end{document}
