@@ -99,7 +99,29 @@ $x_1x_2/Q_1Q_2Q_3$ & 000 & 001 & 010 & 011 & 100 & 101\\\hline
 
 По таблице выходов построим ДНФ для каждого выходного сигнала:
 
-$$y_1 = \bar{x_1}\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}Q_2Q_3 \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}x_2Q_1\bar{Q_2}Q_3 \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3}$$
-$$y_2 = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}Q_2Q_3 \lor x_1\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}Q_3$$
+\begin{align*}
+y_1 & = \bar{x_1}\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}Q_2Q_3 \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}x_2Q_1\bar{Q_2}Q_3 \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} = \\ & = 2 \lor 3 \lor 9 \lor 13 \lor 16 \lor 20 \\
+y_2 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}Q_2Q_3 \lor x_1\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}Q_3 = \\ & = 1 \lor 4 \lor 8 \lor 11 \lor 18 \lor 21
+\end{align*}
+
+\section*{Синтез автомата на D-триггерах}
+
+С учетом закона функционирования D-триггера построим таблицу
+сигналов функций возбуждения:
+
+\begin{tabular}{|*{7}{c|}}
+\hline
+$x_1x_2/Q_1Q_2Q_3$ & 000 & 001 & 010 & 011 & 100 & 101\\\hline
+00 & 001 & 000 & 100 & 101 & 001 & 010\\\hline
+01 & 011 & 010 & 000 & 011 & 101 & 100\\\hline
+10 & 101 & 100 & 010 & 001 & 011 & 000\\\hline
+11 & $D_1D_2D_3$ & $D_1D_2D_3$ & $D_1D_2D_3$ & $D_1D_2D_3$ & $D_1D_2D_3$ & $D_1D_2D_3$\\\hline
+\end{tabular}
+
+\begin{align*}
+D_1 & = \bar{x_1}\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}Q_2Q_3 \lor \bar{x_1}x_2Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2Q_1\bar{Q_2}Q_3 \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 = \\ & = 2 \lor 3 \lor 12 \lor 13 \lor 16 \lor 17 \\
+D_2 & = \bar{x_1}\bar{x_2}Q_1\bar{Q_2}Q_3 \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}x_2\bar{Q_1}Q_2Q_3 \lor x_1\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3}       = \\ & = 5 \lor 8 \lor 9 \lor 11 \lor 18 \lor 20 \\
+D_3 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}Q_2Q_3 \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}Q_2Q_3 \lor \bar{x_1}x_2Q_1\bar{Q_2}\bar{Q_3} \lor \\ & \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}\bar{Q_1}Q_2Q_3 \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} = \\ & = 0 \lor 3 \lor 4 \lor 8 \lor 11 \lor 12 \lor 16 \lor 19 \lor 20
+\end{align*}
 
 \end{document}
