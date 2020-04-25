@@ -35,3 +35,22 @@ emptyTerm :: BoolTerm -> Bool
 emptyTerm (And []) = True
 emptyTerm (Or []) = True
 emptyTerm _ = False
+
+-- eval :: X encoded -> Q encoded -> term -> 0/1
+eval :: [Int] -> [Int] -> BoolTerm -> Int
+eval xs _  (X i)    = xs !! (i - 1)
+eval _  qs (Q i)    = qs !! (i - 1)
+eval xs qs (Not t)  = bitFlip $ eval xs qs t
+    where
+        bitFlip 1 = 0
+        bitFlip 0 = 1
+eval xs qs (And ts) = bitAnd $ eval xs qs <$> ts
+    where
+        bitAnd (0:_)  = 0
+        bitAnd (1:[]) = 1
+        bitAnd (1:bs) = bitAnd bs
+eval xs qs (Or ts)  = bitOr $ eval xs qs <$> ts
+    where
+        bitOr (1:_)  = 1
+        bitOr (0:[]) = 0
+        bitOr (0:bs) = bitOr bs
