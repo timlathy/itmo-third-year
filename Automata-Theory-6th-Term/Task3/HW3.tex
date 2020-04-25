@@ -168,4 +168,27 @@ R_3 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}\bar{x_2}Q_1\bar{Q
 S_3 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2Q_1\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} = \\ & = 0 \lor 4 \lor 8 \lor 12 \lor 16 \lor 20
 \end{align*}
 
+\section*{Синтез автомата на JK-триггерах}
+
+С учетом закона функционирования JK-триггера построим таблицу
+сигналов функций возбуждения:
+
+\begin{tabular}{|c|*{6}{>{\centering\arraybackslash}p{2cm}|}}
+\hline
+$x_1x_2/Q_1Q_2Q_3$ & 000 & 001 & 010 & 011 & 100 & 101\\\hline
+00 & 0-/0-/1- & 0-/0-/-1 & 1-/-1/0- & 1-/-1/-0 & -1/0-/1- & -1/1-/-1\\\hline
+01 & 0-/1-/1- & 0-/1-/-1 & 0-/-1/0- & 0-/-0/-0 & -0/0-/1- & -0/0-/-1\\\hline
+10 & 1-/0-/1- & 1-/0-/-1 & 0-/-0/0- & 0-/-1/-0 & -1/1-/1- & -1/0-/-1\\\hline
+ & $J_1K_1$/ $J_2K_2$/ $J_3K_3$ & $J_1K_1$/ $J_2K_2$/ $J_3K_3$ & $J_1K_1$/ $J_2K_2$/ $J_3K_3$ & $J_1K_1$/ $J_2K_2$/ $J_3K_3$ & $J_1K_1$/ $J_2K_2$/ $J_3K_3$ & $J_1K_1$/ $J_2K_2$/ $J_3K_3$\\\hline
+\end{tabular}
+
+\begin{align*}
+J_1 & = \bar{x_1}\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}Q_2Q_3 \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 = 2 \lor 3 \lor 16 \lor 17 \\
+K_1 & = \bar{x_1}\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}Q_3 \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}Q_3 = 4 \lor 5 \lor 20 \lor 21 \\
+J_2 & = \bar{x_1}\bar{x_2}Q_1\bar{Q_2}Q_3 \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}Q_3 \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} = 5 \lor 8 \lor 9 \lor 20 \\
+K_2 & = \bar{x_1}\bar{x_2}\bar{Q_1}Q_2\bar{Q_3} \lor \bar{x_1}\bar{x_2}\bar{Q_1}Q_2Q_3 \lor \bar{x_1}x_2\bar{Q_1}Q_2\bar{Q_3} \lor x_1\bar{x_2}\bar{Q_1}Q_2Q_3 = 2 \lor 3 \lor 10 \lor 19 \\
+J_3 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}x_2Q_1\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor x_1\bar{x_2}Q_1\bar{Q_2}\bar{Q_3} = \\ & = 0 \lor 4 \lor 8 \lor 12 \lor 16 \lor 20 \\
+K_3 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}\bar{x_2}Q_1\bar{Q_2}Q_3 \lor \bar{x_1}x_2\bar{Q_1}\bar{Q_2}Q_3 \lor \bar{x_1}x_2Q_1\bar{Q_2}Q_3 \lor x_1\bar{x_2}\bar{Q_1}\bar{Q_2}Q_3 \lor x_1\bar{x_2}Q_1\bar{Q_2}Q_3 = \\ & = 1 \lor 5 \lor 9 \lor 13 \lor 17 \lor 21
+\end{align*}
+
 \end{document}
