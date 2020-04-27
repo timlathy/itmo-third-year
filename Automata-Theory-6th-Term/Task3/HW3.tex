@@ -1,5 +1,6 @@
 \documentclass[listings]{labreport}
 \usepackage{amsmath}
+\usepackage{geometry}
 \usepackage{array}
 \subject{Теория автоматов}
 \titleparts{Практическое задание №3}{Вариант 8}
@@ -140,7 +141,10 @@ D_3 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}\ba
 \subsection*{Функциональная схема}
 
 \newpage
-\includegraphics[width=0.42\textwidth]{sdffcircuit.pdf}
+\newgeometry{top=1cm, bottom=1cm, left=1cm, right=1cm}
+\thispagestyle{empty}
+\includegraphics[width=0.44\textwidth]{sdffcircuit.pdf}
+\restoregeometry
 
 \subsection*{Проверка}
 
@@ -177,6 +181,12 @@ T_3 & = \bar{x_1}\bar{x_2}\bar{Q_1}\bar{Q_2}\bar{Q_3} \lor \bar{x_1}\bar{x_2}\ba
 \end{align*}
 
 \subsection*{Функциональная схема}
+
+\newpage
+\newgeometry{top=1cm, bottom=1cm, left=1cm, right=1cm}
+\thispagestyle{empty}
+\includegraphics[width=0.41\textwidth]{stffcircuit.pdf}
+\restoregeometry
 
 \subsection*{Проверка}
 
