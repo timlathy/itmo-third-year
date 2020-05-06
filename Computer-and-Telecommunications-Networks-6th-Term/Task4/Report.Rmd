@@ -229,7 +229,7 @@ sysctl -w net.ipv4.conf.eth1.rp_filter=0
 sysctl -w net.ipv4.conf.eth2.rp_filter=0
 ```
 
-На компьютере #2 осуществляем перенаправление трафика и замену IP-адресов
+На компьютере #2 настроим перенаправление трафика и замену IP-адресов
 получателя и отправителя с помощью правил `DNAT` и `SNAT` соответственно:
 ```
 ip link set eth0 up
@@ -258,7 +258,7 @@ sysctl -w net.ipv4.conf.eth0.rp_filter=0
 sysctl -w net.ipv4.conf.eth1.rp_filter=0
 ```
 
-На компьютере #1 осуществляем перенаправление трафика:
+На компьютере #1 настроим перенаправление трафика:
 ```
 ip link set eth0 up
 ip link set eth1 up
@@ -282,3 +282,8 @@ sysctl -w net.ipv4.conf.all.rp_filter=0
 sysctl -w net.ipv4.conf.eth0.rp_filter=0
 sysctl -w net.ipv4.conf.eth1.rp_filter=0
 ```
+
+Убедимся в правильном прохождении пакетов, отправив один запрос с помощью `ping -c 1 7.7.0.1`
+и проверив число пакетов, соответствующих всем `mangle` правилам, отвечающим за маркировку пакета:
+
+![Рис. 5. Демонстрация работы вариативной части](v1-demo.png)
